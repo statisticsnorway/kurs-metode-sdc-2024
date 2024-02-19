@@ -22,4 +22,10 @@ SuppressSmallCounts(data = social,
                     maxN = 20)
 # The result should be a dataset with 15 rows.
 
+# check whether the SmallCountRounding package works
+library(SmallCountRounding)
+
+# the following should produe a dataset with 15 rows.
+PLSroundingPublish(data = social,
+            dimVar = c("county", "main_income"))
 
