@@ -1,38 +1,25 @@
 
-# Sjekking av at GaussSuppression-pakka virker
+# Check whether the GaussSuppression package works
 
-# Denne koden over bør virke uten feil.
+# This code should run without errors.
 library(GaussSuppression)
 dataset <- SSBtoolsData("sprt_emp_withEU")
 SuppressSmallCounts(data = dataset, 
                     dimVar = c("age", "geo"), 
                     maxN = 3)
-# Et datasett med 12 resultatrader skal skrives ut 
+# The result should be a dataset with 12 rows. 
 
 
 
 
-# Sjekking av at data kan hentes fra GitHub 
+# Check that the data can be loaded
+# For example: 
+load("data/social.RData")
 
-
-# Du bør klare å laste ned fila sosial.RData
-# som ligger i data-mappen i repoet 
-# https://github.com/statisticsnorway/kurs-metode-konfidensialitet-frekvens
-
-
-# Når fila er lagret kan den leses inn i R med load. 
-
-# Hvis fila er på "working directory":
-load("sosial.RData")
-
-# Ellers skrives filstien  (bruk / ikke \)
-# F.eks: 
-load("data/sosial.RData")
-
-# Nå skal det gå an å kjøre denne koden:  
-SuppressSmallCounts(data = sosial, 
-                    dimVar = c("fylkesnavn", "hovedint"), 
+# Now you should be able to run the following code:  
+SuppressSmallCounts(data = social, 
+                    dimVar = c("county", "main_income"), 
                     maxN = 20)
-# Et datasett med 15 resultatrader skal skrives ut 
+# The result should be a dataset with 15 rows.
 
 
