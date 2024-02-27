@@ -1,4 +1,5 @@
 
+
 library(SSBtools)
 library(GaussSuppression)
 
@@ -31,7 +32,9 @@ BuildTable(data = tourism, dimVar = NULL)
 # the torism data set. Which is better suited, dimVar or formula?
 
 # replace either formula = NULL or dimVar = NULL
-BuildTable(data = tourism, formula = NULL, dimVar = NULL)
+BuildTable(data = tourism,
+           formula = NULL,
+           dimVar = NULL)
 
 
 # Oppgave 3 ---------------------------------------------------------------
@@ -51,7 +54,7 @@ BuildTable(data = tourism, formula = NULL)
 # cells should be consistent across tables, and tables should not be able
 # to be used to disclose suppressed cells in other tables.
 
-# In the following exercises we will practice defining multiple tables at the 
+# In the following exercises we will practice defining multiple tables at the
 # same time using the interface used in GaussSuppression.
 
 
@@ -67,7 +70,7 @@ BuildTable(data = tourism, formula = NULL)
 # BuildTables to check your solutions.
 
 # replace NULL with suitable formulas
-f1 <- NULL 
+f1 <- NULL
 f2 <- NULL
 
 BuildTable(data = tourism, formula = f1)
@@ -85,14 +88,13 @@ linked1 <-
 ## 4c.
 # The package SSBtools contains a useful function called FormulaSelection. This
 # can be very helpful when defining multiple tables using a single model formula.
-# It allows us to extract subtables generated via formula. The syntax is 
+# It allows us to extract subtables generated via formula. The syntax is
 # FormulaSelection(data.frame, formula)
 
 # Use FormulaSelection to retrieve the two tables defined in 4a using the linked
 # table defined in 4b.
 
-
 # Exercise 5 ---------------------------------------------------------------
 
-# Experiment using the formula interface. Feel free to use the  `social` eller `pregnant` 
+# Experiment using the formula interface. Feel free to use the  `social` eller `pregnant`
 # data sets to see how it operates with aggregated data, or magnitude tables.
