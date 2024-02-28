@@ -1,7 +1,8 @@
 library(SSBtools)
 library(GaussSuppression)
 
-
+# load data. You might have to change the path in load(...) based on your
+# working directory
 load("data/social.RData")
 load("data/tourism.RData")
 load("data/overnights.RData")
@@ -50,11 +51,23 @@ BuildTable(data = tourism,
 
 
 
-# Exercise 3 ---------------------------------------------------------------
+# Exercise 3a ---------------------------------------------------------------
 
 # Use dimVar to create a two way magnitude table over the overnights data set.
 # The spanning variables should be county and type2, and the response variable
 # (the numerical variable to be summed up per cell) should be revenue.
+
+# replace dimVar = NULL and numVar = NULL
+BuildTable(data = overnights,
+           dimVar = NULL,
+           numVar = NULL)
+
+# Exercise 3a ---------------------------------------------------------------
+
+# Use dimVar to create a two way magnitude table over the overnights data set.
+# The spanning variables should be county and type2, and the response variables
+# (the numerical variable to be summed up per cell) should be revenue and 
+# overnights.
 
 # replace dimVar = NULL and numVar = NULL
 BuildTable(data = overnights,

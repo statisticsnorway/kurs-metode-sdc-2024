@@ -11,6 +11,7 @@ library(GaussSuppression)
 load("data/tourism")
 load("data/social.RData")
 load("data/pregnant.RData")
+load("data/pregnant_micro.RData")
 
 
 # Exercise 0 ---------------------------------------------------------------
@@ -20,24 +21,24 @@ load("data/pregnant.RData")
 # Exercise 1 ---------------------------------------------------------------
 
 ## 1a.
-#  Based on the pregnant data set, create a complete two-way frequency table
+#  Based on the pregnant_micro data set, create a complete two-way frequency table
 #  (that is, with all marginals) over the variables age and pregnant. Use the
 #  dimVar interface.
 #  Make sure that all cell values less than or equal to 3 are primary suppressed.
 
 # replace NULL and ... with relevant code
-SuppressSmallCounts(data = pregnant,
+SuppressSmallCounts(data = pregnant_micro,
                     dimVar = NULL,
                     ...)
 ## 1b.
-#  Based on the pregnant data set, create a complete two-way frequency table
+#  Based on the pregnant_micro data set, create a complete two-way frequency table
 #  (that is, with all marginals) over the variables age and pregnant. Use the
 #  dimVar interface.
 #  Make sure that all cell values greater than 0 and less than or equal to 3 are
 #  primary suppressed.
 
 # replace NULL og ... with relevant code
-SuppressSmallCounts(data = virus,
+SuppressSmallCounts(data = pregnant_micro,
                     dimVar = NULL,
                     ...)
 
@@ -76,7 +77,7 @@ SuppressSmallCounts(data = social,
 # Oppgave 3 ---------------------------------------------------------------
 
 ## 3a.
-#  Based on the social data set, create a complete two-way frequency table
+#  Based on the pregnant data set, create a complete two-way frequency table
 #  (that is, with all marginals) over age and pregnant. Use the formula interface.
 #  All cell values less than or equal to 3 should be primary suppressed. and save
 #  both the formula and the result in their own variables.
@@ -186,3 +187,27 @@ f43 <- NULL
 SuppressSmallCounts(data = tourism,
                     formula = f43,
                     ...)
+
+
+# Exercise 5 --------------------------------------------------------------
+# In this exercise, we will explore the differences between freqVar and numVar
+# when suppressing small counts.
+
+## 5a.
+#  Based on the pregnant data set, create a complete two-way frequency table
+#  (that is, with all marginals) over municipality and pregnant. All cell values less
+#  than or equal to 3 should be primary suppressed.
+
+# replace ... with suitable code
+SuppressSmallCounts(data = pregnant,
+                    freqVar = "freq",
+                    ...)
+
+# replace ... with suitable code
+SuppressSmallCounts(data = pregnant,
+                    numVar = "freq",
+                    ...)
+
+## 5b.
+#  Look at the output of both variants of 5a. What is the difference, what is
+#  happening?

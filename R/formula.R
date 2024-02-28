@@ -3,6 +3,8 @@
 library(SSBtools)
 library(GaussSuppression)
 
+# load data. You might have to change the path in load(...) based on your
+# working directory
 load("data/tourism.RData")
 BuildTable <- function(data, ...) {
   SuppressSmallCounts(data, ..., maxN = NULL, primary = FALSE)
@@ -96,5 +98,5 @@ linked1 <-
 
 # Exercise 5 ---------------------------------------------------------------
 
-# Experiment using the formula interface. Feel free to use the  `social` eller `pregnant`
+# Experiment using the formula interface. Feel free to use the  `social` or `pregnant`
 # data sets to see how it operates with aggregated data, or magnitude tables.
