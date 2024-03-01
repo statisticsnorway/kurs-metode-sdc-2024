@@ -16,7 +16,7 @@ load("data/sdc_cars.RData")
 
 # If you run the following code, you can use a Print function
 # This function might make  inspecting the output of GaussSuppression
-# easier by replacing FALSE with - in the suppressed and primary columns..
+# easier by replacing FALSE with - in the suppressed and primary columns.
 
 source("R/Print.R")
 
@@ -106,7 +106,7 @@ SuppressFewContributors(data = sdc_cars, ...)
 # replace NULL and ... with relevant code
 out1 <-
   SuppressDominantCells(
-    sdc_cars,
+    data = sdc_cars,
     numVar = NULL,
     formula = NULL,
     contributorVar =  NULL,
@@ -210,7 +210,7 @@ SuppressDominantCells(data = overnights1, ...)
 
 ## 4b
 # Create the same tables as in 4a, however the primary suppression should be as
-# followss:
+# follows:
 #  - the largest contribution is more than 60% of the cell value "revenue", or
 #  - the two largest contributions are more than 70% of the cell value "revenue".
 
@@ -227,11 +227,11 @@ SuppressDominantCells(data = overnights1, ...)
 
 # Create the same tables as before (see 4a), but make sure that both "overnights"
 # and "revenue" are summed up with a single function call.
-# Hint: numVar can consist of multiple variable names
+# Hint: numVar can include multiple variable names
 
 
 # replace  ... with relevant code
-SuppressDominantCells(overnights1, ...)
+SuppressDominantCells(data = overnights1, ...)
 
 
 
@@ -240,7 +240,7 @@ SuppressDominantCells(overnights1, ...)
 # as numerical variables in numVar. What happens?
 
 # erstatt  ... med mer kode
-SuppressDominantCells(overnights1, ...)
+SuppressDominantCells(data = overnights1, ...)
 
 
 
@@ -256,7 +256,7 @@ SuppressDominantCells(overnights1, ...)
 ## 5a
 # Repeat exercise 4, but remove contributorVar and add allDominance = TRUE.
 
-#  allDominance = TRUE ad more information to the output, but works best without
+#  allDominance = TRUE adds more information to the output, but works best without
 #  contributorVar.
 
 # What is the danger of not using contributorVar? 
@@ -293,7 +293,10 @@ SuppressDominantCells(overnights1, ...)
 #   pPercent = 10
 # )
 
+# Repeat some of the previous exercises, but use the p% rule instead of
+# the dominance rule.
+
 # Exercise 8 ---------------------------------------------------------------
 
-# Experiment! Feel free to use other data sets, and change parameters to see the
-# effects.
+# Experiment! Feel free to use other data sets, and change parameters to see how
+# this affects the suppression.
