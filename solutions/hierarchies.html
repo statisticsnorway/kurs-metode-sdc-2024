@@ -1,0 +1,862 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+
+<meta name="author" content />
+
+
+<title>Exercises about hierarchies, removeEmpty and removeCodes</title>
+
+<script>// Pandoc 2.9 adds attributes on both header and div. We remove the former (to
+// be compatible with the behavior of Pandoc < 2.8).
+document.addEventListener('DOMContentLoaded', function(e) {
+  var hs = document.querySelectorAll("div.section[class*='level'] > :first-child");
+  var i, h, a;
+  for (i = 0; i < hs.length; i++) {
+    h = hs[i];
+    if (!/^h[1-6]$/i.test(h.tagName)) continue;  // it should be a header h1-h6
+    a = h.attributes;
+    while (a.length > 0) h.removeAttribute(a[0].name);
+  }
+});
+</script>
+
+<style type="text/css">
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+span.underline{text-decoration: underline;}
+div.column{display: inline-block; vertical-align: top; width: 50%;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+</style>
+
+
+
+<style type="text/css">
+code {
+white-space: pre;
+}
+.sourceCode {
+overflow: visible;
+}
+</style>
+<style type="text/css" data-origin="pandoc">
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+{ counter-reset: source-line 0; }
+pre.numberSource code > span
+{ position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+{ content: counter(source-line);
+position: relative; left: -1em; text-align: right; vertical-align: baseline;
+border: none; display: inline-block;
+-webkit-touch-callout: none; -webkit-user-select: none;
+-khtml-user-select: none; -moz-user-select: none;
+-ms-user-select: none; user-select: none;
+padding: 0 4px; width: 4em;
+color: #aaaaaa;
+}
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa; padding-left: 4px; }
+div.sourceCode
+{ }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } 
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.at { color: #7d9029; } 
+code span.bn { color: #40a070; } 
+code span.bu { color: #008000; } 
+code span.cf { color: #007020; font-weight: bold; } 
+code span.ch { color: #4070a0; } 
+code span.cn { color: #880000; } 
+code span.co { color: #60a0b0; font-style: italic; } 
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.do { color: #ba2121; font-style: italic; } 
+code span.dt { color: #902000; } 
+code span.dv { color: #40a070; } 
+code span.er { color: #ff0000; font-weight: bold; } 
+code span.ex { } 
+code span.fl { color: #40a070; } 
+code span.fu { color: #06287e; } 
+code span.im { color: #008000; font-weight: bold; } 
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.kw { color: #007020; font-weight: bold; } 
+code span.op { color: #666666; } 
+code span.ot { color: #007020; } 
+code span.pp { color: #bc7a00; } 
+code span.sc { color: #4070a0; } 
+code span.ss { color: #bb6688; } 
+code span.st { color: #4070a0; } 
+code span.va { color: #19177c; } 
+code span.vs { color: #4070a0; } 
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } 
+</style>
+<script>
+// apply pandoc div.sourceCode style to pre.sourceCode instead
+(function() {
+  var sheets = document.styleSheets;
+  for (var i = 0; i < sheets.length; i++) {
+    if (sheets[i].ownerNode.dataset["origin"] !== "pandoc") continue;
+    try { var rules = sheets[i].cssRules; } catch (e) { continue; }
+    var j = 0;
+    while (j < rules.length) {
+      var rule = rules[j];
+      // check if there is a div.sourceCode rule
+      if (rule.type !== rule.STYLE_RULE || rule.selectorText !== "div.sourceCode") {
+        j++;
+        continue;
+      }
+      var style = rule.style.cssText;
+      // check if color or background-color is set
+      if (rule.style.color === '' && rule.style.backgroundColor === '') {
+        j++;
+        continue;
+      }
+      // replace div.sourceCode by a pre.sourceCode rule
+      sheets[i].deleteRule(j);
+      sheets[i].insertRule('pre.sourceCode{' + style + '}', j);
+    }
+  }
+})();
+</script>
+
+
+
+
+<style type="text/css">body {
+background-color: #fff;
+margin: 1em auto;
+max-width: 700px;
+overflow: visible;
+padding-left: 2em;
+padding-right: 2em;
+font-family: "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+font-size: 14px;
+line-height: 1.35;
+}
+#TOC {
+clear: both;
+margin: 0 0 10px 10px;
+padding: 4px;
+width: 400px;
+border: 1px solid #CCCCCC;
+border-radius: 5px;
+background-color: #f6f6f6;
+font-size: 13px;
+line-height: 1.3;
+}
+#TOC .toctitle {
+font-weight: bold;
+font-size: 15px;
+margin-left: 5px;
+}
+#TOC ul {
+padding-left: 40px;
+margin-left: -1.5em;
+margin-top: 5px;
+margin-bottom: 5px;
+}
+#TOC ul ul {
+margin-left: -2em;
+}
+#TOC li {
+line-height: 16px;
+}
+table {
+margin: 1em auto;
+border-width: 1px;
+border-color: #DDDDDD;
+border-style: outset;
+border-collapse: collapse;
+}
+table th {
+border-width: 2px;
+padding: 5px;
+border-style: inset;
+}
+table td {
+border-width: 1px;
+border-style: inset;
+line-height: 18px;
+padding: 5px 5px;
+}
+table, table th, table td {
+border-left-style: none;
+border-right-style: none;
+}
+table thead, table tr.even {
+background-color: #f7f7f7;
+}
+p {
+margin: 0.5em 0;
+}
+blockquote {
+background-color: #f6f6f6;
+padding: 0.25em 0.75em;
+}
+hr {
+border-style: solid;
+border: none;
+border-top: 1px solid #777;
+margin: 28px 0;
+}
+dl {
+margin-left: 0;
+}
+dl dd {
+margin-bottom: 13px;
+margin-left: 13px;
+}
+dl dt {
+font-weight: bold;
+}
+ul {
+margin-top: 0;
+}
+ul li {
+list-style: circle outside;
+}
+ul ul {
+margin-bottom: 0;
+}
+pre, code {
+background-color: #f7f7f7;
+border-radius: 3px;
+color: #333;
+white-space: pre-wrap; 
+}
+pre {
+border-radius: 3px;
+margin: 5px 0px 10px 0px;
+padding: 10px;
+}
+pre:not([class]) {
+background-color: #f7f7f7;
+}
+code {
+font-family: Consolas, Monaco, 'Courier New', monospace;
+font-size: 85%;
+}
+p > code, li > code {
+padding: 2px 0px;
+}
+div.figure {
+text-align: center;
+}
+img {
+background-color: #FFFFFF;
+padding: 2px;
+border: 1px solid #DDDDDD;
+border-radius: 3px;
+border: 1px solid #CCCCCC;
+margin: 0 5px;
+}
+h1 {
+margin-top: 0;
+font-size: 35px;
+line-height: 40px;
+}
+h2 {
+border-bottom: 4px solid #f7f7f7;
+padding-top: 10px;
+padding-bottom: 2px;
+font-size: 145%;
+}
+h3 {
+border-bottom: 2px solid #f7f7f7;
+padding-top: 10px;
+font-size: 120%;
+}
+h4 {
+border-bottom: 1px solid #f7f7f7;
+margin-left: 8px;
+font-size: 105%;
+}
+h5, h6 {
+border-bottom: 1px solid #ccc;
+font-size: 105%;
+}
+a {
+color: #0033dd;
+text-decoration: none;
+}
+a:hover {
+color: #6666ff; }
+a:visited {
+color: #800080; }
+a:visited:hover {
+color: #BB00BB; }
+a[href^="http:"] {
+text-decoration: underline; }
+a[href^="https:"] {
+text-decoration: underline; }
+
+code > span.kw { color: #555; font-weight: bold; } 
+code > span.dt { color: #902000; } 
+code > span.dv { color: #40a070; } 
+code > span.bn { color: #d14; } 
+code > span.fl { color: #d14; } 
+code > span.ch { color: #d14; } 
+code > span.st { color: #d14; } 
+code > span.co { color: #888888; font-style: italic; } 
+code > span.ot { color: #007020; } 
+code > span.al { color: #ff0000; font-weight: bold; } 
+code > span.fu { color: #900; font-weight: bold; } 
+code > span.er { color: #a61717; background-color: #e3d2d2; } 
+</style>
+
+
+
+
+</head>
+
+<body>
+
+
+
+
+<h1 class="title toc-ignore">Exercises about hierarchies, removeEmpty
+and removeCodes</h1>
+<h4 class="author"></h4>
+
+
+
+<p>If you run the following code, you can use a <code>Print</code>
+function This function might make inspecting the output of
+GaussSuppression easier by replacing FALSE with - in the suppressed and
+primary columns.</p>
+<p><code>source(&quot;/R/Print.R&quot;)</code></p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">source</span>(<span class="st">&quot;../R/Print.R&quot;</span>)</span></code></pre></div>
+<div id="exercise-1" class="section level3">
+<h3>Exercise 1</h3>
+<p>Load the dataset <code>sdc_cars</code> and take a look at it. Tip:
+<code>load(&quot;data/sdc_cars.RData&quot;)</code></p>
+<p>Run this analysis:</p>
+<pre><code>  SuppressDominantCells(sdc_cars, 
+                        n = 1:2, k = c(85, 95), 
+                        numVar = &quot;value&quot;, 
+                        dimVar = c(&quot;sector&quot;, &quot;k_group&quot;), 
+                        contributorVar = &quot;car_brand&quot;)</code></pre>
+<p>How many rows are in the output?</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="fu">load</span>(<span class="st">&quot;../data/sdc_cars.RData&quot;</span>)</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(sdc_cars, <span class="dv">10</span>) <span class="co"># 10 First</span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>      county municipality mun_id k_group sector months car_brand value</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="dv">1</span>  Trondelag       Frosta   <span class="dv">5036</span>       <span class="dv">1</span>  other m01m05      Audi   <span class="dv">422</span></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a><span class="dv">2</span>  Trondelag       Frosta   <span class="dv">5036</span>       <span class="dv">1</span>  other m01m05     Buick  <span class="dv">6404</span></span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a><span class="dv">3</span>  Trondelag       Frosta   <span class="dv">5036</span>       <span class="dv">1</span>  other m01m05 Chevrolet   <span class="dv">597</span></span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a><span class="dv">4</span>  Trondelag       Frosta   <span class="dv">5036</span>       <span class="dv">1</span>  other m01m05      Ford   <span class="dv">406</span></span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a><span class="dv">5</span>  Trondelag       Frosta   <span class="dv">5036</span>       <span class="dv">1</span>  other m01m05   Hyundai  <span class="dv">1998</span></span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a><span class="dv">6</span>  Trondelag       Frosta   <span class="dv">5036</span>       <span class="dv">1</span>  other m01m05    Jaguar  <span class="dv">5196</span></span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a><span class="dv">7</span>  Trondelag       Frosta   <span class="dv">5036</span>       <span class="dv">1</span>  other m01m05       Kia  <span class="dv">7435</span></span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a><span class="dv">8</span>  Trondelag       Frosta   <span class="dv">5036</span>       <span class="dv">1</span>  other m01m05     Lexus  <span class="dv">1238</span></span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a><span class="dv">9</span>  Trondelag       Frosta   <span class="dv">5036</span>       <span class="dv">1</span>  other m01m05     Lotus   <span class="dv">561</span></span>
+<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a><span class="dv">10</span> Trondelag       Frosta   <span class="dv">5036</span>       <span class="dv">1</span>  other m01m05     Mazda   <span class="dv">299</span></span>
+<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a>sdc_cars[<span class="fu">sample.int</span>(<span class="fu">nrow</span>(sdc_cars), <span class="dv">20</span>), ] <span class="co"># 20 random</span></span>
+<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a>       county municipality mun_id k_group     sector months  car_brand value</span>
+<span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a><span class="dv">366</span> Trondelag        Skaun   <span class="dv">5029</span>       <span class="dv">1</span> individual m01m05 Volkswagen  <span class="dv">4007</span></span>
+<span id="cb3-17"><a href="#cb3-17" aria-hidden="true" tabindex="-1"></a><span class="dv">159</span> Trondelag       Oppdal   <span class="dv">5021</span>       <span class="dv">1</span>   business m01m05       Jeep <span class="dv">11451</span></span>
+<span id="cb3-18"><a href="#cb3-18" aria-hidden="true" tabindex="-1"></a><span class="dv">544</span>     Viken    Sarpsborg   <span class="dv">3003</span>       <span class="dv">1</span>   business m06m09      Honda   <span class="dv">198</span></span>
+<span id="cb3-19"><a href="#cb3-19" aria-hidden="true" tabindex="-1"></a><span class="dv">405</span> Trondelag    Steinkjer   <span class="dv">5006</span>       <span class="dv">1</span> individual m01m05      Mazda   <span class="dv">651</span></span>
+<span id="cb3-20"><a href="#cb3-20" aria-hidden="true" tabindex="-1"></a><span class="dv">102</span> Trondelag       Frosta   <span class="dv">5036</span>       <span class="dv">1</span> individual m01m05   Maserati   <span class="dv">223</span></span>
+<span id="cb3-21"><a href="#cb3-21" aria-hidden="true" tabindex="-1"></a><span class="dv">293</span> Trondelag        Skaun   <span class="dv">5029</span>       <span class="dv">1</span>      other m01m05       Ford  <span class="dv">5407</span></span>
+<span id="cb3-22"><a href="#cb3-22" aria-hidden="true" tabindex="-1"></a><span class="dv">252</span> Trondelag        Selbu   <span class="dv">5032</span>       <span class="dv">1</span>   business m06m09      Tesla   <span class="dv">202</span></span>
+<span id="cb3-23"><a href="#cb3-23" aria-hidden="true" tabindex="-1"></a><span class="dv">447</span>     Viken       Marker   <span class="dv">3013</span>       <span class="dv">1</span>   business m01m05       Ford  <span class="dv">1395</span></span>
+<span id="cb3-24"><a href="#cb3-24" aria-hidden="true" tabindex="-1"></a><span class="dv">24</span>  Trondelag       Frosta   <span class="dv">5036</span>       <span class="dv">1</span>   business m01m05        BMW  <span class="dv">7305</span></span>
+<span id="cb3-25"><a href="#cb3-25" aria-hidden="true" tabindex="-1"></a><span class="dv">355</span> Trondelag        Skaun   <span class="dv">5029</span>       <span class="dv">1</span> individual m01m05      Lotus  <span class="dv">9374</span></span>
+<span id="cb3-26"><a href="#cb3-26" aria-hidden="true" tabindex="-1"></a><span class="dv">416</span>     Viken      Drammen   <span class="dv">3005</span>       <span class="dv">3</span>      other m10m12 Mitsubishi   <span class="dv">788</span></span>
+<span id="cb3-27"><a href="#cb3-27" aria-hidden="true" tabindex="-1"></a><span class="dv">337</span> Trondelag        Skaun   <span class="dv">5029</span>       <span class="dv">1</span>     public m01m05      Tesla  <span class="dv">2232</span></span>
+<span id="cb3-28"><a href="#cb3-28" aria-hidden="true" tabindex="-1"></a><span class="dv">321</span> Trondelag        Skaun   <span class="dv">5029</span>       <span class="dv">1</span>   business m01m05     Toyota  <span class="dv">3719</span></span>
+<span id="cb3-29"><a href="#cb3-29" aria-hidden="true" tabindex="-1"></a><span class="dv">569</span>     Viken    Sarpsborg   <span class="dv">3003</span>       <span class="dv">1</span> individual m01m05     Toyota   <span class="dv">178</span></span>
+<span id="cb3-30"><a href="#cb3-30" aria-hidden="true" tabindex="-1"></a><span class="dv">546</span>     Viken    Sarpsborg   <span class="dv">3003</span>       <span class="dv">1</span>   business m06m09    Porsche   <span class="dv">219</span></span>
+<span id="cb3-31"><a href="#cb3-31" aria-hidden="true" tabindex="-1"></a><span class="dv">429</span>     Viken      Drammen   <span class="dv">3005</span>       <span class="dv">3</span> individual m01m05      Volvo  <span class="dv">1102</span></span>
+<span id="cb3-32"><a href="#cb3-32" aria-hidden="true" tabindex="-1"></a><span class="dv">474</span>     Viken       Marker   <span class="dv">3013</span>       <span class="dv">1</span>     public m01m05   Cadillac  <span class="dv">1158</span></span>
+<span id="cb3-33"><a href="#cb3-33" aria-hidden="true" tabindex="-1"></a><span class="dv">484</span>     Viken       Marker   <span class="dv">3013</span>       <span class="dv">1</span>     public m06m09       Ford   <span class="dv">120</span></span>
+<span id="cb3-34"><a href="#cb3-34" aria-hidden="true" tabindex="-1"></a><span class="dv">384</span> Trondelag    Steinkjer   <span class="dv">5006</span>       <span class="dv">1</span>      other m10m12       Audi  <span class="dv">1127</span></span>
+<span id="cb3-35"><a href="#cb3-35" aria-hidden="true" tabindex="-1"></a><span class="dv">523</span>     Viken       Marker   <span class="dv">3013</span>       <span class="dv">1</span> individual m10m12      Honda  <span class="dv">3388</span></span>
+<span id="cb3-36"><a href="#cb3-36" aria-hidden="true" tabindex="-1"></a><span class="fu">tail</span>(sdc_cars, <span class="dv">10</span>) <span class="co"># 10 Load</span></span>
+<span id="cb3-37"><a href="#cb3-37" aria-hidden="true" tabindex="-1"></a>    county municipality mun_id k_group     sector months  car_brand value</span>
+<span id="cb3-38"><a href="#cb3-38" aria-hidden="true" tabindex="-1"></a><span class="dv">573</span>  Viken    Sarpsborg   <span class="dv">3003</span>       <span class="dv">1</span> individual m10m12       Audi   <span class="dv">101</span></span>
+<span id="cb3-39"><a href="#cb3-39" aria-hidden="true" tabindex="-1"></a><span class="dv">574</span>  Viken    Sarpsborg   <span class="dv">3003</span>       <span class="dv">1</span> individual m10m12       Ford   <span class="dv">644</span></span>
+<span id="cb3-40"><a href="#cb3-40" aria-hidden="true" tabindex="-1"></a><span class="dv">575</span>  Viken    Sarpsborg   <span class="dv">3003</span>       <span class="dv">1</span> individual m10m12      Lexus   <span class="dv">675</span></span>
+<span id="cb3-41"><a href="#cb3-41" aria-hidden="true" tabindex="-1"></a><span class="dv">576</span>  Viken    Sarpsborg   <span class="dv">3003</span>       <span class="dv">1</span> individual m10m12      Volvo   <span class="dv">784</span></span>
+<span id="cb3-42"><a href="#cb3-42" aria-hidden="true" tabindex="-1"></a><span class="dv">577</span>  Viken     Skiptvet   <span class="dv">3015</span>       <span class="dv">2</span>   business m06m09    Hyundai   <span class="dv">391</span></span>
+<span id="cb3-43"><a href="#cb3-43" aria-hidden="true" tabindex="-1"></a><span class="dv">578</span>  Viken     Skiptvet   <span class="dv">3015</span>       <span class="dv">2</span> individual m10m12    Hyundai  <span class="dv">6167</span></span>
+<span id="cb3-44"><a href="#cb3-44" aria-hidden="true" tabindex="-1"></a><span class="dv">579</span>  Viken     Skiptvet   <span class="dv">3015</span>       <span class="dv">2</span> individual m10m12      Tesla   <span class="dv">659</span></span>
+<span id="cb3-45"><a href="#cb3-45" aria-hidden="true" tabindex="-1"></a><span class="dv">580</span>  Viken   Ullensaker   <span class="dv">3033</span>       <span class="dv">2</span>      other m01m05      Tesla   <span class="dv">129</span></span>
+<span id="cb3-46"><a href="#cb3-46" aria-hidden="true" tabindex="-1"></a><span class="dv">581</span>  Viken   Ullensaker   <span class="dv">3033</span>       <span class="dv">2</span>   business m01m05        BMW   <span class="dv">142</span></span>
+<span id="cb3-47"><a href="#cb3-47" aria-hidden="true" tabindex="-1"></a><span class="dv">582</span>  Viken   Ullensaker   <span class="dv">3033</span>       <span class="dv">2</span>   business m01m05 Volkswagen   <span class="dv">290</span></span></code></pre></div>
+<div id="solution" class="section level4">
+<h4>Solution</h4>
+<p>20 rows in the output</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(GaussSuppression)</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>Warning<span class="sc">:</span> package <span class="st">&#39;GaussSuppression&#39;</span> was built under R version <span class="dv">4</span>.<span class="fl">3.2</span></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>Loading required package<span class="sc">:</span> Matrix</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>Warning<span class="sc">:</span> package <span class="st">&#39;Matrix&#39;</span> was built under R version <span class="dv">4</span>.<span class="fl">3.1</span></span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>out1 <span class="ot">&lt;-</span> <span class="fu">SuppressDominantCells</span>(sdc_cars,</span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>                               <span class="at">n =</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">2</span>, <span class="at">k =</span> <span class="fu">c</span>(<span class="dv">85</span>, <span class="dv">95</span>),</span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>                               <span class="at">numVar =</span> <span class="st">&quot;value&quot;</span>,</span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>                               <span class="at">dimVar =</span> <span class="fu">c</span>(<span class="st">&quot;sector&quot;</span>, <span class="st">&quot;k_group&quot;</span>),</span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>                               <span class="at">contributorVar =</span> <span class="st">&quot;car_brand&quot;</span>)</span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a>[preAggregate <span class="dv">582</span><span class="sc">*</span><span class="dv">8</span><span class="ot">-&gt;</span><span class="dv">212</span><span class="sc">*</span><span class="dv">5</span>]</span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a>[extraAggregate <span class="dv">212</span><span class="sc">*</span><span class="dv">5</span><span class="ot">-&gt;</span><span class="dv">11</span><span class="sc">*</span><span class="dv">5</span>] Checking .....</span>
+<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a>GaussSuppression_numttHTT<span class="sc">:</span> ...............<span class="sc">:::</span></span>
+<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a><span class="fu">Print</span>(out1)</span>
+<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a>       sector k_group freq   value primary suppressed</span>
+<span id="cb4-15"><a href="#cb4-15" aria-hidden="true" tabindex="-1"></a><span class="dv">1</span>       Total   Total  <span class="dv">582</span> <span class="dv">1651372</span>       <span class="sc">-</span>          <span class="sc">-</span></span>
+<span id="cb4-16"><a href="#cb4-16" aria-hidden="true" tabindex="-1"></a><span class="dv">2</span>       Total       <span class="dv">1</span>  <span class="dv">513</span> <span class="dv">1453098</span>       <span class="sc">-</span>          <span class="sc">-</span></span>
+<span id="cb4-17"><a href="#cb4-17" aria-hidden="true" tabindex="-1"></a><span class="dv">3</span>       Total       <span class="dv">2</span>    <span class="dv">6</span>    <span class="dv">7778</span>       <span class="sc">-</span>          <span class="sc">-</span></span>
+<span id="cb4-18"><a href="#cb4-18" aria-hidden="true" tabindex="-1"></a><span class="dv">4</span>       Total       <span class="dv">3</span>   <span class="dv">63</span>  <span class="dv">190496</span>       <span class="sc">-</span>          <span class="sc">-</span></span>
+<span id="cb4-19"><a href="#cb4-19" aria-hidden="true" tabindex="-1"></a><span class="dv">5</span>    business   Total  <span class="dv">181</span>  <span class="dv">599181</span>       <span class="sc">-</span>          <span class="sc">-</span></span>
+<span id="cb4-20"><a href="#cb4-20" aria-hidden="true" tabindex="-1"></a><span class="dv">6</span>    business       <span class="dv">1</span>  <span class="dv">159</span>  <span class="dv">524179</span>       <span class="sc">-</span>          <span class="sc">-</span></span>
+<span id="cb4-21"><a href="#cb4-21" aria-hidden="true" tabindex="-1"></a><span class="dv">7</span>    business       <span class="dv">2</span>    <span class="dv">3</span>     <span class="dv">823</span>       <span class="sc">-</span>       <span class="cn">TRUE</span></span>
+<span id="cb4-22"><a href="#cb4-22" aria-hidden="true" tabindex="-1"></a><span class="dv">8</span>    business       <span class="dv">3</span>   <span class="dv">19</span>   <span class="dv">74179</span>       <span class="sc">-</span>       <span class="cn">TRUE</span></span>
+<span id="cb4-23"><a href="#cb4-23" aria-hidden="true" tabindex="-1"></a><span class="dv">9</span>  individual   Total  <span class="dv">229</span>  <span class="dv">657346</span>       <span class="sc">-</span>          <span class="sc">-</span></span>
+<span id="cb4-24"><a href="#cb4-24" aria-hidden="true" tabindex="-1"></a><span class="dv">10</span> individual       <span class="dv">1</span>  <span class="dv">199</span>  <span class="dv">565179</span>       <span class="sc">-</span>          <span class="sc">-</span></span>
+<span id="cb4-25"><a href="#cb4-25" aria-hidden="true" tabindex="-1"></a><span class="dv">11</span> individual       <span class="dv">2</span>    <span class="dv">2</span>    <span class="dv">6826</span>    <span class="cn">TRUE</span>       <span class="cn">TRUE</span></span>
+<span id="cb4-26"><a href="#cb4-26" aria-hidden="true" tabindex="-1"></a><span class="dv">12</span> individual       <span class="dv">3</span>   <span class="dv">28</span>   <span class="dv">85341</span>       <span class="sc">-</span>       <span class="cn">TRUE</span></span>
+<span id="cb4-27"><a href="#cb4-27" aria-hidden="true" tabindex="-1"></a><span class="dv">13</span>      other   Total   <span class="dv">82</span>  <span class="dv">208383</span>       <span class="sc">-</span>          <span class="sc">-</span></span>
+<span id="cb4-28"><a href="#cb4-28" aria-hidden="true" tabindex="-1"></a><span class="dv">14</span>      other       <span class="dv">1</span>   <span class="dv">71</span>  <span class="dv">185690</span>       <span class="sc">-</span>          <span class="sc">-</span></span>
+<span id="cb4-29"><a href="#cb4-29" aria-hidden="true" tabindex="-1"></a><span class="dv">15</span>      other       <span class="dv">2</span>    <span class="dv">1</span>     <span class="dv">129</span>    <span class="cn">TRUE</span>       <span class="cn">TRUE</span></span>
+<span id="cb4-30"><a href="#cb4-30" aria-hidden="true" tabindex="-1"></a><span class="dv">16</span>      other       <span class="dv">3</span>   <span class="dv">10</span>   <span class="dv">22564</span>       <span class="sc">-</span>       <span class="cn">TRUE</span></span>
+<span id="cb4-31"><a href="#cb4-31" aria-hidden="true" tabindex="-1"></a><span class="dv">17</span>     public   Total   <span class="dv">90</span>  <span class="dv">186462</span>       <span class="sc">-</span>          <span class="sc">-</span></span>
+<span id="cb4-32"><a href="#cb4-32" aria-hidden="true" tabindex="-1"></a><span class="dv">18</span>     public       <span class="dv">1</span>   <span class="dv">84</span>  <span class="dv">178050</span>       <span class="sc">-</span>          <span class="sc">-</span></span>
+<span id="cb4-33"><a href="#cb4-33" aria-hidden="true" tabindex="-1"></a><span class="dv">19</span>     public       <span class="dv">2</span>    <span class="dv">0</span>       <span class="dv">0</span>       <span class="sc">-</span>          <span class="sc">-</span></span>
+<span id="cb4-34"><a href="#cb4-34" aria-hidden="true" tabindex="-1"></a><span class="dv">20</span>     public       <span class="dv">3</span>    <span class="dv">6</span>    <span class="dv">8412</span>       <span class="sc">-</span>          <span class="sc">-</span></span></code></pre></div>
+</div>
+</div>
+<div id="exercise-2" class="section level3">
+<h3>Exercise 2</h3>
+<p>Run the same analysis with the formula interface. Does it appear that
+the output is the same?</p>
+<div id="solution-1" class="section level4">
+<h4>Solution</h4>
+<p>One row is missing. This has 0 contributions. Otherwise similar, but
+different sorting.</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>out2 <span class="ot">&lt;-</span> <span class="fu">SuppressDominantCells</span>(sdc_cars,</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>                               <span class="at">n =</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">2</span>, <span class="at">k =</span> <span class="fu">c</span>(<span class="dv">85</span>, <span class="dv">95</span>),</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>                               <span class="at">numVar =</span> <span class="st">&quot;value&quot;</span>,</span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>                               <span class="at">formula =</span> <span class="sc">~</span>sector<span class="sc">*</span>k_group,</span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>                               <span class="at">contributorVar =</span> <span class="st">&quot;car_brand&quot;</span>)</span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>[preAggregate <span class="dv">582</span><span class="sc">*</span><span class="dv">8</span><span class="ot">-&gt;</span><span class="dv">212</span><span class="sc">*</span><span class="dv">5</span>]</span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>[extraAggregate <span class="dv">212</span><span class="sc">*</span><span class="dv">5</span><span class="ot">-&gt;</span><span class="dv">11</span><span class="sc">*</span><span class="dv">5</span>] Checking .....</span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>GaussSuppression_numttHTT<span class="sc">:</span> ..............<span class="sc">:::</span></span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a><span class="fu">Print</span>(out2)</span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a>       sector k_group freq   value primary suppressed</span>
+<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a><span class="dv">1</span>       Total   Total  <span class="dv">582</span> <span class="dv">1651372</span>       <span class="sc">-</span>          <span class="sc">-</span></span>
+<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a><span class="dv">2</span>    business   Total  <span class="dv">181</span>  <span class="dv">599181</span>       <span class="sc">-</span>          <span class="sc">-</span></span>
+<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a><span class="dv">3</span>  individual   Total  <span class="dv">229</span>  <span class="dv">657346</span>       <span class="sc">-</span>          <span class="sc">-</span></span>
+<span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a><span class="dv">4</span>       other   Total   <span class="dv">82</span>  <span class="dv">208383</span>       <span class="sc">-</span>          <span class="sc">-</span></span>
+<span id="cb5-15"><a href="#cb5-15" aria-hidden="true" tabindex="-1"></a><span class="dv">5</span>      public   Total   <span class="dv">90</span>  <span class="dv">186462</span>       <span class="sc">-</span>          <span class="sc">-</span></span>
+<span id="cb5-16"><a href="#cb5-16" aria-hidden="true" tabindex="-1"></a><span class="dv">6</span>       Total       <span class="dv">1</span>  <span class="dv">513</span> <span class="dv">1453098</span>       <span class="sc">-</span>          <span class="sc">-</span></span>
+<span id="cb5-17"><a href="#cb5-17" aria-hidden="true" tabindex="-1"></a><span class="dv">7</span>       Total       <span class="dv">2</span>    <span class="dv">6</span>    <span class="dv">7778</span>       <span class="sc">-</span>          <span class="sc">-</span></span>
+<span id="cb5-18"><a href="#cb5-18" aria-hidden="true" tabindex="-1"></a><span class="dv">8</span>       Total       <span class="dv">3</span>   <span class="dv">63</span>  <span class="dv">190496</span>       <span class="sc">-</span>          <span class="sc">-</span></span>
+<span id="cb5-19"><a href="#cb5-19" aria-hidden="true" tabindex="-1"></a><span class="dv">9</span>    business       <span class="dv">1</span>  <span class="dv">159</span>  <span class="dv">524179</span>       <span class="sc">-</span>          <span class="sc">-</span></span>
+<span id="cb5-20"><a href="#cb5-20" aria-hidden="true" tabindex="-1"></a><span class="dv">10</span>   business       <span class="dv">2</span>    <span class="dv">3</span>     <span class="dv">823</span>       <span class="sc">-</span>       <span class="cn">TRUE</span></span>
+<span id="cb5-21"><a href="#cb5-21" aria-hidden="true" tabindex="-1"></a><span class="dv">11</span>   business       <span class="dv">3</span>   <span class="dv">19</span>   <span class="dv">74179</span>       <span class="sc">-</span>       <span class="cn">TRUE</span></span>
+<span id="cb5-22"><a href="#cb5-22" aria-hidden="true" tabindex="-1"></a><span class="dv">12</span> individual       <span class="dv">1</span>  <span class="dv">199</span>  <span class="dv">565179</span>       <span class="sc">-</span>          <span class="sc">-</span></span>
+<span id="cb5-23"><a href="#cb5-23" aria-hidden="true" tabindex="-1"></a><span class="dv">13</span> individual       <span class="dv">2</span>    <span class="dv">2</span>    <span class="dv">6826</span>    <span class="cn">TRUE</span>       <span class="cn">TRUE</span></span>
+<span id="cb5-24"><a href="#cb5-24" aria-hidden="true" tabindex="-1"></a><span class="dv">14</span> individual       <span class="dv">3</span>   <span class="dv">28</span>   <span class="dv">85341</span>       <span class="sc">-</span>       <span class="cn">TRUE</span></span>
+<span id="cb5-25"><a href="#cb5-25" aria-hidden="true" tabindex="-1"></a><span class="dv">15</span>      other       <span class="dv">1</span>   <span class="dv">71</span>  <span class="dv">185690</span>       <span class="sc">-</span>          <span class="sc">-</span></span>
+<span id="cb5-26"><a href="#cb5-26" aria-hidden="true" tabindex="-1"></a><span class="dv">16</span>      other       <span class="dv">2</span>    <span class="dv">1</span>     <span class="dv">129</span>    <span class="cn">TRUE</span>       <span class="cn">TRUE</span></span>
+<span id="cb5-27"><a href="#cb5-27" aria-hidden="true" tabindex="-1"></a><span class="dv">17</span>      other       <span class="dv">3</span>   <span class="dv">10</span>   <span class="dv">22564</span>       <span class="sc">-</span>       <span class="cn">TRUE</span></span>
+<span id="cb5-28"><a href="#cb5-28" aria-hidden="true" tabindex="-1"></a><span class="dv">18</span>     public       <span class="dv">1</span>   <span class="dv">84</span>  <span class="dv">178050</span>       <span class="sc">-</span>          <span class="sc">-</span></span>
+<span id="cb5-29"><a href="#cb5-29" aria-hidden="true" tabindex="-1"></a><span class="dv">19</span>     public       <span class="dv">3</span>    <span class="dv">6</span>    <span class="dv">8412</span>       <span class="sc">-</span>          <span class="sc">-</span></span></code></pre></div>
+</div>
+</div>
+<div id="exercise-3" class="section level3">
+<h3>Exercise 3</h3>
+<p>Run the analyzes in Exercise 1 and 2 again and include the
+<code>removeEmpty</code> parameter. This can be <code>TRUE</code>
+or<code>FALSE</code>. Use the parameter in such a way that you do not
+get the same answer as before.</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>out3a <span class="ot">&lt;-</span> <span class="fu">SuppressDominantCells</span>(sdc_cars,</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>                               <span class="at">n =</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">2</span>, <span class="at">k =</span> <span class="fu">c</span>(<span class="dv">85</span>, <span class="dv">95</span>),</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>                               <span class="at">numVar =</span> <span class="st">&quot;value&quot;</span>,</span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>                               <span class="at">dimVar =</span> <span class="fu">c</span>(<span class="st">&quot;sector&quot;</span>, <span class="st">&quot;k_group&quot;</span>),</span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>                               <span class="at">contributorVar =</span> <span class="st">&quot;car_brand&quot;</span>,</span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>                               <span class="at">removeEmpty =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>[preAggregate <span class="dv">582</span><span class="sc">*</span><span class="dv">8</span><span class="ot">-&gt;</span><span class="dv">212</span><span class="sc">*</span><span class="dv">5</span>]</span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>[extraAggregate <span class="dv">212</span><span class="sc">*</span><span class="dv">5</span><span class="ot">-&gt;</span><span class="dv">11</span><span class="sc">*</span><span class="dv">5</span>] Checking .....</span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a>GaussSuppression_numttHTT<span class="sc">:</span> ..............<span class="sc">:::</span></span>
+<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a><span class="fu">Print</span>(out3a)</span>
+<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a>       sector k_group freq   value primary suppressed</span>
+<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a><span class="dv">1</span>       Total   Total  <span class="dv">582</span> <span class="dv">1651372</span>       <span class="sc">-</span>          <span class="sc">-</span></span>
+<span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a><span class="dv">2</span>       Total       <span class="dv">1</span>  <span class="dv">513</span> <span class="dv">1453098</span>       <span class="sc">-</span>          <span class="sc">-</span></span>
+<span id="cb6-14"><a href="#cb6-14" aria-hidden="true" tabindex="-1"></a><span class="dv">3</span>       Total       <span class="dv">2</span>    <span class="dv">6</span>    <span class="dv">7778</span>       <span class="sc">-</span>          <span class="sc">-</span></span>
+<span id="cb6-15"><a href="#cb6-15" aria-hidden="true" tabindex="-1"></a><span class="dv">4</span>       Total       <span class="dv">3</span>   <span class="dv">63</span>  <span class="dv">190496</span>       <span class="sc">-</span>          <span class="sc">-</span></span>
+<span id="cb6-16"><a href="#cb6-16" aria-hidden="true" tabindex="-1"></a><span class="dv">5</span>    business   Total  <span class="dv">181</span>  <span class="dv">599181</span>       <span class="sc">-</span>          <span class="sc">-</span></span>
+<span id="cb6-17"><a href="#cb6-17" aria-hidden="true" tabindex="-1"></a><span class="dv">6</span>    business       <span class="dv">1</span>  <span class="dv">159</span>  <span class="dv">524179</span>       <span class="sc">-</span>          <span class="sc">-</span></span>
+<span id="cb6-18"><a href="#cb6-18" aria-hidden="true" tabindex="-1"></a><span class="dv">7</span>    business       <span class="dv">2</span>    <span class="dv">3</span>     <span class="dv">823</span>       <span class="sc">-</span>       <span class="cn">TRUE</span></span>
+<span id="cb6-19"><a href="#cb6-19" aria-hidden="true" tabindex="-1"></a><span class="dv">8</span>    business       <span class="dv">3</span>   <span class="dv">19</span>   <span class="dv">74179</span>       <span class="sc">-</span>       <span class="cn">TRUE</span></span>
+<span id="cb6-20"><a href="#cb6-20" aria-hidden="true" tabindex="-1"></a><span class="dv">9</span>  individual   Total  <span class="dv">229</span>  <span class="dv">657346</span>       <span class="sc">-</span>          <span class="sc">-</span></span>
+<span id="cb6-21"><a href="#cb6-21" aria-hidden="true" tabindex="-1"></a><span class="dv">10</span> individual       <span class="dv">1</span>  <span class="dv">199</span>  <span class="dv">565179</span>       <span class="sc">-</span>          <span class="sc">-</span></span>
+<span id="cb6-22"><a href="#cb6-22" aria-hidden="true" tabindex="-1"></a><span class="dv">11</span> individual       <span class="dv">2</span>    <span class="dv">2</span>    <span class="dv">6826</span>    <span class="cn">TRUE</span>       <span class="cn">TRUE</span></span>
+<span id="cb6-23"><a href="#cb6-23" aria-hidden="true" tabindex="-1"></a><span class="dv">12</span> individual       <span class="dv">3</span>   <span class="dv">28</span>   <span class="dv">85341</span>       <span class="sc">-</span>       <span class="cn">TRUE</span></span>
+<span id="cb6-24"><a href="#cb6-24" aria-hidden="true" tabindex="-1"></a><span class="dv">13</span>      other   Total   <span class="dv">82</span>  <span class="dv">208383</span>       <span class="sc">-</span>          <span class="sc">-</span></span>
+<span id="cb6-25"><a href="#cb6-25" aria-hidden="true" tabindex="-1"></a><span class="dv">14</span>      other       <span class="dv">1</span>   <span class="dv">71</span>  <span class="dv">185690</span>       <span class="sc">-</span>          <span class="sc">-</span></span>
+<span id="cb6-26"><a href="#cb6-26" aria-hidden="true" tabindex="-1"></a><span class="dv">15</span>      other       <span class="dv">2</span>    <span class="dv">1</span>     <span class="dv">129</span>    <span class="cn">TRUE</span>       <span class="cn">TRUE</span></span>
+<span id="cb6-27"><a href="#cb6-27" aria-hidden="true" tabindex="-1"></a><span class="dv">16</span>      other       <span class="dv">3</span>   <span class="dv">10</span>   <span class="dv">22564</span>       <span class="sc">-</span>       <span class="cn">TRUE</span></span>
+<span id="cb6-28"><a href="#cb6-28" aria-hidden="true" tabindex="-1"></a><span class="dv">17</span>     public   Total   <span class="dv">90</span>  <span class="dv">186462</span>       <span class="sc">-</span>          <span class="sc">-</span></span>
+<span id="cb6-29"><a href="#cb6-29" aria-hidden="true" tabindex="-1"></a><span class="dv">18</span>     public       <span class="dv">1</span>   <span class="dv">84</span>  <span class="dv">178050</span>       <span class="sc">-</span>          <span class="sc">-</span></span>
+<span id="cb6-30"><a href="#cb6-30" aria-hidden="true" tabindex="-1"></a><span class="dv">19</span>     public       <span class="dv">3</span>    <span class="dv">6</span>    <span class="dv">8412</span>       <span class="sc">-</span>          <span class="sc">-</span></span>
+<span id="cb6-31"><a href="#cb6-31" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-32"><a href="#cb6-32" aria-hidden="true" tabindex="-1"></a>out3b <span class="ot">&lt;-</span> <span class="fu">SuppressDominantCells</span>(sdc_cars,</span>
+<span id="cb6-33"><a href="#cb6-33" aria-hidden="true" tabindex="-1"></a>                               <span class="at">n =</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">2</span>, <span class="at">k =</span> <span class="fu">c</span>(<span class="dv">85</span>, <span class="dv">95</span>),</span>
+<span id="cb6-34"><a href="#cb6-34" aria-hidden="true" tabindex="-1"></a>                               <span class="at">numVar =</span> <span class="st">&quot;value&quot;</span>,</span>
+<span id="cb6-35"><a href="#cb6-35" aria-hidden="true" tabindex="-1"></a>                               <span class="at">formula =</span> <span class="sc">~</span>sector<span class="sc">*</span>k_group,</span>
+<span id="cb6-36"><a href="#cb6-36" aria-hidden="true" tabindex="-1"></a>                               <span class="at">contributorVar =</span> <span class="st">&quot;car_brand&quot;</span>,</span>
+<span id="cb6-37"><a href="#cb6-37" aria-hidden="true" tabindex="-1"></a>                               <span class="at">removeEmpty =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb6-38"><a href="#cb6-38" aria-hidden="true" tabindex="-1"></a>[preAggregate <span class="dv">582</span><span class="sc">*</span><span class="dv">8</span><span class="ot">-&gt;</span><span class="dv">212</span><span class="sc">*</span><span class="dv">5</span>]</span>
+<span id="cb6-39"><a href="#cb6-39" aria-hidden="true" tabindex="-1"></a>[extraAggregate <span class="dv">212</span><span class="sc">*</span><span class="dv">5</span><span class="ot">-&gt;</span><span class="dv">11</span><span class="sc">*</span><span class="dv">5</span>] Checking .....</span>
+<span id="cb6-40"><a href="#cb6-40" aria-hidden="true" tabindex="-1"></a>GaussSuppression_numttHTT<span class="sc">:</span> ...............<span class="sc">:::</span></span>
+<span id="cb6-41"><a href="#cb6-41" aria-hidden="true" tabindex="-1"></a><span class="fu">Print</span>(out3b)</span>
+<span id="cb6-42"><a href="#cb6-42" aria-hidden="true" tabindex="-1"></a>       sector k_group freq   value primary suppressed</span>
+<span id="cb6-43"><a href="#cb6-43" aria-hidden="true" tabindex="-1"></a><span class="dv">1</span>       Total   Total  <span class="dv">582</span> <span class="dv">1651372</span>       <span class="sc">-</span>          <span class="sc">-</span></span>
+<span id="cb6-44"><a href="#cb6-44" aria-hidden="true" tabindex="-1"></a><span class="dv">2</span>    business   Total  <span class="dv">181</span>  <span class="dv">599181</span>       <span class="sc">-</span>          <span class="sc">-</span></span>
+<span id="cb6-45"><a href="#cb6-45" aria-hidden="true" tabindex="-1"></a><span class="dv">3</span>  individual   Total  <span class="dv">229</span>  <span class="dv">657346</span>       <span class="sc">-</span>          <span class="sc">-</span></span>
+<span id="cb6-46"><a href="#cb6-46" aria-hidden="true" tabindex="-1"></a><span class="dv">4</span>       other   Total   <span class="dv">82</span>  <span class="dv">208383</span>       <span class="sc">-</span>          <span class="sc">-</span></span>
+<span id="cb6-47"><a href="#cb6-47" aria-hidden="true" tabindex="-1"></a><span class="dv">5</span>      public   Total   <span class="dv">90</span>  <span class="dv">186462</span>       <span class="sc">-</span>          <span class="sc">-</span></span>
+<span id="cb6-48"><a href="#cb6-48" aria-hidden="true" tabindex="-1"></a><span class="dv">6</span>       Total       <span class="dv">1</span>  <span class="dv">513</span> <span class="dv">1453098</span>       <span class="sc">-</span>          <span class="sc">-</span></span>
+<span id="cb6-49"><a href="#cb6-49" aria-hidden="true" tabindex="-1"></a><span class="dv">7</span>       Total       <span class="dv">2</span>    <span class="dv">6</span>    <span class="dv">7778</span>       <span class="sc">-</span>          <span class="sc">-</span></span>
+<span id="cb6-50"><a href="#cb6-50" aria-hidden="true" tabindex="-1"></a><span class="dv">8</span>       Total       <span class="dv">3</span>   <span class="dv">63</span>  <span class="dv">190496</span>       <span class="sc">-</span>          <span class="sc">-</span></span>
+<span id="cb6-51"><a href="#cb6-51" aria-hidden="true" tabindex="-1"></a><span class="dv">9</span>    business       <span class="dv">1</span>  <span class="dv">159</span>  <span class="dv">524179</span>       <span class="sc">-</span>          <span class="sc">-</span></span>
+<span id="cb6-52"><a href="#cb6-52" aria-hidden="true" tabindex="-1"></a><span class="dv">10</span>   business       <span class="dv">2</span>    <span class="dv">3</span>     <span class="dv">823</span>       <span class="sc">-</span>       <span class="cn">TRUE</span></span>
+<span id="cb6-53"><a href="#cb6-53" aria-hidden="true" tabindex="-1"></a><span class="dv">11</span>   business       <span class="dv">3</span>   <span class="dv">19</span>   <span class="dv">74179</span>       <span class="sc">-</span>       <span class="cn">TRUE</span></span>
+<span id="cb6-54"><a href="#cb6-54" aria-hidden="true" tabindex="-1"></a><span class="dv">12</span> individual       <span class="dv">1</span>  <span class="dv">199</span>  <span class="dv">565179</span>       <span class="sc">-</span>          <span class="sc">-</span></span>
+<span id="cb6-55"><a href="#cb6-55" aria-hidden="true" tabindex="-1"></a><span class="dv">13</span> individual       <span class="dv">2</span>    <span class="dv">2</span>    <span class="dv">6826</span>    <span class="cn">TRUE</span>       <span class="cn">TRUE</span></span>
+<span id="cb6-56"><a href="#cb6-56" aria-hidden="true" tabindex="-1"></a><span class="dv">14</span> individual       <span class="dv">3</span>   <span class="dv">28</span>   <span class="dv">85341</span>       <span class="sc">-</span>       <span class="cn">TRUE</span></span>
+<span id="cb6-57"><a href="#cb6-57" aria-hidden="true" tabindex="-1"></a><span class="dv">15</span>      other       <span class="dv">1</span>   <span class="dv">71</span>  <span class="dv">185690</span>       <span class="sc">-</span>          <span class="sc">-</span></span>
+<span id="cb6-58"><a href="#cb6-58" aria-hidden="true" tabindex="-1"></a><span class="dv">16</span>      other       <span class="dv">2</span>    <span class="dv">1</span>     <span class="dv">129</span>    <span class="cn">TRUE</span>       <span class="cn">TRUE</span></span>
+<span id="cb6-59"><a href="#cb6-59" aria-hidden="true" tabindex="-1"></a><span class="dv">17</span>      other       <span class="dv">3</span>   <span class="dv">10</span>   <span class="dv">22564</span>       <span class="sc">-</span>       <span class="cn">TRUE</span></span>
+<span id="cb6-60"><a href="#cb6-60" aria-hidden="true" tabindex="-1"></a><span class="dv">18</span>     public       <span class="dv">1</span>   <span class="dv">84</span>  <span class="dv">178050</span>       <span class="sc">-</span>          <span class="sc">-</span></span>
+<span id="cb6-61"><a href="#cb6-61" aria-hidden="true" tabindex="-1"></a><span class="dv">19</span>     public       <span class="dv">2</span>    <span class="dv">0</span>       <span class="dv">0</span>       <span class="sc">-</span>          <span class="sc">-</span></span>
+<span id="cb6-62"><a href="#cb6-62" aria-hidden="true" tabindex="-1"></a><span class="dv">20</span>     public       <span class="dv">3</span>    <span class="dv">6</span>    <span class="dv">8412</span>       <span class="sc">-</span>          <span class="sc">-</span></span></code></pre></div>
+</div>
+<div id="exercise-4" class="section level3">
+<h3>Exercise 4</h3>
+<p>Continue with formula interface using <code>&quot;sector&quot;</code> and
+<code>&quot;k_group&quot;</code>, but now switch to
+<code>SuppressFewContributors</code> with <code>maxN = 2</code>. Also
+include <code>removeEmpty = FALSE</code>.</p>
+<p>Do you see that you get the same answer as in Exercise 3?</p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>out4 <span class="ot">&lt;-</span> <span class="fu">SuppressFewContributors</span>(sdc_cars,</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>                                 <span class="at">maxN =</span> <span class="dv">2</span>,</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>                                 <span class="at">numVar =</span> <span class="st">&quot;value&quot;</span>,</span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>                                 <span class="at">formula =</span> <span class="sc">~</span>sector<span class="sc">*</span>k_group,</span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>                                 <span class="at">contributorVar =</span> <span class="st">&quot;car_brand&quot;</span>,</span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>                                 <span class="at">removeEmpty =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>[preAggregate <span class="dv">582</span><span class="sc">*</span><span class="dv">8</span><span class="ot">-&gt;</span><span class="dv">212</span><span class="sc">*</span><span class="dv">5</span>]</span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a>[extraAggregate <span class="dv">212</span><span class="sc">*</span><span class="dv">5</span><span class="ot">-&gt;</span><span class="dv">11</span><span class="sc">*</span><span class="dv">5</span>] Checking .....</span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a>GaussSuppression_numttHTT<span class="sc">:</span> ...............<span class="sc">:::</span></span>
+<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a><span class="fu">Print</span>(out4)</span>
+<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a>       sector k_group freq   value nRule nAll primary suppressed</span>
+<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a><span class="dv">1</span>       Total   Total  <span class="dv">582</span> <span class="dv">1651372</span>    <span class="dv">53</span>   <span class="dv">53</span>       <span class="sc">-</span>          <span class="sc">-</span></span>
+<span id="cb7-13"><a href="#cb7-13" aria-hidden="true" tabindex="-1"></a><span class="dv">2</span>    business   Total  <span class="dv">181</span>  <span class="dv">599181</span>    <span class="dv">42</span>   <span class="dv">42</span>       <span class="sc">-</span>          <span class="sc">-</span></span>
+<span id="cb7-14"><a href="#cb7-14" aria-hidden="true" tabindex="-1"></a><span class="dv">3</span>  individual   Total  <span class="dv">229</span>  <span class="dv">657346</span>    <span class="dv">48</span>   <span class="dv">48</span>       <span class="sc">-</span>          <span class="sc">-</span></span>
+<span id="cb7-15"><a href="#cb7-15" aria-hidden="true" tabindex="-1"></a><span class="dv">4</span>       other   Total   <span class="dv">82</span>  <span class="dv">208383</span>    <span class="dv">33</span>   <span class="dv">33</span>       <span class="sc">-</span>          <span class="sc">-</span></span>
+<span id="cb7-16"><a href="#cb7-16" aria-hidden="true" tabindex="-1"></a><span class="dv">5</span>      public   Total   <span class="dv">90</span>  <span class="dv">186462</span>    <span class="dv">36</span>   <span class="dv">36</span>       <span class="sc">-</span>          <span class="sc">-</span></span>
+<span id="cb7-17"><a href="#cb7-17" aria-hidden="true" tabindex="-1"></a><span class="dv">6</span>       Total       <span class="dv">1</span>  <span class="dv">513</span> <span class="dv">1453098</span>    <span class="dv">53</span>   <span class="dv">53</span>       <span class="sc">-</span>          <span class="sc">-</span></span>
+<span id="cb7-18"><a href="#cb7-18" aria-hidden="true" tabindex="-1"></a><span class="dv">7</span>       Total       <span class="dv">2</span>    <span class="dv">6</span>    <span class="dv">7778</span>     <span class="dv">4</span>    <span class="dv">4</span>       <span class="sc">-</span>          <span class="sc">-</span></span>
+<span id="cb7-19"><a href="#cb7-19" aria-hidden="true" tabindex="-1"></a><span class="dv">8</span>       Total       <span class="dv">3</span>   <span class="dv">63</span>  <span class="dv">190496</span>    <span class="dv">29</span>   <span class="dv">29</span>       <span class="sc">-</span>          <span class="sc">-</span></span>
+<span id="cb7-20"><a href="#cb7-20" aria-hidden="true" tabindex="-1"></a><span class="dv">9</span>    business       <span class="dv">1</span>  <span class="dv">159</span>  <span class="dv">524179</span>    <span class="dv">40</span>   <span class="dv">40</span>       <span class="sc">-</span>          <span class="sc">-</span></span>
+<span id="cb7-21"><a href="#cb7-21" aria-hidden="true" tabindex="-1"></a><span class="dv">10</span>   business       <span class="dv">2</span>    <span class="dv">3</span>     <span class="dv">823</span>     <span class="dv">3</span>    <span class="dv">3</span>       <span class="sc">-</span>       <span class="cn">TRUE</span></span>
+<span id="cb7-22"><a href="#cb7-22" aria-hidden="true" tabindex="-1"></a><span class="dv">11</span>   business       <span class="dv">3</span>   <span class="dv">19</span>   <span class="dv">74179</span>    <span class="dv">15</span>   <span class="dv">15</span>       <span class="sc">-</span>       <span class="cn">TRUE</span></span>
+<span id="cb7-23"><a href="#cb7-23" aria-hidden="true" tabindex="-1"></a><span class="dv">12</span> individual       <span class="dv">1</span>  <span class="dv">199</span>  <span class="dv">565179</span>    <span class="dv">47</span>   <span class="dv">47</span>       <span class="sc">-</span>          <span class="sc">-</span></span>
+<span id="cb7-24"><a href="#cb7-24" aria-hidden="true" tabindex="-1"></a><span class="dv">13</span> individual       <span class="dv">2</span>    <span class="dv">2</span>    <span class="dv">6826</span>     <span class="dv">2</span>    <span class="dv">2</span>    <span class="cn">TRUE</span>       <span class="cn">TRUE</span></span>
+<span id="cb7-25"><a href="#cb7-25" aria-hidden="true" tabindex="-1"></a><span class="dv">14</span> individual       <span class="dv">3</span>   <span class="dv">28</span>   <span class="dv">85341</span>    <span class="dv">20</span>   <span class="dv">20</span>       <span class="sc">-</span>       <span class="cn">TRUE</span></span>
+<span id="cb7-26"><a href="#cb7-26" aria-hidden="true" tabindex="-1"></a><span class="dv">15</span>      other       <span class="dv">1</span>   <span class="dv">71</span>  <span class="dv">185690</span>    <span class="dv">33</span>   <span class="dv">33</span>       <span class="sc">-</span>          <span class="sc">-</span></span>
+<span id="cb7-27"><a href="#cb7-27" aria-hidden="true" tabindex="-1"></a><span class="dv">16</span>      other       <span class="dv">2</span>    <span class="dv">1</span>     <span class="dv">129</span>     <span class="dv">1</span>    <span class="dv">1</span>    <span class="cn">TRUE</span>       <span class="cn">TRUE</span></span>
+<span id="cb7-28"><a href="#cb7-28" aria-hidden="true" tabindex="-1"></a><span class="dv">17</span>      other       <span class="dv">3</span>   <span class="dv">10</span>   <span class="dv">22564</span>     <span class="dv">9</span>    <span class="dv">9</span>       <span class="sc">-</span>       <span class="cn">TRUE</span></span>
+<span id="cb7-29"><a href="#cb7-29" aria-hidden="true" tabindex="-1"></a><span class="dv">18</span>     public       <span class="dv">1</span>   <span class="dv">84</span>  <span class="dv">178050</span>    <span class="dv">36</span>   <span class="dv">36</span>       <span class="sc">-</span>          <span class="sc">-</span></span>
+<span id="cb7-30"><a href="#cb7-30" aria-hidden="true" tabindex="-1"></a><span class="dv">19</span>     public       <span class="dv">2</span>    <span class="dv">0</span>       <span class="dv">0</span>     <span class="dv">0</span>    <span class="dv">0</span>       <span class="sc">-</span>          <span class="sc">-</span></span>
+<span id="cb7-31"><a href="#cb7-31" aria-hidden="true" tabindex="-1"></a><span class="dv">20</span>     public       <span class="dv">3</span>    <span class="dv">6</span>    <span class="dv">8412</span>     <span class="dv">6</span>    <span class="dv">6</span>       <span class="sc">-</span>          <span class="sc">-</span></span></code></pre></div>
+</div>
+<div id="exercise-5" class="section level3">
+<h3>Exercise 5</h3>
+<p>Run one of the analyzes from Exercises 1-3 again, but make a change
+in <code>k</code> so that you get a different result for the
+suppression.</p>
+<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(GaussSuppression)</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>out5 <span class="ot">&lt;-</span> <span class="fu">SuppressDominantCells</span>(sdc_cars,</span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>                               <span class="at">n =</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">2</span>, <span class="at">k =</span> <span class="fu">c</span>(<span class="dv">70</span>, <span class="dv">80</span>),</span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>                               <span class="at">numVar =</span> <span class="st">&quot;value&quot;</span>,</span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>                               <span class="at">dimVar =</span> <span class="fu">c</span>(<span class="st">&quot;sector&quot;</span>, <span class="st">&quot;k_group&quot;</span>),</span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>                               <span class="at">contributorVar =</span> <span class="st">&quot;car_brand&quot;</span>)</span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>[preAggregate <span class="dv">582</span><span class="sc">*</span><span class="dv">8</span><span class="ot">-&gt;</span><span class="dv">212</span><span class="sc">*</span><span class="dv">5</span>]</span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a>[extraAggregate <span class="dv">212</span><span class="sc">*</span><span class="dv">5</span><span class="ot">-&gt;</span><span class="dv">11</span><span class="sc">*</span><span class="dv">5</span>] Checking .....</span>
+<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a>GaussSuppression_numttHTT<span class="sc">:</span> ...............<span class="sc">:</span></span>
+<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a><span class="fu">Print</span>(out5)</span>
+<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a>       sector k_group freq   value primary suppressed</span>
+<span id="cb8-12"><a href="#cb8-12" aria-hidden="true" tabindex="-1"></a><span class="dv">1</span>       Total   Total  <span class="dv">582</span> <span class="dv">1651372</span>       <span class="sc">-</span>          <span class="sc">-</span></span>
+<span id="cb8-13"><a href="#cb8-13" aria-hidden="true" tabindex="-1"></a><span class="dv">2</span>       Total       <span class="dv">1</span>  <span class="dv">513</span> <span class="dv">1453098</span>       <span class="sc">-</span>          <span class="sc">-</span></span>
+<span id="cb8-14"><a href="#cb8-14" aria-hidden="true" tabindex="-1"></a><span class="dv">3</span>       Total       <span class="dv">2</span>    <span class="dv">6</span>    <span class="dv">7778</span>    <span class="cn">TRUE</span>       <span class="cn">TRUE</span></span>
+<span id="cb8-15"><a href="#cb8-15" aria-hidden="true" tabindex="-1"></a><span class="dv">4</span>       Total       <span class="dv">3</span>   <span class="dv">63</span>  <span class="dv">190496</span>       <span class="sc">-</span>       <span class="cn">TRUE</span></span>
+<span id="cb8-16"><a href="#cb8-16" aria-hidden="true" tabindex="-1"></a><span class="dv">5</span>    business   Total  <span class="dv">181</span>  <span class="dv">599181</span>       <span class="sc">-</span>          <span class="sc">-</span></span>
+<span id="cb8-17"><a href="#cb8-17" aria-hidden="true" tabindex="-1"></a><span class="dv">6</span>    business       <span class="dv">1</span>  <span class="dv">159</span>  <span class="dv">524179</span>       <span class="sc">-</span>          <span class="sc">-</span></span>
+<span id="cb8-18"><a href="#cb8-18" aria-hidden="true" tabindex="-1"></a><span class="dv">7</span>    business       <span class="dv">2</span>    <span class="dv">3</span>     <span class="dv">823</span>    <span class="cn">TRUE</span>       <span class="cn">TRUE</span></span>
+<span id="cb8-19"><a href="#cb8-19" aria-hidden="true" tabindex="-1"></a><span class="dv">8</span>    business       <span class="dv">3</span>   <span class="dv">19</span>   <span class="dv">74179</span>       <span class="sc">-</span>       <span class="cn">TRUE</span></span>
+<span id="cb8-20"><a href="#cb8-20" aria-hidden="true" tabindex="-1"></a><span class="dv">9</span>  individual   Total  <span class="dv">229</span>  <span class="dv">657346</span>       <span class="sc">-</span>          <span class="sc">-</span></span>
+<span id="cb8-21"><a href="#cb8-21" aria-hidden="true" tabindex="-1"></a><span class="dv">10</span> individual       <span class="dv">1</span>  <span class="dv">199</span>  <span class="dv">565179</span>       <span class="sc">-</span>          <span class="sc">-</span></span>
+<span id="cb8-22"><a href="#cb8-22" aria-hidden="true" tabindex="-1"></a><span class="dv">11</span> individual       <span class="dv">2</span>    <span class="dv">2</span>    <span class="dv">6826</span>    <span class="cn">TRUE</span>       <span class="cn">TRUE</span></span>
+<span id="cb8-23"><a href="#cb8-23" aria-hidden="true" tabindex="-1"></a><span class="dv">12</span> individual       <span class="dv">3</span>   <span class="dv">28</span>   <span class="dv">85341</span>       <span class="sc">-</span>       <span class="cn">TRUE</span></span>
+<span id="cb8-24"><a href="#cb8-24" aria-hidden="true" tabindex="-1"></a><span class="dv">13</span>      other   Total   <span class="dv">82</span>  <span class="dv">208383</span>       <span class="sc">-</span>          <span class="sc">-</span></span>
+<span id="cb8-25"><a href="#cb8-25" aria-hidden="true" tabindex="-1"></a><span class="dv">14</span>      other       <span class="dv">1</span>   <span class="dv">71</span>  <span class="dv">185690</span>       <span class="sc">-</span>          <span class="sc">-</span></span>
+<span id="cb8-26"><a href="#cb8-26" aria-hidden="true" tabindex="-1"></a><span class="dv">15</span>      other       <span class="dv">2</span>    <span class="dv">1</span>     <span class="dv">129</span>    <span class="cn">TRUE</span>       <span class="cn">TRUE</span></span>
+<span id="cb8-27"><a href="#cb8-27" aria-hidden="true" tabindex="-1"></a><span class="dv">16</span>      other       <span class="dv">3</span>   <span class="dv">10</span>   <span class="dv">22564</span>       <span class="sc">-</span>       <span class="cn">TRUE</span></span>
+<span id="cb8-28"><a href="#cb8-28" aria-hidden="true" tabindex="-1"></a><span class="dv">17</span>     public   Total   <span class="dv">90</span>  <span class="dv">186462</span>       <span class="sc">-</span>          <span class="sc">-</span></span>
+<span id="cb8-29"><a href="#cb8-29" aria-hidden="true" tabindex="-1"></a><span class="dv">18</span>     public       <span class="dv">1</span>   <span class="dv">84</span>  <span class="dv">178050</span>       <span class="sc">-</span>          <span class="sc">-</span></span>
+<span id="cb8-30"><a href="#cb8-30" aria-hidden="true" tabindex="-1"></a><span class="dv">19</span>     public       <span class="dv">2</span>    <span class="dv">0</span>       <span class="dv">0</span>       <span class="sc">-</span>          <span class="sc">-</span></span>
+<span id="cb8-31"><a href="#cb8-31" aria-hidden="true" tabindex="-1"></a><span class="dv">20</span>     public       <span class="dv">3</span>    <span class="dv">6</span>    <span class="dv">8412</span>       <span class="sc">-</span>          <span class="sc">-</span></span></code></pre></div>
+</div>
+<div id="exercise-6" class="section level3">
+<h3>Exercise 6</h3>
+<p>We will continue with roughly the same problems</p>
+<p>Run this analysis:</p>
+<pre><code>  SuppressFewContributors(sdc_cars, 
+                          maxN = 2, 
+                          numVar = &quot;value&quot;, 
+                          dimVar = c(&quot;sector&quot;, &quot;k_group&quot;), 
+                          contributorVar = &quot;car_brand&quot;)</code></pre>
+<p>What is the difference between the numbers in <code>freq</code>,
+<code>nRule</code> and <code>nAll</code>?</p>
+<div id="solution-2" class="section level4">
+<h4>Solution</h4>
+<ul>
+<li><em>freq:</em> Number of rows that have been summed</li>
+<li><em>nRule=nAll:</em> Number of <code>car_brand</code> included in
+the sum</li>
+</ul>
+<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>out6 <span class="ot">&lt;-</span> <span class="fu">SuppressFewContributors</span>(sdc_cars,</span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>                                 <span class="at">maxN =</span> <span class="dv">2</span>,</span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>                                 <span class="at">numVar =</span> <span class="st">&quot;value&quot;</span>,</span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>                                 <span class="at">dimVar =</span> <span class="fu">c</span>(<span class="st">&quot;sector&quot;</span>, <span class="st">&quot;k_group&quot;</span>),</span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>                                 <span class="at">contributorVar =</span> <span class="st">&quot;car_brand&quot;</span>,</span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a>                                 <span class="at">removeEmpty =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a>[preAggregate <span class="dv">582</span><span class="sc">*</span><span class="dv">8</span><span class="ot">-&gt;</span><span class="dv">212</span><span class="sc">*</span><span class="dv">5</span>]</span>
+<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a>[extraAggregate <span class="dv">212</span><span class="sc">*</span><span class="dv">5</span><span class="ot">-&gt;</span><span class="dv">11</span><span class="sc">*</span><span class="dv">5</span>] Checking .....</span>
+<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a>GaussSuppression_numttHTT<span class="sc">:</span> ...............<span class="sc">:::</span></span>
+<span id="cb10-10"><a href="#cb10-10" aria-hidden="true" tabindex="-1"></a><span class="fu">Print</span>(out6)</span>
+<span id="cb10-11"><a href="#cb10-11" aria-hidden="true" tabindex="-1"></a>       sector k_group freq   value nRule nAll primary suppressed</span>
+<span id="cb10-12"><a href="#cb10-12" aria-hidden="true" tabindex="-1"></a><span class="dv">1</span>       Total   Total  <span class="dv">582</span> <span class="dv">1651372</span>    <span class="dv">53</span>   <span class="dv">53</span>       <span class="sc">-</span>          <span class="sc">-</span></span>
+<span id="cb10-13"><a href="#cb10-13" aria-hidden="true" tabindex="-1"></a><span class="dv">2</span>       Total       <span class="dv">1</span>  <span class="dv">513</span> <span class="dv">1453098</span>    <span class="dv">53</span>   <span class="dv">53</span>       <span class="sc">-</span>          <span class="sc">-</span></span>
+<span id="cb10-14"><a href="#cb10-14" aria-hidden="true" tabindex="-1"></a><span class="dv">3</span>       Total       <span class="dv">2</span>    <span class="dv">6</span>    <span class="dv">7778</span>     <span class="dv">4</span>    <span class="dv">4</span>       <span class="sc">-</span>          <span class="sc">-</span></span>
+<span id="cb10-15"><a href="#cb10-15" aria-hidden="true" tabindex="-1"></a><span class="dv">4</span>       Total       <span class="dv">3</span>   <span class="dv">63</span>  <span class="dv">190496</span>    <span class="dv">29</span>   <span class="dv">29</span>       <span class="sc">-</span>          <span class="sc">-</span></span>
+<span id="cb10-16"><a href="#cb10-16" aria-hidden="true" tabindex="-1"></a><span class="dv">5</span>    business   Total  <span class="dv">181</span>  <span class="dv">599181</span>    <span class="dv">42</span>   <span class="dv">42</span>       <span class="sc">-</span>          <span class="sc">-</span></span>
+<span id="cb10-17"><a href="#cb10-17" aria-hidden="true" tabindex="-1"></a><span class="dv">6</span>    business       <span class="dv">1</span>  <span class="dv">159</span>  <span class="dv">524179</span>    <span class="dv">40</span>   <span class="dv">40</span>       <span class="sc">-</span>          <span class="sc">-</span></span>
+<span id="cb10-18"><a href="#cb10-18" aria-hidden="true" tabindex="-1"></a><span class="dv">7</span>    business       <span class="dv">2</span>    <span class="dv">3</span>     <span class="dv">823</span>     <span class="dv">3</span>    <span class="dv">3</span>       <span class="sc">-</span>       <span class="cn">TRUE</span></span>
+<span id="cb10-19"><a href="#cb10-19" aria-hidden="true" tabindex="-1"></a><span class="dv">8</span>    business       <span class="dv">3</span>   <span class="dv">19</span>   <span class="dv">74179</span>    <span class="dv">15</span>   <span class="dv">15</span>       <span class="sc">-</span>       <span class="cn">TRUE</span></span>
+<span id="cb10-20"><a href="#cb10-20" aria-hidden="true" tabindex="-1"></a><span class="dv">9</span>  individual   Total  <span class="dv">229</span>  <span class="dv">657346</span>    <span class="dv">48</span>   <span class="dv">48</span>       <span class="sc">-</span>          <span class="sc">-</span></span>
+<span id="cb10-21"><a href="#cb10-21" aria-hidden="true" tabindex="-1"></a><span class="dv">10</span> individual       <span class="dv">1</span>  <span class="dv">199</span>  <span class="dv">565179</span>    <span class="dv">47</span>   <span class="dv">47</span>       <span class="sc">-</span>          <span class="sc">-</span></span>
+<span id="cb10-22"><a href="#cb10-22" aria-hidden="true" tabindex="-1"></a><span class="dv">11</span> individual       <span class="dv">2</span>    <span class="dv">2</span>    <span class="dv">6826</span>     <span class="dv">2</span>    <span class="dv">2</span>    <span class="cn">TRUE</span>       <span class="cn">TRUE</span></span>
+<span id="cb10-23"><a href="#cb10-23" aria-hidden="true" tabindex="-1"></a><span class="dv">12</span> individual       <span class="dv">3</span>   <span class="dv">28</span>   <span class="dv">85341</span>    <span class="dv">20</span>   <span class="dv">20</span>       <span class="sc">-</span>       <span class="cn">TRUE</span></span>
+<span id="cb10-24"><a href="#cb10-24" aria-hidden="true" tabindex="-1"></a><span class="dv">13</span>      other   Total   <span class="dv">82</span>  <span class="dv">208383</span>    <span class="dv">33</span>   <span class="dv">33</span>       <span class="sc">-</span>          <span class="sc">-</span></span>
+<span id="cb10-25"><a href="#cb10-25" aria-hidden="true" tabindex="-1"></a><span class="dv">14</span>      other       <span class="dv">1</span>   <span class="dv">71</span>  <span class="dv">185690</span>    <span class="dv">33</span>   <span class="dv">33</span>       <span class="sc">-</span>          <span class="sc">-</span></span>
+<span id="cb10-26"><a href="#cb10-26" aria-hidden="true" tabindex="-1"></a><span class="dv">15</span>      other       <span class="dv">2</span>    <span class="dv">1</span>     <span class="dv">129</span>     <span class="dv">1</span>    <span class="dv">1</span>    <span class="cn">TRUE</span>       <span class="cn">TRUE</span></span>
+<span id="cb10-27"><a href="#cb10-27" aria-hidden="true" tabindex="-1"></a><span class="dv">16</span>      other       <span class="dv">3</span>   <span class="dv">10</span>   <span class="dv">22564</span>     <span class="dv">9</span>    <span class="dv">9</span>       <span class="sc">-</span>       <span class="cn">TRUE</span></span>
+<span id="cb10-28"><a href="#cb10-28" aria-hidden="true" tabindex="-1"></a><span class="dv">17</span>     public   Total   <span class="dv">90</span>  <span class="dv">186462</span>    <span class="dv">36</span>   <span class="dv">36</span>       <span class="sc">-</span>          <span class="sc">-</span></span>
+<span id="cb10-29"><a href="#cb10-29" aria-hidden="true" tabindex="-1"></a><span class="dv">18</span>     public       <span class="dv">1</span>   <span class="dv">84</span>  <span class="dv">178050</span>    <span class="dv">36</span>   <span class="dv">36</span>       <span class="sc">-</span>          <span class="sc">-</span></span>
+<span id="cb10-30"><a href="#cb10-30" aria-hidden="true" tabindex="-1"></a><span class="dv">19</span>     public       <span class="dv">2</span>    <span class="dv">0</span>       <span class="dv">0</span>     <span class="dv">0</span>    <span class="dv">0</span>       <span class="sc">-</span>          <span class="sc">-</span></span>
+<span id="cb10-31"><a href="#cb10-31" aria-hidden="true" tabindex="-1"></a><span class="dv">20</span>     public       <span class="dv">3</span>    <span class="dv">6</span>    <span class="dv">8412</span>     <span class="dv">6</span>    <span class="dv">6</span>       <span class="sc">-</span>          <span class="sc">-</span></span></code></pre></div>
+</div>
+</div>
+<div id="exercise-7" class="section level3">
+<h3>Exercise 7</h3>
+<p>Make a change in the analysis in Exercise 6 that takes into account
+that all the figures from Tesla and Hyundai are openly available. Use
+the <code>removeCodes</code> parameter for this.</p>
+<p>What is the difference between the numbers in <code>nRule</code> and
+<code>nAll</code> now?</p>
+<div id="solution-3" class="section level4">
+<h4>Solution</h4>
+<ul>
+<li><em>nAll:</em> Number of <code>car_brand</code>’s included in the
+sum</li>
+<li><em>nRule:</em> Number of <code>car_brand</code>’s that is counted
+in the suppression rule. What is open (Tesla and Hyundai) is not
+counted.</li>
+</ul>
+<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>out7 <span class="ot">&lt;-</span> <span class="fu">SuppressFewContributors</span>(sdc_cars,</span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>                                 <span class="at">maxN =</span> <span class="dv">2</span>,</span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>                                 <span class="at">numVar =</span> <span class="st">&quot;value&quot;</span>,</span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>                                 <span class="at">dimVar =</span> <span class="fu">c</span>(<span class="st">&quot;sector&quot;</span>, <span class="st">&quot;k_group&quot;</span>),</span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>                                 <span class="at">contributorVar =</span> <span class="st">&quot;car_brand&quot;</span>,</span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a>                                 <span class="at">removeEmpty =</span> <span class="cn">FALSE</span>,</span>
+<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a>                                 <span class="at">removeCodes =</span> <span class="fu">c</span>(<span class="st">&quot;Tesla&quot;</span>, <span class="st">&quot;Hyundai&quot;</span>))</span>
+<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a>[preAggregate <span class="dv">582</span><span class="sc">*</span><span class="dv">8</span><span class="ot">-&gt;</span><span class="dv">212</span><span class="sc">*</span><span class="dv">5</span>]</span>
+<span id="cb11-9"><a href="#cb11-9" aria-hidden="true" tabindex="-1"></a>[extraAggregate <span class="dv">212</span><span class="sc">*</span><span class="dv">5</span><span class="ot">-&gt;</span><span class="dv">11</span><span class="sc">*</span><span class="dv">5</span>] Checking .....</span>
+<span id="cb11-10"><a href="#cb11-10" aria-hidden="true" tabindex="-1"></a>GaussSuppression_numttHTT<span class="sc">:</span> ..................</span>
+<span id="cb11-11"><a href="#cb11-11" aria-hidden="true" tabindex="-1"></a><span class="fu">Print</span>(out7)</span>
+<span id="cb11-12"><a href="#cb11-12" aria-hidden="true" tabindex="-1"></a>       sector k_group freq   value nRule nAll primary suppressed</span>
+<span id="cb11-13"><a href="#cb11-13" aria-hidden="true" tabindex="-1"></a><span class="dv">1</span>       Total   Total  <span class="dv">582</span> <span class="dv">1651372</span>    <span class="dv">51</span>   <span class="dv">53</span>       <span class="sc">-</span>          <span class="sc">-</span></span>
+<span id="cb11-14"><a href="#cb11-14" aria-hidden="true" tabindex="-1"></a><span class="dv">2</span>       Total       <span class="dv">1</span>  <span class="dv">513</span> <span class="dv">1453098</span>    <span class="dv">51</span>   <span class="dv">53</span>       <span class="sc">-</span>          <span class="sc">-</span></span>
+<span id="cb11-15"><a href="#cb11-15" aria-hidden="true" tabindex="-1"></a><span class="dv">3</span>       Total       <span class="dv">2</span>    <span class="dv">6</span>    <span class="dv">7778</span>     <span class="dv">2</span>    <span class="dv">4</span>    <span class="cn">TRUE</span>       <span class="cn">TRUE</span></span>
+<span id="cb11-16"><a href="#cb11-16" aria-hidden="true" tabindex="-1"></a><span class="dv">4</span>       Total       <span class="dv">3</span>   <span class="dv">63</span>  <span class="dv">190496</span>    <span class="dv">27</span>   <span class="dv">29</span>       <span class="sc">-</span>       <span class="cn">TRUE</span></span>
+<span id="cb11-17"><a href="#cb11-17" aria-hidden="true" tabindex="-1"></a><span class="dv">5</span>    business   Total  <span class="dv">181</span>  <span class="dv">599181</span>    <span class="dv">40</span>   <span class="dv">42</span>       <span class="sc">-</span>          <span class="sc">-</span></span>
+<span id="cb11-18"><a href="#cb11-18" aria-hidden="true" tabindex="-1"></a><span class="dv">6</span>    business       <span class="dv">1</span>  <span class="dv">159</span>  <span class="dv">524179</span>    <span class="dv">38</span>   <span class="dv">40</span>       <span class="sc">-</span>          <span class="sc">-</span></span>
+<span id="cb11-19"><a href="#cb11-19" aria-hidden="true" tabindex="-1"></a><span class="dv">7</span>    business       <span class="dv">2</span>    <span class="dv">3</span>     <span class="dv">823</span>     <span class="dv">2</span>    <span class="dv">3</span>    <span class="cn">TRUE</span>       <span class="cn">TRUE</span></span>
+<span id="cb11-20"><a href="#cb11-20" aria-hidden="true" tabindex="-1"></a><span class="dv">8</span>    business       <span class="dv">3</span>   <span class="dv">19</span>   <span class="dv">74179</span>    <span class="dv">14</span>   <span class="dv">15</span>       <span class="sc">-</span>       <span class="cn">TRUE</span></span>
+<span id="cb11-21"><a href="#cb11-21" aria-hidden="true" tabindex="-1"></a><span class="dv">9</span>  individual   Total  <span class="dv">229</span>  <span class="dv">657346</span>    <span class="dv">46</span>   <span class="dv">48</span>       <span class="sc">-</span>          <span class="sc">-</span></span>
+<span id="cb11-22"><a href="#cb11-22" aria-hidden="true" tabindex="-1"></a><span class="dv">10</span> individual       <span class="dv">1</span>  <span class="dv">199</span>  <span class="dv">565179</span>    <span class="dv">45</span>   <span class="dv">47</span>       <span class="sc">-</span>          <span class="sc">-</span></span>
+<span id="cb11-23"><a href="#cb11-23" aria-hidden="true" tabindex="-1"></a><span class="dv">11</span> individual       <span class="dv">2</span>    <span class="dv">2</span>    <span class="dv">6826</span>     <span class="dv">0</span>    <span class="dv">2</span>       <span class="sc">-</span>          <span class="sc">-</span></span>
+<span id="cb11-24"><a href="#cb11-24" aria-hidden="true" tabindex="-1"></a><span class="dv">12</span> individual       <span class="dv">3</span>   <span class="dv">28</span>   <span class="dv">85341</span>    <span class="dv">18</span>   <span class="dv">20</span>       <span class="sc">-</span>          <span class="sc">-</span></span>
+<span id="cb11-25"><a href="#cb11-25" aria-hidden="true" tabindex="-1"></a><span class="dv">13</span>      other   Total   <span class="dv">82</span>  <span class="dv">208383</span>    <span class="dv">31</span>   <span class="dv">33</span>       <span class="sc">-</span>          <span class="sc">-</span></span>
+<span id="cb11-26"><a href="#cb11-26" aria-hidden="true" tabindex="-1"></a><span class="dv">14</span>      other       <span class="dv">1</span>   <span class="dv">71</span>  <span class="dv">185690</span>    <span class="dv">31</span>   <span class="dv">33</span>       <span class="sc">-</span>          <span class="sc">-</span></span>
+<span id="cb11-27"><a href="#cb11-27" aria-hidden="true" tabindex="-1"></a><span class="dv">15</span>      other       <span class="dv">2</span>    <span class="dv">1</span>     <span class="dv">129</span>     <span class="dv">0</span>    <span class="dv">1</span>       <span class="sc">-</span>          <span class="sc">-</span></span>
+<span id="cb11-28"><a href="#cb11-28" aria-hidden="true" tabindex="-1"></a><span class="dv">16</span>      other       <span class="dv">3</span>   <span class="dv">10</span>   <span class="dv">22564</span>     <span class="dv">9</span>    <span class="dv">9</span>       <span class="sc">-</span>          <span class="sc">-</span></span>
+<span id="cb11-29"><a href="#cb11-29" aria-hidden="true" tabindex="-1"></a><span class="dv">17</span>     public   Total   <span class="dv">90</span>  <span class="dv">186462</span>    <span class="dv">34</span>   <span class="dv">36</span>       <span class="sc">-</span>          <span class="sc">-</span></span>
+<span id="cb11-30"><a href="#cb11-30" aria-hidden="true" tabindex="-1"></a><span class="dv">18</span>     public       <span class="dv">1</span>   <span class="dv">84</span>  <span class="dv">178050</span>    <span class="dv">34</span>   <span class="dv">36</span>       <span class="sc">-</span>          <span class="sc">-</span></span>
+<span id="cb11-31"><a href="#cb11-31" aria-hidden="true" tabindex="-1"></a><span class="dv">19</span>     public       <span class="dv">2</span>    <span class="dv">0</span>       <span class="dv">0</span>     <span class="dv">0</span>    <span class="dv">0</span>       <span class="sc">-</span>          <span class="sc">-</span></span>
+<span id="cb11-32"><a href="#cb11-32" aria-hidden="true" tabindex="-1"></a><span class="dv">20</span>     public       <span class="dv">3</span>    <span class="dv">6</span>    <span class="dv">8412</span>     <span class="dv">5</span>    <span class="dv">6</span>       <span class="sc">-</span>          <span class="sc">-</span></span></code></pre></div>
+</div>
+</div>
+<div id="exercise-8" class="section level3">
+<h3>Exercise 8</h3>
+<p>Run the analysis in Exercise 1 again with a modification where you no
+longer use the <code>dimVar</code> parameter, but instead use
+<code>hierarchies</code>. What you need for the <code>hierarchies</code>
+parameter can be generated with either <code>FindDimLists</code> or
+<code>FindHierarchies</code> in the <code>SSBtools</code> package.</p>
+<p>How should <code>FindDimLists</code> or <code>FindHierarchies</code>
+be executed?</p>
+<p>Take a look at the results from <code>FindDimLists</code> or
+<code>FindHierarchies</code>. Do you see that the output from
+<code>SuppressDominantCells</code> is the same as in Exercise 1?</p>
+<div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(SSBtools)</span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>diml <span class="ot">&lt;-</span> <span class="fu">FindDimLists</span>(sdc_cars[<span class="fu">c</span>(<span class="st">&quot;sector&quot;</span>, <span class="st">&quot;k_group&quot;</span>)])</span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a>diml</span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a><span class="sc">$</span>sector</span>
+<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a>  levels      codes</span>
+<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a><span class="dv">1</span>      <span class="sc">@</span>      Total</span>
+<span id="cb12-8"><a href="#cb12-8" aria-hidden="true" tabindex="-1"></a><span class="dv">2</span>     <span class="sc">@</span><span class="er">@</span>   business</span>
+<span id="cb12-9"><a href="#cb12-9" aria-hidden="true" tabindex="-1"></a><span class="dv">3</span>     <span class="sc">@</span><span class="er">@</span> individual</span>
+<span id="cb12-10"><a href="#cb12-10" aria-hidden="true" tabindex="-1"></a><span class="dv">4</span>     <span class="sc">@</span><span class="er">@</span>      other</span>
+<span id="cb12-11"><a href="#cb12-11" aria-hidden="true" tabindex="-1"></a><span class="dv">5</span>     <span class="sc">@</span><span class="er">@</span>     public</span>
+<span id="cb12-12"><a href="#cb12-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-13"><a href="#cb12-13" aria-hidden="true" tabindex="-1"></a><span class="sc">$</span>k_group</span>
+<span id="cb12-14"><a href="#cb12-14" aria-hidden="true" tabindex="-1"></a>  levels codes</span>
+<span id="cb12-15"><a href="#cb12-15" aria-hidden="true" tabindex="-1"></a><span class="dv">1</span>      <span class="sc">@</span> Total</span>
+<span id="cb12-16"><a href="#cb12-16" aria-hidden="true" tabindex="-1"></a><span class="dv">2</span>     <span class="sc">@</span><span class="er">@</span>     <span class="dv">1</span></span>
+<span id="cb12-17"><a href="#cb12-17" aria-hidden="true" tabindex="-1"></a><span class="dv">3</span>     <span class="sc">@</span><span class="er">@</span>     <span class="dv">2</span></span>
+<span id="cb12-18"><a href="#cb12-18" aria-hidden="true" tabindex="-1"></a><span class="dv">4</span>     <span class="sc">@</span><span class="er">@</span>     <span class="dv">3</span></span>
+<span id="cb12-19"><a href="#cb12-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-20"><a href="#cb12-20" aria-hidden="true" tabindex="-1"></a>hier <span class="ot">&lt;-</span> <span class="fu">FindHierarchies</span>(sdc_cars[<span class="fu">c</span>(<span class="st">&quot;sector&quot;</span>, <span class="st">&quot;k_group&quot;</span>)])</span>
+<span id="cb12-21"><a href="#cb12-21" aria-hidden="true" tabindex="-1"></a>hier</span>
+<span id="cb12-22"><a href="#cb12-22" aria-hidden="true" tabindex="-1"></a><span class="sc">$</span>sector</span>
+<span id="cb12-23"><a href="#cb12-23" aria-hidden="true" tabindex="-1"></a>    mapsFrom mapsTo sign level</span>
+<span id="cb12-24"><a href="#cb12-24" aria-hidden="true" tabindex="-1"></a><span class="dv">1</span>   business  Total    <span class="dv">1</span>     <span class="dv">1</span></span>
+<span id="cb12-25"><a href="#cb12-25" aria-hidden="true" tabindex="-1"></a><span class="dv">2</span> individual  Total    <span class="dv">1</span>     <span class="dv">1</span></span>
+<span id="cb12-26"><a href="#cb12-26" aria-hidden="true" tabindex="-1"></a><span class="dv">3</span>      other  Total    <span class="dv">1</span>     <span class="dv">1</span></span>
+<span id="cb12-27"><a href="#cb12-27" aria-hidden="true" tabindex="-1"></a><span class="dv">4</span>     public  Total    <span class="dv">1</span>     <span class="dv">1</span></span>
+<span id="cb12-28"><a href="#cb12-28" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-29"><a href="#cb12-29" aria-hidden="true" tabindex="-1"></a><span class="sc">$</span>k_group</span>
+<span id="cb12-30"><a href="#cb12-30" aria-hidden="true" tabindex="-1"></a>  mapsFrom mapsTo sign level</span>
+<span id="cb12-31"><a href="#cb12-31" aria-hidden="true" tabindex="-1"></a><span class="dv">1</span>        <span class="dv">1</span>  Total    <span class="dv">1</span>     <span class="dv">1</span></span>
+<span id="cb12-32"><a href="#cb12-32" aria-hidden="true" tabindex="-1"></a><span class="dv">2</span>        <span class="dv">2</span>  Total    <span class="dv">1</span>     <span class="dv">1</span></span>
+<span id="cb12-33"><a href="#cb12-33" aria-hidden="true" tabindex="-1"></a><span class="dv">3</span>        <span class="dv">3</span>  Total    <span class="dv">1</span>     <span class="dv">1</span></span>
+<span id="cb12-34"><a href="#cb12-34" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-35"><a href="#cb12-35" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-36"><a href="#cb12-36" aria-hidden="true" tabindex="-1"></a>out8a <span class="ot">&lt;-</span> <span class="fu">SuppressDominantCells</span>(sdc_cars,</span>
+<span id="cb12-37"><a href="#cb12-37" aria-hidden="true" tabindex="-1"></a>                               <span class="at">n =</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">2</span>, <span class="at">k =</span> <span class="fu">c</span>(<span class="dv">85</span>, <span class="dv">95</span>),</span>
+<span id="cb12-38"><a href="#cb12-38" aria-hidden="true" tabindex="-1"></a>                               <span class="at">numVar =</span> <span class="st">&quot;value&quot;</span>,</span>
+<span id="cb12-39"><a href="#cb12-39" aria-hidden="true" tabindex="-1"></a>                               <span class="at">hierarchies =</span> diml,</span>
+<span id="cb12-40"><a href="#cb12-40" aria-hidden="true" tabindex="-1"></a>                               <span class="at">contributorVar =</span> <span class="st">&quot;car_brand&quot;</span>)</span>
+<span id="cb12-41"><a href="#cb12-41" aria-hidden="true" tabindex="-1"></a>[preAggregate <span class="dv">582</span><span class="sc">*</span><span class="dv">8</span><span class="ot">-&gt;</span><span class="dv">212</span><span class="sc">*</span><span class="dv">5</span>]</span>
+<span id="cb12-42"><a href="#cb12-42" aria-hidden="true" tabindex="-1"></a>[extraAggregate <span class="dv">212</span><span class="sc">*</span><span class="dv">5</span><span class="ot">-&gt;</span><span class="dv">11</span><span class="sc">*</span><span class="dv">5</span>] Checking .....</span>
+<span id="cb12-43"><a href="#cb12-43" aria-hidden="true" tabindex="-1"></a>GaussSuppression_numttHTT<span class="sc">:</span> ...............<span class="sc">:::</span></span>
+<span id="cb12-44"><a href="#cb12-44" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-45"><a href="#cb12-45" aria-hidden="true" tabindex="-1"></a><span class="fu">Print</span>(out8a)</span>
+<span id="cb12-46"><a href="#cb12-46" aria-hidden="true" tabindex="-1"></a>       sector k_group freq   value primary suppressed</span>
+<span id="cb12-47"><a href="#cb12-47" aria-hidden="true" tabindex="-1"></a><span class="dv">1</span>       Total   Total  <span class="dv">582</span> <span class="dv">1651372</span>       <span class="sc">-</span>          <span class="sc">-</span></span>
+<span id="cb12-48"><a href="#cb12-48" aria-hidden="true" tabindex="-1"></a><span class="dv">2</span>       Total       <span class="dv">1</span>  <span class="dv">513</span> <span class="dv">1453098</span>       <span class="sc">-</span>          <span class="sc">-</span></span>
+<span id="cb12-49"><a href="#cb12-49" aria-hidden="true" tabindex="-1"></a><span class="dv">3</span>       Total       <span class="dv">2</span>    <span class="dv">6</span>    <span class="dv">7778</span>       <span class="sc">-</span>          <span class="sc">-</span></span>
+<span id="cb12-50"><a href="#cb12-50" aria-hidden="true" tabindex="-1"></a><span class="dv">4</span>       Total       <span class="dv">3</span>   <span class="dv">63</span>  <span class="dv">190496</span>       <span class="sc">-</span>          <span class="sc">-</span></span>
+<span id="cb12-51"><a href="#cb12-51" aria-hidden="true" tabindex="-1"></a><span class="dv">5</span>    business   Total  <span class="dv">181</span>  <span class="dv">599181</span>       <span class="sc">-</span>          <span class="sc">-</span></span>
+<span id="cb12-52"><a href="#cb12-52" aria-hidden="true" tabindex="-1"></a><span class="dv">6</span>    business       <span class="dv">1</span>  <span class="dv">159</span>  <span class="dv">524179</span>       <span class="sc">-</span>          <span class="sc">-</span></span>
+<span id="cb12-53"><a href="#cb12-53" aria-hidden="true" tabindex="-1"></a><span class="dv">7</span>    business       <span class="dv">2</span>    <span class="dv">3</span>     <span class="dv">823</span>       <span class="sc">-</span>       <span class="cn">TRUE</span></span>
+<span id="cb12-54"><a href="#cb12-54" aria-hidden="true" tabindex="-1"></a><span class="dv">8</span>    business       <span class="dv">3</span>   <span class="dv">19</span>   <span class="dv">74179</span>       <span class="sc">-</span>       <span class="cn">TRUE</span></span>
+<span id="cb12-55"><a href="#cb12-55" aria-hidden="true" tabindex="-1"></a><span class="dv">9</span>  individual   Total  <span class="dv">229</span>  <span class="dv">657346</span>       <span class="sc">-</span>          <span class="sc">-</span></span>
+<span id="cb12-56"><a href="#cb12-56" aria-hidden="true" tabindex="-1"></a><span class="dv">10</span> individual       <span class="dv">1</span>  <span class="dv">199</span>  <span class="dv">565179</span>       <span class="sc">-</span>          <span class="sc">-</span></span>
+<span id="cb12-57"><a href="#cb12-57" aria-hidden="true" tabindex="-1"></a><span class="dv">11</span> individual       <span class="dv">2</span>    <span class="dv">2</span>    <span class="dv">6826</span>    <span class="cn">TRUE</span>       <span class="cn">TRUE</span></span>
+<span id="cb12-58"><a href="#cb12-58" aria-hidden="true" tabindex="-1"></a><span class="dv">12</span> individual       <span class="dv">3</span>   <span class="dv">28</span>   <span class="dv">85341</span>       <span class="sc">-</span>       <span class="cn">TRUE</span></span>
+<span id="cb12-59"><a href="#cb12-59" aria-hidden="true" tabindex="-1"></a><span class="dv">13</span>      other   Total   <span class="dv">82</span>  <span class="dv">208383</span>       <span class="sc">-</span>          <span class="sc">-</span></span>
+<span id="cb12-60"><a href="#cb12-60" aria-hidden="true" tabindex="-1"></a><span class="dv">14</span>      other       <span class="dv">1</span>   <span class="dv">71</span>  <span class="dv">185690</span>       <span class="sc">-</span>          <span class="sc">-</span></span>
+<span id="cb12-61"><a href="#cb12-61" aria-hidden="true" tabindex="-1"></a><span class="dv">15</span>      other       <span class="dv">2</span>    <span class="dv">1</span>     <span class="dv">129</span>    <span class="cn">TRUE</span>       <span class="cn">TRUE</span></span>
+<span id="cb12-62"><a href="#cb12-62" aria-hidden="true" tabindex="-1"></a><span class="dv">16</span>      other       <span class="dv">3</span>   <span class="dv">10</span>   <span class="dv">22564</span>       <span class="sc">-</span>       <span class="cn">TRUE</span></span>
+<span id="cb12-63"><a href="#cb12-63" aria-hidden="true" tabindex="-1"></a><span class="dv">17</span>     public   Total   <span class="dv">90</span>  <span class="dv">186462</span>       <span class="sc">-</span>          <span class="sc">-</span></span>
+<span id="cb12-64"><a href="#cb12-64" aria-hidden="true" tabindex="-1"></a><span class="dv">18</span>     public       <span class="dv">1</span>   <span class="dv">84</span>  <span class="dv">178050</span>       <span class="sc">-</span>          <span class="sc">-</span></span>
+<span id="cb12-65"><a href="#cb12-65" aria-hidden="true" tabindex="-1"></a><span class="dv">19</span>     public       <span class="dv">2</span>    <span class="dv">0</span>       <span class="dv">0</span>       <span class="sc">-</span>          <span class="sc">-</span></span>
+<span id="cb12-66"><a href="#cb12-66" aria-hidden="true" tabindex="-1"></a><span class="dv">20</span>     public       <span class="dv">3</span>    <span class="dv">6</span>    <span class="dv">8412</span>       <span class="sc">-</span>          <span class="sc">-</span></span>
+<span id="cb12-67"><a href="#cb12-67" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-68"><a href="#cb12-68" aria-hidden="true" tabindex="-1"></a>out8b <span class="ot">&lt;-</span> <span class="fu">SuppressDominantCells</span>(sdc_cars,</span>
+<span id="cb12-69"><a href="#cb12-69" aria-hidden="true" tabindex="-1"></a>                               <span class="at">n =</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">2</span>, <span class="at">k =</span> <span class="fu">c</span>(<span class="dv">85</span>, <span class="dv">95</span>),</span>
+<span id="cb12-70"><a href="#cb12-70" aria-hidden="true" tabindex="-1"></a>                               <span class="at">numVar =</span> <span class="st">&quot;value&quot;</span>,</span>
+<span id="cb12-71"><a href="#cb12-71" aria-hidden="true" tabindex="-1"></a>                               <span class="at">hierarchies =</span> hier,</span>
+<span id="cb12-72"><a href="#cb12-72" aria-hidden="true" tabindex="-1"></a>                               <span class="at">contributorVar =</span> <span class="st">&quot;car_brand&quot;</span>)</span>
+<span id="cb12-73"><a href="#cb12-73" aria-hidden="true" tabindex="-1"></a>[preAggregate <span class="dv">582</span><span class="sc">*</span><span class="dv">8</span><span class="ot">-&gt;</span><span class="dv">212</span><span class="sc">*</span><span class="dv">5</span>]</span>
+<span id="cb12-74"><a href="#cb12-74" aria-hidden="true" tabindex="-1"></a>[extraAggregate <span class="dv">212</span><span class="sc">*</span><span class="dv">5</span><span class="ot">-&gt;</span><span class="dv">11</span><span class="sc">*</span><span class="dv">5</span>] Checking .....</span>
+<span id="cb12-75"><a href="#cb12-75" aria-hidden="true" tabindex="-1"></a>GaussSuppression_numttHTT<span class="sc">:</span> ...............<span class="sc">:::</span></span>
+<span id="cb12-76"><a href="#cb12-76" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-77"><a href="#cb12-77" aria-hidden="true" tabindex="-1"></a><span class="fu">Print</span>(out8b)</span>
+<span id="cb12-78"><a href="#cb12-78" aria-hidden="true" tabindex="-1"></a>       sector k_group freq   value primary suppressed</span>
+<span id="cb12-79"><a href="#cb12-79" aria-hidden="true" tabindex="-1"></a><span class="dv">1</span>       Total   Total  <span class="dv">582</span> <span class="dv">1651372</span>       <span class="sc">-</span>          <span class="sc">-</span></span>
+<span id="cb12-80"><a href="#cb12-80" aria-hidden="true" tabindex="-1"></a><span class="dv">2</span>       Total       <span class="dv">1</span>  <span class="dv">513</span> <span class="dv">1453098</span>       <span class="sc">-</span>          <span class="sc">-</span></span>
+<span id="cb12-81"><a href="#cb12-81" aria-hidden="true" tabindex="-1"></a><span class="dv">3</span>       Total       <span class="dv">2</span>    <span class="dv">6</span>    <span class="dv">7778</span>       <span class="sc">-</span>          <span class="sc">-</span></span>
+<span id="cb12-82"><a href="#cb12-82" aria-hidden="true" tabindex="-1"></a><span class="dv">4</span>       Total       <span class="dv">3</span>   <span class="dv">63</span>  <span class="dv">190496</span>       <span class="sc">-</span>          <span class="sc">-</span></span>
+<span id="cb12-83"><a href="#cb12-83" aria-hidden="true" tabindex="-1"></a><span class="dv">5</span>    business   Total  <span class="dv">181</span>  <span class="dv">599181</span>       <span class="sc">-</span>          <span class="sc">-</span></span>
+<span id="cb12-84"><a href="#cb12-84" aria-hidden="true" tabindex="-1"></a><span class="dv">6</span>    business       <span class="dv">1</span>  <span class="dv">159</span>  <span class="dv">524179</span>       <span class="sc">-</span>          <span class="sc">-</span></span>
+<span id="cb12-85"><a href="#cb12-85" aria-hidden="true" tabindex="-1"></a><span class="dv">7</span>    business       <span class="dv">2</span>    <span class="dv">3</span>     <span class="dv">823</span>       <span class="sc">-</span>       <span class="cn">TRUE</span></span>
+<span id="cb12-86"><a href="#cb12-86" aria-hidden="true" tabindex="-1"></a><span class="dv">8</span>    business       <span class="dv">3</span>   <span class="dv">19</span>   <span class="dv">74179</span>       <span class="sc">-</span>       <span class="cn">TRUE</span></span>
+<span id="cb12-87"><a href="#cb12-87" aria-hidden="true" tabindex="-1"></a><span class="dv">9</span>  individual   Total  <span class="dv">229</span>  <span class="dv">657346</span>       <span class="sc">-</span>          <span class="sc">-</span></span>
+<span id="cb12-88"><a href="#cb12-88" aria-hidden="true" tabindex="-1"></a><span class="dv">10</span> individual       <span class="dv">1</span>  <span class="dv">199</span>  <span class="dv">565179</span>       <span class="sc">-</span>          <span class="sc">-</span></span>
+<span id="cb12-89"><a href="#cb12-89" aria-hidden="true" tabindex="-1"></a><span class="dv">11</span> individual       <span class="dv">2</span>    <span class="dv">2</span>    <span class="dv">6826</span>    <span class="cn">TRUE</span>       <span class="cn">TRUE</span></span>
+<span id="cb12-90"><a href="#cb12-90" aria-hidden="true" tabindex="-1"></a><span class="dv">12</span> individual       <span class="dv">3</span>   <span class="dv">28</span>   <span class="dv">85341</span>       <span class="sc">-</span>       <span class="cn">TRUE</span></span>
+<span id="cb12-91"><a href="#cb12-91" aria-hidden="true" tabindex="-1"></a><span class="dv">13</span>      other   Total   <span class="dv">82</span>  <span class="dv">208383</span>       <span class="sc">-</span>          <span class="sc">-</span></span>
+<span id="cb12-92"><a href="#cb12-92" aria-hidden="true" tabindex="-1"></a><span class="dv">14</span>      other       <span class="dv">1</span>   <span class="dv">71</span>  <span class="dv">185690</span>       <span class="sc">-</span>          <span class="sc">-</span></span>
+<span id="cb12-93"><a href="#cb12-93" aria-hidden="true" tabindex="-1"></a><span class="dv">15</span>      other       <span class="dv">2</span>    <span class="dv">1</span>     <span class="dv">129</span>    <span class="cn">TRUE</span>       <span class="cn">TRUE</span></span>
+<span id="cb12-94"><a href="#cb12-94" aria-hidden="true" tabindex="-1"></a><span class="dv">16</span>      other       <span class="dv">3</span>   <span class="dv">10</span>   <span class="dv">22564</span>       <span class="sc">-</span>       <span class="cn">TRUE</span></span>
+<span id="cb12-95"><a href="#cb12-95" aria-hidden="true" tabindex="-1"></a><span class="dv">17</span>     public   Total   <span class="dv">90</span>  <span class="dv">186462</span>       <span class="sc">-</span>          <span class="sc">-</span></span>
+<span id="cb12-96"><a href="#cb12-96" aria-hidden="true" tabindex="-1"></a><span class="dv">18</span>     public       <span class="dv">1</span>   <span class="dv">84</span>  <span class="dv">178050</span>       <span class="sc">-</span>          <span class="sc">-</span></span>
+<span id="cb12-97"><a href="#cb12-97" aria-hidden="true" tabindex="-1"></a><span class="dv">19</span>     public       <span class="dv">2</span>    <span class="dv">0</span>       <span class="dv">0</span>       <span class="sc">-</span>          <span class="sc">-</span></span>
+<span id="cb12-98"><a href="#cb12-98" aria-hidden="true" tabindex="-1"></a><span class="dv">20</span>     public       <span class="dv">3</span>    <span class="dv">6</span>    <span class="dv">8412</span>       <span class="sc">-</span>          <span class="sc">-</span></span></code></pre></div>
+</div>
+
+
+
+<!-- code folding -->
+
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>
