@@ -11,7 +11,7 @@ Load the dataset `pregnant_micro`. Tip: `load("data/pregnant_micro.RData")`
 Run this analysis:
 ```
 PLSroundingPublish(pregnant_micro, 
-                   roundBase = 3, 
+                   roundBase = 5, 
                    formula = ~municipality*gender*pregnant)
 ```
 
@@ -19,7 +19,8 @@ Also try `removeEmpty = FALSE`
 
 What is the difference?
 
-
+**Correction:** We have changed from  `roundBase = 3` to `roundBase = 5` 
+                so that the results are more interesting
 
 
 ### Exercise 2
