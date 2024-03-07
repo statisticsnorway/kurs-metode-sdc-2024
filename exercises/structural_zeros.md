@@ -6,7 +6,7 @@ If you run the following code, you can use a `Print` function
 This function might make  inspecting the output of GaussSuppression
 easier by replacing FALSE with - in the suppressed and primary columns.
 
-`source("/R/Print.R")`
+`source("R/Print.R")`
 
 
 ### Exercise 1

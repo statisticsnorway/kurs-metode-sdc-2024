@@ -1,0 +1,1006 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+
+<meta name="author" content />
+
+
+<title>Exercises about singleton, aggregation and weightVar</title>
+
+<script>// Pandoc 2.9 adds attributes on both header and div. We remove the former (to
+// be compatible with the behavior of Pandoc < 2.8).
+document.addEventListener('DOMContentLoaded', function(e) {
+  var hs = document.querySelectorAll("div.section[class*='level'] > :first-child");
+  var i, h, a;
+  for (i = 0; i < hs.length; i++) {
+    h = hs[i];
+    if (!/^h[1-6]$/i.test(h.tagName)) continue;  // it should be a header h1-h6
+    a = h.attributes;
+    while (a.length > 0) h.removeAttribute(a[0].name);
+  }
+});
+</script>
+
+<style type="text/css">
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+span.underline{text-decoration: underline;}
+div.column{display: inline-block; vertical-align: top; width: 50%;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+</style>
+
+
+
+<style type="text/css">
+code {
+white-space: pre;
+}
+.sourceCode {
+overflow: visible;
+}
+</style>
+<style type="text/css" data-origin="pandoc">
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+{ counter-reset: source-line 0; }
+pre.numberSource code > span
+{ position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+{ content: counter(source-line);
+position: relative; left: -1em; text-align: right; vertical-align: baseline;
+border: none; display: inline-block;
+-webkit-touch-callout: none; -webkit-user-select: none;
+-khtml-user-select: none; -moz-user-select: none;
+-ms-user-select: none; user-select: none;
+padding: 0 4px; width: 4em;
+color: #aaaaaa;
+}
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa; padding-left: 4px; }
+div.sourceCode
+{ }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } 
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.at { color: #7d9029; } 
+code span.bn { color: #40a070; } 
+code span.bu { color: #008000; } 
+code span.cf { color: #007020; font-weight: bold; } 
+code span.ch { color: #4070a0; } 
+code span.cn { color: #880000; } 
+code span.co { color: #60a0b0; font-style: italic; } 
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.do { color: #ba2121; font-style: italic; } 
+code span.dt { color: #902000; } 
+code span.dv { color: #40a070; } 
+code span.er { color: #ff0000; font-weight: bold; } 
+code span.ex { } 
+code span.fl { color: #40a070; } 
+code span.fu { color: #06287e; } 
+code span.im { color: #008000; font-weight: bold; } 
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.kw { color: #007020; font-weight: bold; } 
+code span.op { color: #666666; } 
+code span.ot { color: #007020; } 
+code span.pp { color: #bc7a00; } 
+code span.sc { color: #4070a0; } 
+code span.ss { color: #bb6688; } 
+code span.st { color: #4070a0; } 
+code span.va { color: #19177c; } 
+code span.vs { color: #4070a0; } 
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } 
+</style>
+<script>
+// apply pandoc div.sourceCode style to pre.sourceCode instead
+(function() {
+  var sheets = document.styleSheets;
+  for (var i = 0; i < sheets.length; i++) {
+    if (sheets[i].ownerNode.dataset["origin"] !== "pandoc") continue;
+    try { var rules = sheets[i].cssRules; } catch (e) { continue; }
+    var j = 0;
+    while (j < rules.length) {
+      var rule = rules[j];
+      // check if there is a div.sourceCode rule
+      if (rule.type !== rule.STYLE_RULE || rule.selectorText !== "div.sourceCode") {
+        j++;
+        continue;
+      }
+      var style = rule.style.cssText;
+      // check if color or background-color is set
+      if (rule.style.color === '' && rule.style.backgroundColor === '') {
+        j++;
+        continue;
+      }
+      // replace div.sourceCode by a pre.sourceCode rule
+      sheets[i].deleteRule(j);
+      sheets[i].insertRule('pre.sourceCode{' + style + '}', j);
+    }
+  }
+})();
+</script>
+
+
+
+
+<style type="text/css">body {
+background-color: #fff;
+margin: 1em auto;
+max-width: 700px;
+overflow: visible;
+padding-left: 2em;
+padding-right: 2em;
+font-family: "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+font-size: 14px;
+line-height: 1.35;
+}
+#TOC {
+clear: both;
+margin: 0 0 10px 10px;
+padding: 4px;
+width: 400px;
+border: 1px solid #CCCCCC;
+border-radius: 5px;
+background-color: #f6f6f6;
+font-size: 13px;
+line-height: 1.3;
+}
+#TOC .toctitle {
+font-weight: bold;
+font-size: 15px;
+margin-left: 5px;
+}
+#TOC ul {
+padding-left: 40px;
+margin-left: -1.5em;
+margin-top: 5px;
+margin-bottom: 5px;
+}
+#TOC ul ul {
+margin-left: -2em;
+}
+#TOC li {
+line-height: 16px;
+}
+table {
+margin: 1em auto;
+border-width: 1px;
+border-color: #DDDDDD;
+border-style: outset;
+border-collapse: collapse;
+}
+table th {
+border-width: 2px;
+padding: 5px;
+border-style: inset;
+}
+table td {
+border-width: 1px;
+border-style: inset;
+line-height: 18px;
+padding: 5px 5px;
+}
+table, table th, table td {
+border-left-style: none;
+border-right-style: none;
+}
+table thead, table tr.even {
+background-color: #f7f7f7;
+}
+p {
+margin: 0.5em 0;
+}
+blockquote {
+background-color: #f6f6f6;
+padding: 0.25em 0.75em;
+}
+hr {
+border-style: solid;
+border: none;
+border-top: 1px solid #777;
+margin: 28px 0;
+}
+dl {
+margin-left: 0;
+}
+dl dd {
+margin-bottom: 13px;
+margin-left: 13px;
+}
+dl dt {
+font-weight: bold;
+}
+ul {
+margin-top: 0;
+}
+ul li {
+list-style: circle outside;
+}
+ul ul {
+margin-bottom: 0;
+}
+pre, code {
+background-color: #f7f7f7;
+border-radius: 3px;
+color: #333;
+white-space: pre-wrap; 
+}
+pre {
+border-radius: 3px;
+margin: 5px 0px 10px 0px;
+padding: 10px;
+}
+pre:not([class]) {
+background-color: #f7f7f7;
+}
+code {
+font-family: Consolas, Monaco, 'Courier New', monospace;
+font-size: 85%;
+}
+p > code, li > code {
+padding: 2px 0px;
+}
+div.figure {
+text-align: center;
+}
+img {
+background-color: #FFFFFF;
+padding: 2px;
+border: 1px solid #DDDDDD;
+border-radius: 3px;
+border: 1px solid #CCCCCC;
+margin: 0 5px;
+}
+h1 {
+margin-top: 0;
+font-size: 35px;
+line-height: 40px;
+}
+h2 {
+border-bottom: 4px solid #f7f7f7;
+padding-top: 10px;
+padding-bottom: 2px;
+font-size: 145%;
+}
+h3 {
+border-bottom: 2px solid #f7f7f7;
+padding-top: 10px;
+font-size: 120%;
+}
+h4 {
+border-bottom: 1px solid #f7f7f7;
+margin-left: 8px;
+font-size: 105%;
+}
+h5, h6 {
+border-bottom: 1px solid #ccc;
+font-size: 105%;
+}
+a {
+color: #0033dd;
+text-decoration: none;
+}
+a:hover {
+color: #6666ff; }
+a:visited {
+color: #800080; }
+a:visited:hover {
+color: #BB00BB; }
+a[href^="http:"] {
+text-decoration: underline; }
+a[href^="https:"] {
+text-decoration: underline; }
+
+code > span.kw { color: #555; font-weight: bold; } 
+code > span.dt { color: #902000; } 
+code > span.dv { color: #40a070; } 
+code > span.bn { color: #d14; } 
+code > span.fl { color: #d14; } 
+code > span.ch { color: #d14; } 
+code > span.st { color: #d14; } 
+code > span.co { color: #888888; font-style: italic; } 
+code > span.ot { color: #007020; } 
+code > span.al { color: #ff0000; font-weight: bold; } 
+code > span.fu { color: #900; font-weight: bold; } 
+code > span.er { color: #a61717; background-color: #e3d2d2; } 
+</style>
+
+
+
+
+</head>
+
+<body>
+
+
+
+
+<h1 class="title toc-ignore">Exercises about singleton, aggregation and
+weightVar</h1>
+<h4 class="author"></h4>
+
+
+
+<p>If you run the following code, you can use a <code>Print</code>
+function This function might make inspecting the output of
+GaussSuppression easier by replacing FALSE with - in the suppressed and
+primary columns.</p>
+<p><code>source(&quot;R/Print.R&quot;)</code></p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">source</span>(<span class="st">&quot;../R/Print.R&quot;</span>) <span class="co"># Here,  &quot;../&quot; is included since this document is generated from a subfolder</span></span></code></pre></div>
+<div id="exercise-1" class="section level3">
+<h3>Exercise 1</h3>
+<p>Load the dataset <code>sdc_cars</code>. Tip:
+<code>load(&quot;data/sdc_cars.RData&quot;)</code></p>
+<p>Run this analysis:</p>
+<pre><code>  SuppressDominantCells(sdc_cars, 
+                        n = 1:2, k = c(50, 60), 
+                        numVar = &quot;value&quot;, 
+                        dimVar = c(&quot;months&quot;, &quot;k_group&quot;), 
+                        contributorVar = &quot;car_brand&quot;)</code></pre>
+<p>Also run a corresponding analysis where you enter
+<code>singletonMethod = &quot;none&quot;</code>.</p>
+<p>Do you see that the answer was different?</p>
+<p>Are you able to understand the disclosure that can be found at
+<code>singletonMethod = &quot;none&quot;</code>.</p>
+<div id="solution" class="section level4">
+<h4>Solution</h4>
+<p>With <code>singletonMethod = &quot;none&quot;</code> only two values are
+suppressed in m06m09. One of these is a single contribution since
+freq=1. This contributor knows his own number and can thus calculate the
+second suppressed number in m06m09.</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(GaussSuppression)</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>Warning<span class="sc">:</span> package <span class="st">&#39;GaussSuppression&#39;</span> was built under R version <span class="dv">4</span>.<span class="fl">3.2</span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>Loading required package<span class="sc">:</span> Matrix</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>Warning<span class="sc">:</span> package <span class="st">&#39;Matrix&#39;</span> was built under R version <span class="dv">4</span>.<span class="fl">3.1</span></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a><span class="fu">load</span>(<span class="st">&quot;../data/sdc_cars.RData&quot;</span>)</span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>out8a <span class="ot">&lt;-</span> <span class="fu">SuppressDominantCells</span>(sdc_cars,</span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>                                <span class="at">n =</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">2</span>, <span class="at">k =</span> <span class="fu">c</span>(<span class="dv">50</span>, <span class="dv">60</span>),</span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>                                <span class="at">numVar =</span> <span class="st">&quot;value&quot;</span>,</span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a>                                <span class="at">dimVar =</span> <span class="fu">c</span>(<span class="st">&quot;months&quot;</span>, <span class="st">&quot;k_group&quot;</span>),</span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a>                                <span class="at">contributorVar =</span> <span class="st">&quot;car_brand&quot;</span>)</span>
+<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a>[preAggregate <span class="dv">582</span><span class="sc">*</span><span class="dv">8</span><span class="ot">-&gt;</span><span class="dv">172</span><span class="sc">*</span><span class="dv">5</span>]</span>
+<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a>[extraAggregate <span class="dv">172</span><span class="sc">*</span><span class="dv">5</span><span class="ot">-&gt;</span><span class="dv">9</span><span class="sc">*</span><span class="dv">5</span>] Checking .....</span>
+<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a>GaussSuppression_numttHTT<span class="sc">:</span> ...........</span>
+<span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a><span class="fu">Print</span>(out8a)</span>
+<span id="cb3-17"><a href="#cb3-17" aria-hidden="true" tabindex="-1"></a>   months k_group freq   value primary suppressed</span>
+<span id="cb3-18"><a href="#cb3-18" aria-hidden="true" tabindex="-1"></a><span class="dv">1</span>   Total   Total  <span class="dv">582</span> <span class="dv">1651372</span>       <span class="sc">-</span>          <span class="sc">-</span></span>
+<span id="cb3-19"><a href="#cb3-19" aria-hidden="true" tabindex="-1"></a><span class="dv">2</span>   Total       <span class="dv">1</span>  <span class="dv">513</span> <span class="dv">1453098</span>       <span class="sc">-</span>          <span class="sc">-</span></span>
+<span id="cb3-20"><a href="#cb3-20" aria-hidden="true" tabindex="-1"></a><span class="dv">3</span>   Total       <span class="dv">2</span>    <span class="dv">6</span>    <span class="dv">7778</span>    <span class="cn">TRUE</span>       <span class="cn">TRUE</span></span>
+<span id="cb3-21"><a href="#cb3-21" aria-hidden="true" tabindex="-1"></a><span class="dv">4</span>   Total       <span class="dv">3</span>   <span class="dv">63</span>  <span class="dv">190496</span>       <span class="sc">-</span>       <span class="cn">TRUE</span></span>
+<span id="cb3-22"><a href="#cb3-22" aria-hidden="true" tabindex="-1"></a><span class="dv">5</span>  m01m05   Total  <span class="dv">393</span> <span class="dv">1233769</span>       <span class="sc">-</span>          <span class="sc">-</span></span>
+<span id="cb3-23"><a href="#cb3-23" aria-hidden="true" tabindex="-1"></a><span class="dv">6</span>  m01m05       <span class="dv">1</span>  <span class="dv">352</span> <span class="dv">1117596</span>       <span class="sc">-</span>          <span class="sc">-</span></span>
+<span id="cb3-24"><a href="#cb3-24" aria-hidden="true" tabindex="-1"></a><span class="dv">7</span>  m01m05       <span class="dv">2</span>    <span class="dv">3</span>     <span class="dv">561</span>    <span class="cn">TRUE</span>       <span class="cn">TRUE</span></span>
+<span id="cb3-25"><a href="#cb3-25" aria-hidden="true" tabindex="-1"></a><span class="dv">8</span>  m01m05       <span class="dv">3</span>   <span class="dv">38</span>  <span class="dv">115612</span>       <span class="sc">-</span>       <span class="cn">TRUE</span></span>
+<span id="cb3-26"><a href="#cb3-26" aria-hidden="true" tabindex="-1"></a><span class="dv">9</span>  m06m09   Total  <span class="dv">112</span>  <span class="dv">241460</span>       <span class="sc">-</span>          <span class="sc">-</span></span>
+<span id="cb3-27"><a href="#cb3-27" aria-hidden="true" tabindex="-1"></a><span class="dv">10</span> m06m09       <span class="dv">1</span>   <span class="dv">98</span>  <span class="dv">206402</span>       <span class="sc">-</span>       <span class="cn">TRUE</span></span>
+<span id="cb3-28"><a href="#cb3-28" aria-hidden="true" tabindex="-1"></a><span class="dv">11</span> m06m09       <span class="dv">2</span>    <span class="dv">1</span>     <span class="dv">391</span>    <span class="cn">TRUE</span>       <span class="cn">TRUE</span></span>
+<span id="cb3-29"><a href="#cb3-29" aria-hidden="true" tabindex="-1"></a><span class="dv">12</span> m06m09       <span class="dv">3</span>   <span class="dv">13</span>   <span class="dv">34667</span>    <span class="cn">TRUE</span>       <span class="cn">TRUE</span></span>
+<span id="cb3-30"><a href="#cb3-30" aria-hidden="true" tabindex="-1"></a><span class="dv">13</span> m10m12   Total   <span class="dv">77</span>  <span class="dv">176143</span>       <span class="sc">-</span>          <span class="sc">-</span></span>
+<span id="cb3-31"><a href="#cb3-31" aria-hidden="true" tabindex="-1"></a><span class="dv">14</span> m10m12       <span class="dv">1</span>   <span class="dv">63</span>  <span class="dv">129100</span>       <span class="sc">-</span>       <span class="cn">TRUE</span></span>
+<span id="cb3-32"><a href="#cb3-32" aria-hidden="true" tabindex="-1"></a><span class="dv">15</span> m10m12       <span class="dv">2</span>    <span class="dv">2</span>    <span class="dv">6826</span>    <span class="cn">TRUE</span>       <span class="cn">TRUE</span></span>
+<span id="cb3-33"><a href="#cb3-33" aria-hidden="true" tabindex="-1"></a><span class="dv">16</span> m10m12       <span class="dv">3</span>   <span class="dv">12</span>   <span class="dv">40217</span>       <span class="sc">-</span>          <span class="sc">-</span></span>
+<span id="cb3-34"><a href="#cb3-34" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-35"><a href="#cb3-35" aria-hidden="true" tabindex="-1"></a>out8b <span class="ot">&lt;-</span> <span class="fu">SuppressDominantCells</span>(sdc_cars,</span>
+<span id="cb3-36"><a href="#cb3-36" aria-hidden="true" tabindex="-1"></a>                                <span class="at">n =</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">2</span>, <span class="at">k =</span> <span class="fu">c</span>(<span class="dv">50</span>, <span class="dv">60</span>),</span>
+<span id="cb3-37"><a href="#cb3-37" aria-hidden="true" tabindex="-1"></a>                                <span class="at">numVar =</span> <span class="st">&quot;value&quot;</span>,</span>
+<span id="cb3-38"><a href="#cb3-38" aria-hidden="true" tabindex="-1"></a>                                <span class="at">dimVar =</span> <span class="fu">c</span>(<span class="st">&quot;months&quot;</span>, <span class="st">&quot;k_group&quot;</span>),</span>
+<span id="cb3-39"><a href="#cb3-39" aria-hidden="true" tabindex="-1"></a>                                <span class="at">contributorVar =</span> <span class="st">&quot;car_brand&quot;</span>,</span>
+<span id="cb3-40"><a href="#cb3-40" aria-hidden="true" tabindex="-1"></a>                                <span class="at">singletonMethod =</span> <span class="st">&quot;none&quot;</span>)</span>
+<span id="cb3-41"><a href="#cb3-41" aria-hidden="true" tabindex="-1"></a>[preAggregate <span class="dv">582</span><span class="sc">*</span><span class="dv">8</span><span class="ot">-&gt;</span><span class="dv">172</span><span class="sc">*</span><span class="dv">5</span>]</span>
+<span id="cb3-42"><a href="#cb3-42" aria-hidden="true" tabindex="-1"></a>[extraAggregate <span class="dv">172</span><span class="sc">*</span><span class="dv">5</span><span class="ot">-&gt;</span><span class="dv">9</span><span class="sc">*</span><span class="dv">5</span>] Checking .....</span>
+<span id="cb3-43"><a href="#cb3-43" aria-hidden="true" tabindex="-1"></a>GaussSuppression_none<span class="sc">:</span> ...........</span>
+<span id="cb3-44"><a href="#cb3-44" aria-hidden="true" tabindex="-1"></a><span class="fu">Print</span>(out8b)</span>
+<span id="cb3-45"><a href="#cb3-45" aria-hidden="true" tabindex="-1"></a>   months k_group freq   value primary suppressed</span>
+<span id="cb3-46"><a href="#cb3-46" aria-hidden="true" tabindex="-1"></a><span class="dv">1</span>   Total   Total  <span class="dv">582</span> <span class="dv">1651372</span>       <span class="sc">-</span>          <span class="sc">-</span></span>
+<span id="cb3-47"><a href="#cb3-47" aria-hidden="true" tabindex="-1"></a><span class="dv">2</span>   Total       <span class="dv">1</span>  <span class="dv">513</span> <span class="dv">1453098</span>       <span class="sc">-</span>          <span class="sc">-</span></span>
+<span id="cb3-48"><a href="#cb3-48" aria-hidden="true" tabindex="-1"></a><span class="dv">3</span>   Total       <span class="dv">2</span>    <span class="dv">6</span>    <span class="dv">7778</span>    <span class="cn">TRUE</span>       <span class="cn">TRUE</span></span>
+<span id="cb3-49"><a href="#cb3-49" aria-hidden="true" tabindex="-1"></a><span class="dv">4</span>   Total       <span class="dv">3</span>   <span class="dv">63</span>  <span class="dv">190496</span>       <span class="sc">-</span>       <span class="cn">TRUE</span></span>
+<span id="cb3-50"><a href="#cb3-50" aria-hidden="true" tabindex="-1"></a><span class="dv">5</span>  m01m05   Total  <span class="dv">393</span> <span class="dv">1233769</span>       <span class="sc">-</span>          <span class="sc">-</span></span>
+<span id="cb3-51"><a href="#cb3-51" aria-hidden="true" tabindex="-1"></a><span class="dv">6</span>  m01m05       <span class="dv">1</span>  <span class="dv">352</span> <span class="dv">1117596</span>       <span class="sc">-</span>          <span class="sc">-</span></span>
+<span id="cb3-52"><a href="#cb3-52" aria-hidden="true" tabindex="-1"></a><span class="dv">7</span>  m01m05       <span class="dv">2</span>    <span class="dv">3</span>     <span class="dv">561</span>    <span class="cn">TRUE</span>       <span class="cn">TRUE</span></span>
+<span id="cb3-53"><a href="#cb3-53" aria-hidden="true" tabindex="-1"></a><span class="dv">8</span>  m01m05       <span class="dv">3</span>   <span class="dv">38</span>  <span class="dv">115612</span>       <span class="sc">-</span>       <span class="cn">TRUE</span></span>
+<span id="cb3-54"><a href="#cb3-54" aria-hidden="true" tabindex="-1"></a><span class="dv">9</span>  m06m09   Total  <span class="dv">112</span>  <span class="dv">241460</span>       <span class="sc">-</span>          <span class="sc">-</span></span>
+<span id="cb3-55"><a href="#cb3-55" aria-hidden="true" tabindex="-1"></a><span class="dv">10</span> m06m09       <span class="dv">1</span>   <span class="dv">98</span>  <span class="dv">206402</span>       <span class="sc">-</span>          <span class="sc">-</span></span>
+<span id="cb3-56"><a href="#cb3-56" aria-hidden="true" tabindex="-1"></a><span class="dv">11</span> m06m09       <span class="dv">2</span>    <span class="dv">1</span>     <span class="dv">391</span>    <span class="cn">TRUE</span>       <span class="cn">TRUE</span></span>
+<span id="cb3-57"><a href="#cb3-57" aria-hidden="true" tabindex="-1"></a><span class="dv">12</span> m06m09       <span class="dv">3</span>   <span class="dv">13</span>   <span class="dv">34667</span>    <span class="cn">TRUE</span>       <span class="cn">TRUE</span></span>
+<span id="cb3-58"><a href="#cb3-58" aria-hidden="true" tabindex="-1"></a><span class="dv">13</span> m10m12   Total   <span class="dv">77</span>  <span class="dv">176143</span>       <span class="sc">-</span>          <span class="sc">-</span></span>
+<span id="cb3-59"><a href="#cb3-59" aria-hidden="true" tabindex="-1"></a><span class="dv">14</span> m10m12       <span class="dv">1</span>   <span class="dv">63</span>  <span class="dv">129100</span>       <span class="sc">-</span>          <span class="sc">-</span></span>
+<span id="cb3-60"><a href="#cb3-60" aria-hidden="true" tabindex="-1"></a><span class="dv">15</span> m10m12       <span class="dv">2</span>    <span class="dv">2</span>    <span class="dv">6826</span>    <span class="cn">TRUE</span>       <span class="cn">TRUE</span></span>
+<span id="cb3-61"><a href="#cb3-61" aria-hidden="true" tabindex="-1"></a><span class="dv">16</span> m10m12       <span class="dv">3</span>   <span class="dv">12</span>   <span class="dv">40217</span>       <span class="sc">-</span>       <span class="cn">TRUE</span></span></code></pre></div>
+</div>
+</div>
+<div id="exercise-2" class="section level3">
+<h3>Exercise 2</h3>
+<p>In Exercise 1, the total value for <code>k_group</code> 3 is
+suppressed. Suppose it is very important that this does not happen.</p>
+<p>Use the <code>weightVar</code> parameter to ensure that the
+suppression will be different.</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>sdc_cars[[<span class="st">&quot;w&quot;</span>]] <span class="ot">&lt;-</span> <span class="dv">1</span></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>sdc_cars[[<span class="st">&quot;w&quot;</span>]][sdc_cars[[<span class="st">&quot;k_group&quot;</span>]] <span class="sc">==</span> <span class="dv">3</span>] <span class="ot">&lt;-</span> <span class="dv">10000</span></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>out9 <span class="ot">&lt;-</span> <span class="fu">SuppressDominantCells</span>(sdc_cars,</span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>                               <span class="at">n =</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">2</span>, <span class="at">k =</span> <span class="fu">c</span>(<span class="dv">50</span>, <span class="dv">60</span>),</span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>                               <span class="at">numVar =</span> <span class="st">&quot;value&quot;</span>,</span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>                               <span class="at">dimVar =</span> <span class="fu">c</span>(<span class="st">&quot;months&quot;</span>, <span class="st">&quot;k_group&quot;</span>),</span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>                               <span class="at">contributorVar =</span> <span class="st">&quot;car_brand&quot;</span>,</span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a>                               <span class="at">weightVar =</span> <span class="st">&quot;w&quot;</span>)</span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a>[preAggregate <span class="dv">582</span><span class="sc">*</span><span class="dv">9</span><span class="ot">-&gt;</span><span class="dv">172</span><span class="sc">*</span><span class="dv">6</span>]</span>
+<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a>[extraAggregate <span class="dv">172</span><span class="sc">*</span><span class="dv">6</span><span class="ot">-&gt;</span><span class="dv">9</span><span class="sc">*</span><span class="dv">6</span>] Checking .....</span>
+<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a>GaussSuppression_numttHTT<span class="sc">:</span> ...........</span>
+<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a><span class="fu">Print</span>(out9)</span>
+<span id="cb4-15"><a href="#cb4-15" aria-hidden="true" tabindex="-1"></a>   months k_group freq   value      w primary suppressed</span>
+<span id="cb4-16"><a href="#cb4-16" aria-hidden="true" tabindex="-1"></a><span class="dv">1</span>   Total   Total  <span class="dv">582</span> <span class="dv">1651372</span> <span class="dv">630519</span>       <span class="sc">-</span>          <span class="sc">-</span></span>
+<span id="cb4-17"><a href="#cb4-17" aria-hidden="true" tabindex="-1"></a><span class="dv">2</span>   Total       <span class="dv">1</span>  <span class="dv">513</span> <span class="dv">1453098</span>    <span class="dv">513</span>       <span class="sc">-</span>       <span class="cn">TRUE</span></span>
+<span id="cb4-18"><a href="#cb4-18" aria-hidden="true" tabindex="-1"></a><span class="dv">3</span>   Total       <span class="dv">2</span>    <span class="dv">6</span>    <span class="dv">7778</span>      <span class="dv">6</span>    <span class="cn">TRUE</span>       <span class="cn">TRUE</span></span>
+<span id="cb4-19"><a href="#cb4-19" aria-hidden="true" tabindex="-1"></a><span class="dv">4</span>   Total       <span class="dv">3</span>   <span class="dv">63</span>  <span class="dv">190496</span> <span class="dv">630000</span>       <span class="sc">-</span>          <span class="sc">-</span></span>
+<span id="cb4-20"><a href="#cb4-20" aria-hidden="true" tabindex="-1"></a><span class="dv">5</span>  m01m05   Total  <span class="dv">393</span> <span class="dv">1233769</span> <span class="dv">380355</span>       <span class="sc">-</span>          <span class="sc">-</span></span>
+<span id="cb4-21"><a href="#cb4-21" aria-hidden="true" tabindex="-1"></a><span class="dv">6</span>  m01m05       <span class="dv">1</span>  <span class="dv">352</span> <span class="dv">1117596</span>    <span class="dv">352</span>       <span class="sc">-</span>       <span class="cn">TRUE</span></span>
+<span id="cb4-22"><a href="#cb4-22" aria-hidden="true" tabindex="-1"></a><span class="dv">7</span>  m01m05       <span class="dv">2</span>    <span class="dv">3</span>     <span class="dv">561</span>      <span class="dv">3</span>    <span class="cn">TRUE</span>       <span class="cn">TRUE</span></span>
+<span id="cb4-23"><a href="#cb4-23" aria-hidden="true" tabindex="-1"></a><span class="dv">8</span>  m01m05       <span class="dv">3</span>   <span class="dv">38</span>  <span class="dv">115612</span> <span class="dv">380000</span>       <span class="sc">-</span>          <span class="sc">-</span></span>
+<span id="cb4-24"><a href="#cb4-24" aria-hidden="true" tabindex="-1"></a><span class="dv">9</span>  m06m09   Total  <span class="dv">112</span>  <span class="dv">241460</span> <span class="dv">130099</span>       <span class="sc">-</span>          <span class="sc">-</span></span>
+<span id="cb4-25"><a href="#cb4-25" aria-hidden="true" tabindex="-1"></a><span class="dv">10</span> m06m09       <span class="dv">1</span>   <span class="dv">98</span>  <span class="dv">206402</span>     <span class="dv">98</span>       <span class="sc">-</span>       <span class="cn">TRUE</span></span>
+<span id="cb4-26"><a href="#cb4-26" aria-hidden="true" tabindex="-1"></a><span class="dv">11</span> m06m09       <span class="dv">2</span>    <span class="dv">1</span>     <span class="dv">391</span>      <span class="dv">1</span>    <span class="cn">TRUE</span>       <span class="cn">TRUE</span></span>
+<span id="cb4-27"><a href="#cb4-27" aria-hidden="true" tabindex="-1"></a><span class="dv">12</span> m06m09       <span class="dv">3</span>   <span class="dv">13</span>   <span class="dv">34667</span> <span class="dv">130000</span>    <span class="cn">TRUE</span>       <span class="cn">TRUE</span></span>
+<span id="cb4-28"><a href="#cb4-28" aria-hidden="true" tabindex="-1"></a><span class="dv">13</span> m10m12   Total   <span class="dv">77</span>  <span class="dv">176143</span> <span class="dv">120065</span>       <span class="sc">-</span>          <span class="sc">-</span></span>
+<span id="cb4-29"><a href="#cb4-29" aria-hidden="true" tabindex="-1"></a><span class="dv">14</span> m10m12       <span class="dv">1</span>   <span class="dv">63</span>  <span class="dv">129100</span>     <span class="dv">63</span>       <span class="sc">-</span>          <span class="sc">-</span></span>
+<span id="cb4-30"><a href="#cb4-30" aria-hidden="true" tabindex="-1"></a><span class="dv">15</span> m10m12       <span class="dv">2</span>    <span class="dv">2</span>    <span class="dv">6826</span>      <span class="dv">2</span>    <span class="cn">TRUE</span>       <span class="cn">TRUE</span></span>
+<span id="cb4-31"><a href="#cb4-31" aria-hidden="true" tabindex="-1"></a><span class="dv">16</span> m10m12       <span class="dv">3</span>   <span class="dv">12</span>   <span class="dv">40217</span> <span class="dv">120000</span>       <span class="sc">-</span>       <span class="cn">TRUE</span></span></code></pre></div>
+</div>
+<div id="exercise-3" class="section level3">
+<h3>Exercise 3</h3>
+<p>Run this analysis:</p>
+<pre><code>  SuppressDominantCells(sdc_cars, 
+                        n = 1:2, k = c(85, 95), 
+                        numVar = &quot;value&quot;, 
+                        dimVar = c(&quot;sector&quot;, &quot;k_group&quot;), 
+                        contributorVar = &quot;car_brand&quot;)</code></pre>
+<p>See that the combination of <code>other</code> and
+<code>k_group</code> 3 is suppressed. Suppose it is very important that
+this does not happen.</p>
+<p>Use the <code>weightVar</code> parameter to ensure that the
+suppression will be different.</p>
+<div id="solution-1" class="section level4">
+<h4>Solution</h4>
+<p>Can use the same weight variable as above.</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>out3a <span class="ot">&lt;-</span> <span class="fu">SuppressDominantCells</span>(sdc_cars,</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>                               <span class="at">n =</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">2</span>, <span class="at">k =</span> <span class="fu">c</span>(<span class="dv">85</span>, <span class="dv">95</span>),</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>                               <span class="at">numVar =</span> <span class="st">&quot;value&quot;</span>,</span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>                               <span class="at">dimVar =</span> <span class="fu">c</span>(<span class="st">&quot;sector&quot;</span>, <span class="st">&quot;k_group&quot;</span>),</span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>                               <span class="at">contributorVar =</span> <span class="st">&quot;car_brand&quot;</span>)</span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>[preAggregate <span class="dv">582</span><span class="sc">*</span><span class="dv">9</span><span class="ot">-&gt;</span><span class="dv">212</span><span class="sc">*</span><span class="dv">5</span>]</span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>[extraAggregate <span class="dv">212</span><span class="sc">*</span><span class="dv">5</span><span class="ot">-&gt;</span><span class="dv">11</span><span class="sc">*</span><span class="dv">5</span>] Checking .....</span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>GaussSuppression_numttHTT<span class="sc">:</span> ...............<span class="sc">:::</span></span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a><span class="fu">Print</span>(out3a)</span>
+<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a>       sector k_group freq   value primary suppressed</span>
+<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a><span class="dv">1</span>       Total   Total  <span class="dv">582</span> <span class="dv">1651372</span>       <span class="sc">-</span>          <span class="sc">-</span></span>
+<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a><span class="dv">2</span>       Total       <span class="dv">1</span>  <span class="dv">513</span> <span class="dv">1453098</span>       <span class="sc">-</span>          <span class="sc">-</span></span>
+<span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a><span class="dv">3</span>       Total       <span class="dv">2</span>    <span class="dv">6</span>    <span class="dv">7778</span>       <span class="sc">-</span>          <span class="sc">-</span></span>
+<span id="cb6-14"><a href="#cb6-14" aria-hidden="true" tabindex="-1"></a><span class="dv">4</span>       Total       <span class="dv">3</span>   <span class="dv">63</span>  <span class="dv">190496</span>       <span class="sc">-</span>          <span class="sc">-</span></span>
+<span id="cb6-15"><a href="#cb6-15" aria-hidden="true" tabindex="-1"></a><span class="dv">5</span>    business   Total  <span class="dv">181</span>  <span class="dv">599181</span>       <span class="sc">-</span>          <span class="sc">-</span></span>
+<span id="cb6-16"><a href="#cb6-16" aria-hidden="true" tabindex="-1"></a><span class="dv">6</span>    business       <span class="dv">1</span>  <span class="dv">159</span>  <span class="dv">524179</span>       <span class="sc">-</span>          <span class="sc">-</span></span>
+<span id="cb6-17"><a href="#cb6-17" aria-hidden="true" tabindex="-1"></a><span class="dv">7</span>    business       <span class="dv">2</span>    <span class="dv">3</span>     <span class="dv">823</span>       <span class="sc">-</span>       <span class="cn">TRUE</span></span>
+<span id="cb6-18"><a href="#cb6-18" aria-hidden="true" tabindex="-1"></a><span class="dv">8</span>    business       <span class="dv">3</span>   <span class="dv">19</span>   <span class="dv">74179</span>       <span class="sc">-</span>       <span class="cn">TRUE</span></span>
+<span id="cb6-19"><a href="#cb6-19" aria-hidden="true" tabindex="-1"></a><span class="dv">9</span>  individual   Total  <span class="dv">229</span>  <span class="dv">657346</span>       <span class="sc">-</span>          <span class="sc">-</span></span>
+<span id="cb6-20"><a href="#cb6-20" aria-hidden="true" tabindex="-1"></a><span class="dv">10</span> individual       <span class="dv">1</span>  <span class="dv">199</span>  <span class="dv">565179</span>       <span class="sc">-</span>          <span class="sc">-</span></span>
+<span id="cb6-21"><a href="#cb6-21" aria-hidden="true" tabindex="-1"></a><span class="dv">11</span> individual       <span class="dv">2</span>    <span class="dv">2</span>    <span class="dv">6826</span>    <span class="cn">TRUE</span>       <span class="cn">TRUE</span></span>
+<span id="cb6-22"><a href="#cb6-22" aria-hidden="true" tabindex="-1"></a><span class="dv">12</span> individual       <span class="dv">3</span>   <span class="dv">28</span>   <span class="dv">85341</span>       <span class="sc">-</span>       <span class="cn">TRUE</span></span>
+<span id="cb6-23"><a href="#cb6-23" aria-hidden="true" tabindex="-1"></a><span class="dv">13</span>      other   Total   <span class="dv">82</span>  <span class="dv">208383</span>       <span class="sc">-</span>          <span class="sc">-</span></span>
+<span id="cb6-24"><a href="#cb6-24" aria-hidden="true" tabindex="-1"></a><span class="dv">14</span>      other       <span class="dv">1</span>   <span class="dv">71</span>  <span class="dv">185690</span>       <span class="sc">-</span>          <span class="sc">-</span></span>
+<span id="cb6-25"><a href="#cb6-25" aria-hidden="true" tabindex="-1"></a><span class="dv">15</span>      other       <span class="dv">2</span>    <span class="dv">1</span>     <span class="dv">129</span>    <span class="cn">TRUE</span>       <span class="cn">TRUE</span></span>
+<span id="cb6-26"><a href="#cb6-26" aria-hidden="true" tabindex="-1"></a><span class="dv">16</span>      other       <span class="dv">3</span>   <span class="dv">10</span>   <span class="dv">22564</span>       <span class="sc">-</span>       <span class="cn">TRUE</span></span>
+<span id="cb6-27"><a href="#cb6-27" aria-hidden="true" tabindex="-1"></a><span class="dv">17</span>     public   Total   <span class="dv">90</span>  <span class="dv">186462</span>       <span class="sc">-</span>          <span class="sc">-</span></span>
+<span id="cb6-28"><a href="#cb6-28" aria-hidden="true" tabindex="-1"></a><span class="dv">18</span>     public       <span class="dv">1</span>   <span class="dv">84</span>  <span class="dv">178050</span>       <span class="sc">-</span>          <span class="sc">-</span></span>
+<span id="cb6-29"><a href="#cb6-29" aria-hidden="true" tabindex="-1"></a><span class="dv">19</span>     public       <span class="dv">2</span>    <span class="dv">0</span>       <span class="dv">0</span>       <span class="sc">-</span>          <span class="sc">-</span></span>
+<span id="cb6-30"><a href="#cb6-30" aria-hidden="true" tabindex="-1"></a><span class="dv">20</span>     public       <span class="dv">3</span>    <span class="dv">6</span>    <span class="dv">8412</span>       <span class="sc">-</span>          <span class="sc">-</span></span>
+<span id="cb6-31"><a href="#cb6-31" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-32"><a href="#cb6-32" aria-hidden="true" tabindex="-1"></a>out3b <span class="ot">&lt;-</span> <span class="fu">SuppressDominantCells</span>(sdc_cars,</span>
+<span id="cb6-33"><a href="#cb6-33" aria-hidden="true" tabindex="-1"></a>                                <span class="at">n =</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">2</span>, <span class="at">k =</span> <span class="fu">c</span>(<span class="dv">85</span>, <span class="dv">95</span>),</span>
+<span id="cb6-34"><a href="#cb6-34" aria-hidden="true" tabindex="-1"></a>                                <span class="at">numVar =</span> <span class="st">&quot;value&quot;</span>,</span>
+<span id="cb6-35"><a href="#cb6-35" aria-hidden="true" tabindex="-1"></a>                                <span class="at">dimVar =</span> <span class="fu">c</span>(<span class="st">&quot;sector&quot;</span>, <span class="st">&quot;k_group&quot;</span>),</span>
+<span id="cb6-36"><a href="#cb6-36" aria-hidden="true" tabindex="-1"></a>                                <span class="at">contributorVar =</span> <span class="st">&quot;car_brand&quot;</span>,</span>
+<span id="cb6-37"><a href="#cb6-37" aria-hidden="true" tabindex="-1"></a>                                <span class="at">weightVar =</span> <span class="st">&quot;w&quot;</span>)</span>
+<span id="cb6-38"><a href="#cb6-38" aria-hidden="true" tabindex="-1"></a>[preAggregate <span class="dv">582</span><span class="sc">*</span><span class="dv">9</span><span class="ot">-&gt;</span><span class="dv">212</span><span class="sc">*</span><span class="dv">6</span>]</span>
+<span id="cb6-39"><a href="#cb6-39" aria-hidden="true" tabindex="-1"></a>[extraAggregate <span class="dv">212</span><span class="sc">*</span><span class="dv">6</span><span class="ot">-&gt;</span><span class="dv">11</span><span class="sc">*</span><span class="dv">6</span>] Checking .....</span>
+<span id="cb6-40"><a href="#cb6-40" aria-hidden="true" tabindex="-1"></a>GaussSuppression_numttHTT<span class="sc">:</span> ................<span class="sc">::</span></span>
+<span id="cb6-41"><a href="#cb6-41" aria-hidden="true" tabindex="-1"></a><span class="fu">Print</span>(out3b)</span>
+<span id="cb6-42"><a href="#cb6-42" aria-hidden="true" tabindex="-1"></a>       sector k_group freq   value      w primary suppressed</span>
+<span id="cb6-43"><a href="#cb6-43" aria-hidden="true" tabindex="-1"></a><span class="dv">1</span>       Total   Total  <span class="dv">582</span> <span class="dv">1651372</span> <span class="dv">630519</span>       <span class="sc">-</span>          <span class="sc">-</span></span>
+<span id="cb6-44"><a href="#cb6-44" aria-hidden="true" tabindex="-1"></a><span class="dv">2</span>       Total       <span class="dv">1</span>  <span class="dv">513</span> <span class="dv">1453098</span>    <span class="dv">513</span>       <span class="sc">-</span>          <span class="sc">-</span></span>
+<span id="cb6-45"><a href="#cb6-45" aria-hidden="true" tabindex="-1"></a><span class="dv">3</span>       Total       <span class="dv">2</span>    <span class="dv">6</span>    <span class="dv">7778</span>      <span class="dv">6</span>       <span class="sc">-</span>          <span class="sc">-</span></span>
+<span id="cb6-46"><a href="#cb6-46" aria-hidden="true" tabindex="-1"></a><span class="dv">4</span>       Total       <span class="dv">3</span>   <span class="dv">63</span>  <span class="dv">190496</span> <span class="dv">630000</span>       <span class="sc">-</span>          <span class="sc">-</span></span>
+<span id="cb6-47"><a href="#cb6-47" aria-hidden="true" tabindex="-1"></a><span class="dv">5</span>    business   Total  <span class="dv">181</span>  <span class="dv">599181</span> <span class="dv">190162</span>       <span class="sc">-</span>          <span class="sc">-</span></span>
+<span id="cb6-48"><a href="#cb6-48" aria-hidden="true" tabindex="-1"></a><span class="dv">6</span>    business       <span class="dv">1</span>  <span class="dv">159</span>  <span class="dv">524179</span>    <span class="dv">159</span>       <span class="sc">-</span>       <span class="cn">TRUE</span></span>
+<span id="cb6-49"><a href="#cb6-49" aria-hidden="true" tabindex="-1"></a><span class="dv">7</span>    business       <span class="dv">2</span>    <span class="dv">3</span>     <span class="dv">823</span>      <span class="dv">3</span>       <span class="sc">-</span>       <span class="cn">TRUE</span></span>
+<span id="cb6-50"><a href="#cb6-50" aria-hidden="true" tabindex="-1"></a><span class="dv">8</span>    business       <span class="dv">3</span>   <span class="dv">19</span>   <span class="dv">74179</span> <span class="dv">190000</span>       <span class="sc">-</span>          <span class="sc">-</span></span>
+<span id="cb6-51"><a href="#cb6-51" aria-hidden="true" tabindex="-1"></a><span class="dv">9</span>  individual   Total  <span class="dv">229</span>  <span class="dv">657346</span> <span class="dv">280201</span>       <span class="sc">-</span>          <span class="sc">-</span></span>
+<span id="cb6-52"><a href="#cb6-52" aria-hidden="true" tabindex="-1"></a><span class="dv">10</span> individual       <span class="dv">1</span>  <span class="dv">199</span>  <span class="dv">565179</span>    <span class="dv">199</span>       <span class="sc">-</span>       <span class="cn">TRUE</span></span>
+<span id="cb6-53"><a href="#cb6-53" aria-hidden="true" tabindex="-1"></a><span class="dv">11</span> individual       <span class="dv">2</span>    <span class="dv">2</span>    <span class="dv">6826</span>      <span class="dv">2</span>    <span class="cn">TRUE</span>       <span class="cn">TRUE</span></span>
+<span id="cb6-54"><a href="#cb6-54" aria-hidden="true" tabindex="-1"></a><span class="dv">12</span> individual       <span class="dv">3</span>   <span class="dv">28</span>   <span class="dv">85341</span> <span class="dv">280000</span>       <span class="sc">-</span>          <span class="sc">-</span></span>
+<span id="cb6-55"><a href="#cb6-55" aria-hidden="true" tabindex="-1"></a><span class="dv">13</span>      other   Total   <span class="dv">82</span>  <span class="dv">208383</span> <span class="dv">100072</span>       <span class="sc">-</span>          <span class="sc">-</span></span>
+<span id="cb6-56"><a href="#cb6-56" aria-hidden="true" tabindex="-1"></a><span class="dv">14</span>      other       <span class="dv">1</span>   <span class="dv">71</span>  <span class="dv">185690</span>     <span class="dv">71</span>       <span class="sc">-</span>       <span class="cn">TRUE</span></span>
+<span id="cb6-57"><a href="#cb6-57" aria-hidden="true" tabindex="-1"></a><span class="dv">15</span>      other       <span class="dv">2</span>    <span class="dv">1</span>     <span class="dv">129</span>      <span class="dv">1</span>    <span class="cn">TRUE</span>       <span class="cn">TRUE</span></span>
+<span id="cb6-58"><a href="#cb6-58" aria-hidden="true" tabindex="-1"></a><span class="dv">16</span>      other       <span class="dv">3</span>   <span class="dv">10</span>   <span class="dv">22564</span> <span class="dv">100000</span>       <span class="sc">-</span>          <span class="sc">-</span></span>
+<span id="cb6-59"><a href="#cb6-59" aria-hidden="true" tabindex="-1"></a><span class="dv">17</span>     public   Total   <span class="dv">90</span>  <span class="dv">186462</span>  <span class="dv">60084</span>       <span class="sc">-</span>          <span class="sc">-</span></span>
+<span id="cb6-60"><a href="#cb6-60" aria-hidden="true" tabindex="-1"></a><span class="dv">18</span>     public       <span class="dv">1</span>   <span class="dv">84</span>  <span class="dv">178050</span>     <span class="dv">84</span>       <span class="sc">-</span>          <span class="sc">-</span></span>
+<span id="cb6-61"><a href="#cb6-61" aria-hidden="true" tabindex="-1"></a><span class="dv">19</span>     public       <span class="dv">2</span>    <span class="dv">0</span>       <span class="dv">0</span>      <span class="dv">0</span>       <span class="sc">-</span>          <span class="sc">-</span></span>
+<span id="cb6-62"><a href="#cb6-62" aria-hidden="true" tabindex="-1"></a><span class="dv">20</span>     public       <span class="dv">3</span>    <span class="dv">6</span>    <span class="dv">8412</span>  <span class="dv">60000</span>       <span class="sc">-</span>          <span class="sc">-</span></span></code></pre></div>
+<p>`</p>
+</div>
+</div>
+<div id="exercise-4" class="section level3">
+<h3>Exercise 4</h3>
+<p>By using the output parameter it is possible to get other datasets as
+output.</p>
+<p>We now modify the analysis above and create two data frames by the
+code:</p>
+<pre><code>  data1 &lt;- SuppressDominantCells(sdc_cars, 
+                        n = 1:2, k = c(85, 95), 
+                        numVar = &quot;value&quot;, 
+                        dimVar = c(&quot;sector&quot;, &quot;k_group&quot;), 
+                        contributorVar = &quot;car_brand&quot;, output = &quot;inner&quot;)
+                    
+  
+  data2 &lt;- SuppressDominantCells(sdc_cars, 
+                        n = 1:2, k = c(85, 95), 
+                        numVar = &quot;value&quot;, 
+                        dimVar = c(&quot;sector&quot;, &quot;k_group&quot;), 
+                        contributorVar = &quot;car_brand&quot;, output = &quot;all&quot;)$inner
+                        </code></pre>
+<p>Can you explain what kind of data this is?</p>
+<p>Can you explain all the variables in <code>data2</code>?</p>
+<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>  data1 <span class="ot">&lt;-</span> <span class="fu">SuppressDominantCells</span>(sdc_cars, </span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>                        <span class="at">n =</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">2</span>, <span class="at">k =</span> <span class="fu">c</span>(<span class="dv">85</span>, <span class="dv">95</span>), </span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>                        <span class="at">numVar =</span> <span class="st">&quot;value&quot;</span>, </span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>                        <span class="at">dimVar =</span> <span class="fu">c</span>(<span class="st">&quot;sector&quot;</span>, <span class="st">&quot;k_group&quot;</span>), </span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>                        <span class="at">contributorVar =</span> <span class="st">&quot;car_brand&quot;</span>, <span class="at">output =</span> <span class="st">&quot;inner&quot;</span>)</span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>[preAggregate <span class="dv">582</span><span class="sc">*</span><span class="dv">9</span><span class="ot">-&gt;</span><span class="dv">212</span><span class="sc">*</span><span class="dv">5</span>]</span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a><span class="fu">Print</span>(data1)                    </span>
+<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a><span class="dv">112</span> rows omitted below</span>
+<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a>        sector k_group   car_brand freq value</span>
+<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a><span class="dv">1</span>     business       <span class="dv">1</span>        Audi    <span class="dv">6</span> <span class="dv">16772</span></span>
+<span id="cb8-12"><a href="#cb8-12" aria-hidden="true" tabindex="-1"></a><span class="dv">2</span>   individual       <span class="dv">1</span>        Audi    <span class="dv">7</span> <span class="dv">12793</span></span>
+<span id="cb8-13"><a href="#cb8-13" aria-hidden="true" tabindex="-1"></a><span class="dv">3</span>        other       <span class="dv">1</span>        Audi    <span class="dv">2</span>  <span class="dv">1549</span></span>
+<span id="cb8-14"><a href="#cb8-14" aria-hidden="true" tabindex="-1"></a><span class="dv">4</span>       public       <span class="dv">1</span>        Audi    <span class="dv">2</span>  <span class="dv">2467</span></span>
+<span id="cb8-15"><a href="#cb8-15" aria-hidden="true" tabindex="-1"></a><span class="dv">5</span>     business       <span class="dv">3</span>        Audi    <span class="dv">3</span>  <span class="dv">9577</span></span>
+<span id="cb8-16"><a href="#cb8-16" aria-hidden="true" tabindex="-1"></a><span class="dv">6</span>   individual       <span class="dv">3</span>        Audi    <span class="dv">2</span>  <span class="dv">7838</span></span>
+<span id="cb8-17"><a href="#cb8-17" aria-hidden="true" tabindex="-1"></a><span class="dv">7</span>        other       <span class="dv">3</span>        Audi    <span class="dv">1</span>  <span class="dv">3192</span></span>
+<span id="cb8-18"><a href="#cb8-18" aria-hidden="true" tabindex="-1"></a><span class="dv">8</span>   individual       <span class="dv">1</span>      Baojun    <span class="dv">1</span>  <span class="dv">2619</span></span>
+<span id="cb8-19"><a href="#cb8-19" aria-hidden="true" tabindex="-1"></a><span class="dv">9</span>     business       <span class="dv">1</span>         BMW    <span class="dv">6</span> <span class="dv">19052</span></span>
+<span id="cb8-20"><a href="#cb8-20" aria-hidden="true" tabindex="-1"></a><span class="dv">10</span>  individual       <span class="dv">1</span>         BMW    <span class="dv">8</span> <span class="dv">27115</span></span>
+<span id="cb8-21"><a href="#cb8-21" aria-hidden="true" tabindex="-1"></a><span class="dv">11</span>       other       <span class="dv">1</span>         BMW    <span class="dv">1</span> <span class="dv">13805</span></span>
+<span id="cb8-22"><a href="#cb8-22" aria-hidden="true" tabindex="-1"></a><span class="dv">12</span>      public       <span class="dv">1</span>         BMW    <span class="dv">2</span>  <span class="dv">1943</span></span>
+<span id="cb8-23"><a href="#cb8-23" aria-hidden="true" tabindex="-1"></a><span class="dv">13</span>    business       <span class="dv">2</span>         BMW    <span class="dv">1</span>   <span class="dv">142</span></span>
+<span id="cb8-24"><a href="#cb8-24" aria-hidden="true" tabindex="-1"></a><span class="dv">14</span>      public       <span class="dv">3</span>         BMW    <span class="dv">1</span>  <span class="dv">2323</span></span>
+<span id="cb8-25"><a href="#cb8-25" aria-hidden="true" tabindex="-1"></a><span class="dv">15</span>  individual       <span class="dv">1</span>     Bugatti    <span class="dv">2</span>  <span class="dv">6716</span></span>
+<span id="cb8-26"><a href="#cb8-26" aria-hidden="true" tabindex="-1"></a><span class="dv">16</span>       other       <span class="dv">1</span>     Bugatti    <span class="dv">3</span> <span class="dv">14446</span></span>
+<span id="cb8-27"><a href="#cb8-27" aria-hidden="true" tabindex="-1"></a><span class="dv">17</span>    business       <span class="dv">1</span>       Buick    <span class="dv">3</span>  <span class="dv">6604</span></span>
+<span id="cb8-28"><a href="#cb8-28" aria-hidden="true" tabindex="-1"></a><span class="dv">18</span>  individual       <span class="dv">1</span>       Buick    <span class="dv">6</span> <span class="dv">24588</span></span>
+<span id="cb8-29"><a href="#cb8-29" aria-hidden="true" tabindex="-1"></a><span class="dv">19</span>       other       <span class="dv">1</span>       Buick    <span class="dv">1</span>  <span class="dv">6404</span></span>
+<span id="cb8-30"><a href="#cb8-30" aria-hidden="true" tabindex="-1"></a><span class="dv">20</span>      public       <span class="dv">1</span>       Buick    <span class="dv">2</span>  <span class="dv">1472</span></span>
+<span id="cb8-31"><a href="#cb8-31" aria-hidden="true" tabindex="-1"></a><span class="dv">21</span>  individual       <span class="dv">3</span>       Buick    <span class="dv">1</span>   <span class="dv">116</span></span>
+<span id="cb8-32"><a href="#cb8-32" aria-hidden="true" tabindex="-1"></a><span class="dv">22</span>    business       <span class="dv">1</span>    Cadillac    <span class="dv">4</span>  <span class="dv">7050</span></span>
+<span id="cb8-33"><a href="#cb8-33" aria-hidden="true" tabindex="-1"></a><span class="dv">23</span>  individual       <span class="dv">1</span>    Cadillac    <span class="dv">4</span>  <span class="dv">6767</span></span>
+<span id="cb8-34"><a href="#cb8-34" aria-hidden="true" tabindex="-1"></a><span class="dv">24</span>       other       <span class="dv">1</span>    Cadillac    <span class="dv">1</span>   <span class="dv">201</span></span>
+<span id="cb8-35"><a href="#cb8-35" aria-hidden="true" tabindex="-1"></a><span class="dv">25</span>      public       <span class="dv">1</span>    Cadillac    <span class="dv">4</span>  <span class="dv">3749</span></span>
+<span id="cb8-36"><a href="#cb8-36" aria-hidden="true" tabindex="-1"></a><span class="dv">26</span>  individual       <span class="dv">3</span>    Cadillac    <span class="dv">1</span>   <span class="dv">550</span></span>
+<span id="cb8-37"><a href="#cb8-37" aria-hidden="true" tabindex="-1"></a><span class="dv">27</span>  individual       <span class="dv">1</span>       Chery    <span class="dv">2</span>  <span class="dv">6941</span></span>
+<span id="cb8-38"><a href="#cb8-38" aria-hidden="true" tabindex="-1"></a><span class="dv">28</span>    business       <span class="dv">1</span>   Chevrolet    <span class="dv">2</span> <span class="dv">16166</span></span>
+<span id="cb8-39"><a href="#cb8-39" aria-hidden="true" tabindex="-1"></a><span class="dv">29</span>  individual       <span class="dv">1</span>   Chevrolet    <span class="dv">3</span> <span class="dv">12934</span></span>
+<span id="cb8-40"><a href="#cb8-40" aria-hidden="true" tabindex="-1"></a><span class="dv">30</span>       other       <span class="dv">1</span>   Chevrolet    <span class="dv">3</span>  <span class="dv">3086</span></span>
+<span id="cb8-41"><a href="#cb8-41" aria-hidden="true" tabindex="-1"></a><span class="dv">31</span>      public       <span class="dv">1</span>   Chevrolet    <span class="dv">3</span> <span class="dv">11787</span></span>
+<span id="cb8-42"><a href="#cb8-42" aria-hidden="true" tabindex="-1"></a><span class="dv">32</span>       other       <span class="dv">3</span>   Chevrolet    <span class="dv">1</span>   <span class="dv">111</span></span>
+<span id="cb8-43"><a href="#cb8-43" aria-hidden="true" tabindex="-1"></a><span class="dv">33</span>      public       <span class="dv">3</span>   Chevrolet    <span class="dv">1</span>   <span class="dv">421</span></span>
+<span id="cb8-44"><a href="#cb8-44" aria-hidden="true" tabindex="-1"></a><span class="dv">34</span>  individual       <span class="dv">1</span>     Citroen    <span class="dv">1</span>  <span class="dv">3291</span></span>
+<span id="cb8-45"><a href="#cb8-45" aria-hidden="true" tabindex="-1"></a><span class="dv">35</span>      public       <span class="dv">1</span>     Citroen    <span class="dv">1</span>  <span class="dv">2963</span></span>
+<span id="cb8-46"><a href="#cb8-46" aria-hidden="true" tabindex="-1"></a><span class="dv">36</span>    business       <span class="dv">1</span>       Dacia    <span class="dv">1</span>  <span class="dv">2907</span></span>
+<span id="cb8-47"><a href="#cb8-47" aria-hidden="true" tabindex="-1"></a><span class="dv">37</span>  individual       <span class="dv">1</span>      Daewoo    <span class="dv">1</span>   <span class="dv">502</span></span>
+<span id="cb8-48"><a href="#cb8-48" aria-hidden="true" tabindex="-1"></a><span class="dv">38</span>    business       <span class="dv">1</span>       Dodge    <span class="dv">3</span>  <span class="dv">7088</span></span>
+<span id="cb8-49"><a href="#cb8-49" aria-hidden="true" tabindex="-1"></a><span class="dv">39</span>  individual       <span class="dv">1</span>       Dodge    <span class="dv">6</span> <span class="dv">21633</span></span>
+<span id="cb8-50"><a href="#cb8-50" aria-hidden="true" tabindex="-1"></a><span class="dv">40</span>       other       <span class="dv">1</span>       Dodge    <span class="dv">1</span>   <span class="dv">197</span></span>
+<span id="cb8-51"><a href="#cb8-51" aria-hidden="true" tabindex="-1"></a><span class="dv">41</span>      public       <span class="dv">1</span>       Dodge    <span class="dv">2</span>  <span class="dv">1210</span></span>
+<span id="cb8-52"><a href="#cb8-52" aria-hidden="true" tabindex="-1"></a><span class="dv">42</span>    business       <span class="dv">3</span>       Dodge    <span class="dv">1</span>   <span class="dv">192</span></span>
+<span id="cb8-53"><a href="#cb8-53" aria-hidden="true" tabindex="-1"></a><span class="dv">43</span>  individual       <span class="dv">3</span>       Dodge    <span class="dv">1</span>   <span class="dv">155</span></span>
+<span id="cb8-54"><a href="#cb8-54" aria-hidden="true" tabindex="-1"></a><span class="dv">44</span>       other       <span class="dv">3</span>       Dodge    <span class="dv">1</span>   <span class="dv">436</span></span>
+<span id="cb8-55"><a href="#cb8-55" aria-hidden="true" tabindex="-1"></a><span class="dv">45</span>    business       <span class="dv">1</span>     Ferrari    <span class="dv">6</span> <span class="dv">11412</span></span>
+<span id="cb8-56"><a href="#cb8-56" aria-hidden="true" tabindex="-1"></a><span class="dv">46</span>  individual       <span class="dv">1</span>     Ferrari    <span class="dv">6</span>  <span class="dv">6092</span></span>
+<span id="cb8-57"><a href="#cb8-57" aria-hidden="true" tabindex="-1"></a><span class="dv">47</span>       other       <span class="dv">1</span>     Ferrari    <span class="dv">1</span>   <span class="dv">121</span></span>
+<span id="cb8-58"><a href="#cb8-58" aria-hidden="true" tabindex="-1"></a><span class="dv">48</span>      public       <span class="dv">1</span>     Ferrari    <span class="dv">1</span>   <span class="dv">966</span></span>
+<span id="cb8-59"><a href="#cb8-59" aria-hidden="true" tabindex="-1"></a><span class="dv">49</span>    business       <span class="dv">1</span>        Fiat    <span class="dv">3</span> <span class="dv">12175</span></span>
+<span id="cb8-60"><a href="#cb8-60" aria-hidden="true" tabindex="-1"></a><span class="dv">50</span>  individual       <span class="dv">1</span>        Fiat    <span class="dv">1</span>   <span class="dv">547</span></span>
+<span id="cb8-61"><a href="#cb8-61" aria-hidden="true" tabindex="-1"></a><span class="dv">51</span>      public       <span class="dv">1</span>        Fiat    <span class="dv">2</span>  <span class="dv">3224</span></span>
+<span id="cb8-62"><a href="#cb8-62" aria-hidden="true" tabindex="-1"></a><span class="dv">52</span>    business       <span class="dv">3</span>        Fiat    <span class="dv">1</span>  <span class="dv">9770</span></span>
+<span id="cb8-63"><a href="#cb8-63" aria-hidden="true" tabindex="-1"></a><span class="dv">53</span>    business       <span class="dv">1</span>        Ford   <span class="dv">10</span> <span class="dv">25251</span></span>
+<span id="cb8-64"><a href="#cb8-64" aria-hidden="true" tabindex="-1"></a><span class="dv">54</span>  individual       <span class="dv">1</span>        Ford    <span class="dv">3</span>  <span class="dv">7671</span></span>
+<span id="cb8-65"><a href="#cb8-65" aria-hidden="true" tabindex="-1"></a><span class="dv">55</span>       other       <span class="dv">1</span>        Ford    <span class="dv">3</span>  <span class="dv">6379</span></span>
+<span id="cb8-66"><a href="#cb8-66" aria-hidden="true" tabindex="-1"></a><span class="dv">56</span>      public       <span class="dv">1</span>        Ford   <span class="dv">10</span> <span class="dv">17122</span></span>
+<span id="cb8-67"><a href="#cb8-67" aria-hidden="true" tabindex="-1"></a><span class="dv">57</span>  individual       <span class="dv">3</span>        Ford    <span class="dv">2</span>  <span class="dv">2617</span></span>
+<span id="cb8-68"><a href="#cb8-68" aria-hidden="true" tabindex="-1"></a><span class="dv">58</span>  individual       <span class="dv">1</span>       Geely    <span class="dv">1</span>   <span class="dv">188</span></span>
+<span id="cb8-69"><a href="#cb8-69" aria-hidden="true" tabindex="-1"></a><span class="dv">59</span>    business       <span class="dv">1</span>     Genesis    <span class="dv">2</span>  <span class="dv">1195</span></span>
+<span id="cb8-70"><a href="#cb8-70" aria-hidden="true" tabindex="-1"></a><span class="dv">60</span>       other       <span class="dv">1</span>     Genesis    <span class="dv">3</span>  <span class="dv">9056</span></span>
+<span id="cb8-71"><a href="#cb8-71" aria-hidden="true" tabindex="-1"></a><span class="dv">61</span>      public       <span class="dv">1</span>     Genesis    <span class="dv">1</span>  <span class="dv">3770</span></span>
+<span id="cb8-72"><a href="#cb8-72" aria-hidden="true" tabindex="-1"></a><span class="dv">62</span>       other       <span class="dv">3</span>     Genesis    <span class="dv">2</span>  <span class="dv">7017</span></span>
+<span id="cb8-73"><a href="#cb8-73" aria-hidden="true" tabindex="-1"></a><span class="dv">63</span>    business       <span class="dv">1</span>       Honda    <span class="dv">8</span> <span class="dv">23580</span></span>
+<span id="cb8-74"><a href="#cb8-74" aria-hidden="true" tabindex="-1"></a><span class="dv">64</span>  individual       <span class="dv">1</span>       Honda    <span class="dv">9</span> <span class="dv">29851</span></span>
+<span id="cb8-75"><a href="#cb8-75" aria-hidden="true" tabindex="-1"></a><span class="dv">65</span>       other       <span class="dv">1</span>       Honda    <span class="dv">3</span>  <span class="dv">6937</span></span>
+<span id="cb8-76"><a href="#cb8-76" aria-hidden="true" tabindex="-1"></a><span class="dv">66</span>      public       <span class="dv">1</span>       Honda    <span class="dv">4</span> <span class="dv">13865</span></span>
+<span id="cb8-77"><a href="#cb8-77" aria-hidden="true" tabindex="-1"></a><span class="dv">67</span>    business       <span class="dv">3</span>       Honda    <span class="dv">1</span>   <span class="dv">991</span></span>
+<span id="cb8-78"><a href="#cb8-78" aria-hidden="true" tabindex="-1"></a><span class="dv">68</span>  individual       <span class="dv">3</span>       Honda    <span class="dv">1</span>   <span class="dv">271</span></span>
+<span id="cb8-79"><a href="#cb8-79" aria-hidden="true" tabindex="-1"></a><span class="dv">69</span>      public       <span class="dv">3</span>       Honda    <span class="dv">1</span>  <span class="dv">1595</span></span>
+<span id="cb8-80"><a href="#cb8-80" aria-hidden="true" tabindex="-1"></a><span class="dv">70</span>    business       <span class="dv">1</span>     Hyundai    <span class="dv">5</span> <span class="dv">18967</span></span>
+<span id="cb8-81"><a href="#cb8-81" aria-hidden="true" tabindex="-1"></a><span class="dv">71</span>  individual       <span class="dv">1</span>     Hyundai    <span class="dv">6</span> <span class="dv">31083</span></span>
+<span id="cb8-82"><a href="#cb8-82" aria-hidden="true" tabindex="-1"></a><span class="dv">72</span>       other       <span class="dv">1</span>     Hyundai    <span class="dv">2</span>  <span class="dv">6020</span></span>
+<span id="cb8-83"><a href="#cb8-83" aria-hidden="true" tabindex="-1"></a><span class="dv">73</span>      public       <span class="dv">1</span>     Hyundai    <span class="dv">1</span>   <span class="dv">273</span></span>
+<span id="cb8-84"><a href="#cb8-84" aria-hidden="true" tabindex="-1"></a><span class="dv">74</span>    business       <span class="dv">2</span>     Hyundai    <span class="dv">1</span>   <span class="dv">391</span></span>
+<span id="cb8-85"><a href="#cb8-85" aria-hidden="true" tabindex="-1"></a><span class="dv">75</span>  individual       <span class="dv">2</span>     Hyundai    <span class="dv">1</span>  <span class="dv">6167</span></span>
+<span id="cb8-86"><a href="#cb8-86" aria-hidden="true" tabindex="-1"></a><span class="dv">76</span>  individual       <span class="dv">3</span>     Hyundai    <span class="dv">1</span>  <span class="dv">4297</span></span>
+<span id="cb8-87"><a href="#cb8-87" aria-hidden="true" tabindex="-1"></a><span class="dv">77</span>    business       <span class="dv">1</span>      Jaguar    <span class="dv">4</span>  <span class="dv">5634</span></span>
+<span id="cb8-88"><a href="#cb8-88" aria-hidden="true" tabindex="-1"></a><span class="dv">78</span>  individual       <span class="dv">1</span>      Jaguar    <span class="dv">4</span>  <span class="dv">8167</span></span>
+<span id="cb8-89"><a href="#cb8-89" aria-hidden="true" tabindex="-1"></a><span class="dv">79</span>       other       <span class="dv">1</span>      Jaguar    <span class="dv">2</span> <span class="dv">14207</span></span>
+<span id="cb8-90"><a href="#cb8-90" aria-hidden="true" tabindex="-1"></a><span class="dv">80</span>    business       <span class="dv">3</span>      Jaguar    <span class="dv">2</span>  <span class="dv">5635</span></span>
+<span id="cb8-91"><a href="#cb8-91" aria-hidden="true" tabindex="-1"></a><span class="dv">81</span>    business       <span class="dv">1</span>        Jeep    <span class="dv">3</span> <span class="dv">27905</span></span>
+<span id="cb8-92"><a href="#cb8-92" aria-hidden="true" tabindex="-1"></a><span class="dv">82</span>  individual       <span class="dv">1</span>        Jeep    <span class="dv">8</span> <span class="dv">19066</span></span>
+<span id="cb8-93"><a href="#cb8-93" aria-hidden="true" tabindex="-1"></a><span class="dv">83</span>      public       <span class="dv">1</span>        Jeep    <span class="dv">2</span>   <span class="dv">781</span></span>
+<span id="cb8-94"><a href="#cb8-94" aria-hidden="true" tabindex="-1"></a><span class="dv">84</span>  individual       <span class="dv">3</span>        Jeep    <span class="dv">2</span>  <span class="dv">2715</span></span>
+<span id="cb8-95"><a href="#cb8-95" aria-hidden="true" tabindex="-1"></a><span class="dv">85</span>    business       <span class="dv">1</span>         Kia    <span class="dv">5</span> <span class="dv">18798</span></span>
+<span id="cb8-96"><a href="#cb8-96" aria-hidden="true" tabindex="-1"></a><span class="dv">86</span>  individual       <span class="dv">1</span>         Kia    <span class="dv">4</span> <span class="dv">22293</span></span>
+<span id="cb8-97"><a href="#cb8-97" aria-hidden="true" tabindex="-1"></a><span class="dv">87</span>       other       <span class="dv">1</span>         Kia    <span class="dv">2</span>  <span class="dv">8224</span></span>
+<span id="cb8-98"><a href="#cb8-98" aria-hidden="true" tabindex="-1"></a><span class="dv">88</span>      public       <span class="dv">1</span>         Kia    <span class="dv">2</span>   <span class="dv">399</span></span>
+<span id="cb8-99"><a href="#cb8-99" aria-hidden="true" tabindex="-1"></a><span class="dv">89</span>    business       <span class="dv">3</span>         Kia    <span class="dv">1</span>  <span class="dv">7223</span></span>
+<span id="cb8-100"><a href="#cb8-100" aria-hidden="true" tabindex="-1"></a><span class="dv">90</span>  individual       <span class="dv">3</span>         Kia    <span class="dv">2</span> <span class="dv">16666</span></span>
+<span id="cb8-101"><a href="#cb8-101" aria-hidden="true" tabindex="-1"></a><span class="dv">91</span>      public       <span class="dv">3</span>         Kia    <span class="dv">1</span>  <span class="dv">3225</span></span>
+<span id="cb8-102"><a href="#cb8-102" aria-hidden="true" tabindex="-1"></a><span class="dv">92</span>  individual       <span class="dv">1</span>  Koenigsegg    <span class="dv">2</span>   <span class="dv">504</span></span>
+<span id="cb8-103"><a href="#cb8-103" aria-hidden="true" tabindex="-1"></a><span class="dv">93</span>      public       <span class="dv">1</span>  Koenigsegg    <span class="dv">2</span>  <span class="dv">2177</span></span>
+<span id="cb8-104"><a href="#cb8-104" aria-hidden="true" tabindex="-1"></a><span class="dv">94</span>    business       <span class="dv">1</span> Lamborghini    <span class="dv">4</span> <span class="dv">13638</span></span>
+<span id="cb8-105"><a href="#cb8-105" aria-hidden="true" tabindex="-1"></a><span class="dv">95</span>  individual       <span class="dv">1</span> Lamborghini    <span class="dv">3</span>  <span class="dv">6974</span></span>
+<span id="cb8-106"><a href="#cb8-106" aria-hidden="true" tabindex="-1"></a><span class="dv">96</span>       other       <span class="dv">1</span> Lamborghini    <span class="dv">2</span>  <span class="dv">2842</span></span>
+<span id="cb8-107"><a href="#cb8-107" aria-hidden="true" tabindex="-1"></a><span class="dv">97</span>       other       <span class="dv">3</span> Lamborghini    <span class="dv">1</span>  <span class="dv">5766</span></span>
+<span id="cb8-108"><a href="#cb8-108" aria-hidden="true" tabindex="-1"></a><span class="dv">98</span>    business       <span class="dv">1</span>      Lancia    <span class="dv">1</span>  <span class="dv">9291</span></span>
+<span id="cb8-109"><a href="#cb8-109" aria-hidden="true" tabindex="-1"></a><span class="dv">99</span>  individual       <span class="dv">3</span>      Lancia    <span class="dv">2</span>  <span class="dv">5934</span></span>
+<span id="cb8-110"><a href="#cb8-110" aria-hidden="true" tabindex="-1"></a><span class="dv">100</span>   business       <span class="dv">1</span>       Lexus    <span class="dv">7</span> <span class="dv">23956</span></span>
+<span id="cb8-111"><a href="#cb8-111" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb8-112"><a href="#cb8-112" aria-hidden="true" tabindex="-1"></a>  data2 <span class="ot">&lt;-</span> <span class="fu">SuppressDominantCells</span>(sdc_cars, </span>
+<span id="cb8-113"><a href="#cb8-113" aria-hidden="true" tabindex="-1"></a>                        <span class="at">n =</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">2</span>, <span class="at">k =</span> <span class="fu">c</span>(<span class="dv">85</span>, <span class="dv">95</span>), </span>
+<span id="cb8-114"><a href="#cb8-114" aria-hidden="true" tabindex="-1"></a>                        <span class="at">numVar =</span> <span class="st">&quot;value&quot;</span>, </span>
+<span id="cb8-115"><a href="#cb8-115" aria-hidden="true" tabindex="-1"></a>                        <span class="at">dimVar =</span> <span class="fu">c</span>(<span class="st">&quot;sector&quot;</span>, <span class="st">&quot;k_group&quot;</span>), </span>
+<span id="cb8-116"><a href="#cb8-116" aria-hidden="true" tabindex="-1"></a>                        <span class="at">contributorVar =</span> <span class="st">&quot;car_brand&quot;</span>, <span class="at">output =</span> <span class="st">&quot;all&quot;</span>)<span class="sc">$</span>inner</span>
+<span id="cb8-117"><a href="#cb8-117" aria-hidden="true" tabindex="-1"></a>[preAggregate <span class="dv">582</span><span class="sc">*</span><span class="dv">9</span><span class="ot">-&gt;</span><span class="dv">212</span><span class="sc">*</span><span class="dv">5</span>]</span>
+<span id="cb8-118"><a href="#cb8-118" aria-hidden="true" tabindex="-1"></a>[extraAggregate <span class="dv">212</span><span class="sc">*</span><span class="dv">5</span><span class="ot">-&gt;</span><span class="dv">11</span><span class="sc">*</span><span class="dv">5</span>] Checking .....</span>
+<span id="cb8-119"><a href="#cb8-119" aria-hidden="true" tabindex="-1"></a>GaussSuppression_numttHTT<span class="sc">:</span> ...............<span class="sc">:::</span></span>
+<span id="cb8-120"><a href="#cb8-120" aria-hidden="true" tabindex="-1"></a><span class="fu">Print</span>(data2)</span>
+<span id="cb8-121"><a href="#cb8-121" aria-hidden="true" tabindex="-1"></a>       sector k_group freq  value nUnique car_brand</span>
+<span id="cb8-122"><a href="#cb8-122" aria-hidden="true" tabindex="-1"></a><span class="dv">1</span>    business       <span class="dv">1</span>  <span class="dv">159</span> <span class="dv">524179</span>      <span class="dv">40</span>      <span class="sc">&lt;</span><span class="cn">NA</span><span class="sc">&gt;</span></span>
+<span id="cb8-123"><a href="#cb8-123" aria-hidden="true" tabindex="-1"></a><span class="dv">2</span>  individual       <span class="dv">1</span>  <span class="dv">199</span> <span class="dv">565179</span>      <span class="dv">47</span>      <span class="sc">&lt;</span><span class="cn">NA</span><span class="sc">&gt;</span></span>
+<span id="cb8-124"><a href="#cb8-124" aria-hidden="true" tabindex="-1"></a><span class="dv">3</span>       other       <span class="dv">1</span>   <span class="dv">71</span> <span class="dv">185690</span>      <span class="dv">33</span>      <span class="sc">&lt;</span><span class="cn">NA</span><span class="sc">&gt;</span></span>
+<span id="cb8-125"><a href="#cb8-125" aria-hidden="true" tabindex="-1"></a><span class="dv">4</span>      public       <span class="dv">1</span>   <span class="dv">84</span> <span class="dv">178050</span>      <span class="dv">36</span>      <span class="sc">&lt;</span><span class="cn">NA</span><span class="sc">&gt;</span></span>
+<span id="cb8-126"><a href="#cb8-126" aria-hidden="true" tabindex="-1"></a><span class="dv">5</span>    business       <span class="dv">2</span>    <span class="dv">3</span>    <span class="dv">823</span>       <span class="dv">3</span>      <span class="sc">&lt;</span><span class="cn">NA</span><span class="sc">&gt;</span></span>
+<span id="cb8-127"><a href="#cb8-127" aria-hidden="true" tabindex="-1"></a><span class="dv">6</span>  individual       <span class="dv">2</span>    <span class="dv">2</span>   <span class="dv">6826</span>       <span class="dv">2</span>      <span class="sc">&lt;</span><span class="cn">NA</span><span class="sc">&gt;</span></span>
+<span id="cb8-128"><a href="#cb8-128" aria-hidden="true" tabindex="-1"></a><span class="dv">7</span>       other       <span class="dv">2</span>    <span class="dv">1</span>    <span class="dv">129</span>       <span class="dv">1</span>     Tesla</span>
+<span id="cb8-129"><a href="#cb8-129" aria-hidden="true" tabindex="-1"></a><span class="dv">8</span>    business       <span class="dv">3</span>   <span class="dv">19</span>  <span class="dv">74179</span>      <span class="dv">15</span>      <span class="sc">&lt;</span><span class="cn">NA</span><span class="sc">&gt;</span></span>
+<span id="cb8-130"><a href="#cb8-130" aria-hidden="true" tabindex="-1"></a><span class="dv">9</span>  individual       <span class="dv">3</span>   <span class="dv">28</span>  <span class="dv">85341</span>      <span class="dv">20</span>      <span class="sc">&lt;</span><span class="cn">NA</span><span class="sc">&gt;</span></span>
+<span id="cb8-131"><a href="#cb8-131" aria-hidden="true" tabindex="-1"></a><span class="dv">10</span>      other       <span class="dv">3</span>   <span class="dv">10</span>  <span class="dv">22564</span>       <span class="dv">9</span>      <span class="sc">&lt;</span><span class="cn">NA</span><span class="sc">&gt;</span></span>
+<span id="cb8-132"><a href="#cb8-132" aria-hidden="true" tabindex="-1"></a><span class="dv">11</span>     public       <span class="dv">3</span>    <span class="dv">6</span>   <span class="dv">8412</span>       <span class="dv">6</span>      <span class="sc">&lt;</span><span class="cn">NA</span><span class="sc">&gt;</span></span></code></pre></div>
+</div>
+<div id="exercise-5" class="section level3">
+<h3>Exercise 5</h3>
+<p>First run this analysis</p>
+<pre><code>SuppressDominantCells(sdc_cars,
+                       n = 1:2, k = c(85, 95),
+                       numVar = &quot;value&quot;,
+                       formula = ~municipality + k_group*months + sector*county,
+                       contributorVar = &quot;car_brand&quot;)</code></pre>
+<p>Assume that all the data for <code>Skiptvet</code> is openly
+available. Try to use what you have learned to take this into account.
+Look at the result. What was it that happened?</p>
+<p><strong>Correction:</strong> This exercise might be overly complex.
+The necessary knowledge to solve it was not covered in the
+presentation.</p>
+<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>out101a <span class="ot">&lt;-</span> <span class="fu">SuppressDominantCells</span>(sdc_cars,</span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>                               <span class="at">n =</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">2</span>, <span class="at">k =</span> <span class="fu">c</span>(<span class="dv">85</span>, <span class="dv">95</span>),</span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>                               <span class="at">numVar =</span> <span class="st">&quot;value&quot;</span>,</span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>                               <span class="at">formula =</span> <span class="sc">~</span>municipality <span class="sc">+</span> k_group<span class="sc">*</span>months <span class="sc">+</span> sector<span class="sc">*</span>county,</span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>                               <span class="at">contributorVar =</span> <span class="st">&quot;car_brand&quot;</span>)</span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a>[preAggregate <span class="dv">582</span><span class="sc">*</span><span class="dv">9</span><span class="ot">-&gt;</span><span class="dv">582</span><span class="sc">*</span><span class="dv">8</span>]</span>
+<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a>[extraAggregate <span class="dv">582</span><span class="sc">*</span><span class="dv">8</span><span class="ot">-&gt;</span><span class="dv">103</span><span class="sc">*</span><span class="dv">8</span>] Checking .....</span>
+<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a>GaussSuppression_numttHTT<span class="sc">:</span> ....................................<span class="sc">::</span></span>
+<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a><span class="fu">Print</span>(out101a)</span>
+<span id="cb10-10"><a href="#cb10-10" aria-hidden="true" tabindex="-1"></a>   municipality months     sector freq   value primary suppressed</span>
+<span id="cb10-11"><a href="#cb10-11" aria-hidden="true" tabindex="-1"></a><span class="dv">1</span>         Total  Total      Total  <span class="dv">582</span> <span class="dv">1651372</span>       <span class="sc">-</span>          <span class="sc">-</span></span>
+<span id="cb10-12"><a href="#cb10-12" aria-hidden="true" tabindex="-1"></a><span class="dv">2</span>       Drammen  Total      Total   <span class="dv">17</span>   <span class="dv">49979</span>       <span class="sc">-</span>          <span class="sc">-</span></span>
+<span id="cb10-13"><a href="#cb10-13" aria-hidden="true" tabindex="-1"></a><span class="dv">3</span>        Frosta  Total      Total  <span class="dv">135</span>  <span class="dv">483443</span>       <span class="sc">-</span>          <span class="sc">-</span></span>
+<span id="cb10-14"><a href="#cb10-14" aria-hidden="true" tabindex="-1"></a><span class="dv">4</span>        Malvik  Total      Total    <span class="dv">9</span>   <span class="dv">41920</span>       <span class="sc">-</span>          <span class="sc">-</span></span>
+<span id="cb10-15"><a href="#cb10-15" aria-hidden="true" tabindex="-1"></a><span class="dv">5</span>        Marker  Total      Total   <span class="dv">96</span>  <span class="dv">273243</span>       <span class="sc">-</span>          <span class="sc">-</span></span>
+<span id="cb10-16"><a href="#cb10-16" aria-hidden="true" tabindex="-1"></a><span class="dv">6</span>        Oppdal  Total      Total   <span class="dv">43</span>   <span class="dv">93190</span>       <span class="sc">-</span>          <span class="sc">-</span></span>
+<span id="cb10-17"><a href="#cb10-17" aria-hidden="true" tabindex="-1"></a><span class="dv">7</span>          Osen  Total      Total   <span class="dv">37</span>   <span class="dv">98597</span>       <span class="sc">-</span>          <span class="sc">-</span></span>
+<span id="cb10-18"><a href="#cb10-18" aria-hidden="true" tabindex="-1"></a><span class="dv">8</span>     Sarpsborg  Total      Total   <span class="dv">50</span>  <span class="dv">119646</span>       <span class="sc">-</span>          <span class="sc">-</span></span>
+<span id="cb10-19"><a href="#cb10-19" aria-hidden="true" tabindex="-1"></a><span class="dv">9</span>         Selbu  Total      Total   <span class="dv">67</span>  <span class="dv">151412</span>       <span class="sc">-</span>          <span class="sc">-</span></span>
+<span id="cb10-20"><a href="#cb10-20" aria-hidden="true" tabindex="-1"></a><span class="dv">10</span>        Skaun  Total      Total   <span class="dv">87</span>  <span class="dv">234433</span>       <span class="sc">-</span>          <span class="sc">-</span></span>
+<span id="cb10-21"><a href="#cb10-21" aria-hidden="true" tabindex="-1"></a><span class="dv">11</span>     Skiptvet  Total      Total    <span class="dv">3</span>    <span class="dv">7217</span>    <span class="cn">TRUE</span>       <span class="cn">TRUE</span></span>
+<span id="cb10-22"><a href="#cb10-22" aria-hidden="true" tabindex="-1"></a><span class="dv">12</span>    Steinkjer  Total      Total   <span class="dv">35</span>   <span class="dv">97731</span>       <span class="sc">-</span>          <span class="sc">-</span></span>
+<span id="cb10-23"><a href="#cb10-23" aria-hidden="true" tabindex="-1"></a><span class="dv">13</span>   Ullensaker  Total      Total    <span class="dv">3</span>     <span class="dv">561</span>       <span class="sc">-</span>       <span class="cn">TRUE</span></span>
+<span id="cb10-24"><a href="#cb10-24" aria-hidden="true" tabindex="-1"></a><span class="dv">14</span>            <span class="dv">1</span>  Total      Total  <span class="dv">513</span> <span class="dv">1453098</span>       <span class="sc">-</span>          <span class="sc">-</span></span>
+<span id="cb10-25"><a href="#cb10-25" aria-hidden="true" tabindex="-1"></a><span class="dv">15</span>            <span class="dv">2</span>  Total      Total    <span class="dv">6</span>    <span class="dv">7778</span>       <span class="sc">-</span>          <span class="sc">-</span></span>
+<span id="cb10-26"><a href="#cb10-26" aria-hidden="true" tabindex="-1"></a><span class="dv">16</span>            <span class="dv">3</span>  Total      Total   <span class="dv">63</span>  <span class="dv">190496</span>       <span class="sc">-</span>          <span class="sc">-</span></span>
+<span id="cb10-27"><a href="#cb10-27" aria-hidden="true" tabindex="-1"></a><span class="dv">17</span>        Total m01m05      Total  <span class="dv">393</span> <span class="dv">1233769</span>       <span class="sc">-</span>          <span class="sc">-</span></span>
+<span id="cb10-28"><a href="#cb10-28" aria-hidden="true" tabindex="-1"></a><span class="dv">18</span>        Total m06m09      Total  <span class="dv">112</span>  <span class="dv">241460</span>       <span class="sc">-</span>          <span class="sc">-</span></span>
+<span id="cb10-29"><a href="#cb10-29" aria-hidden="true" tabindex="-1"></a><span class="dv">19</span>        Total m10m12      Total   <span class="dv">77</span>  <span class="dv">176143</span>       <span class="sc">-</span>          <span class="sc">-</span></span>
+<span id="cb10-30"><a href="#cb10-30" aria-hidden="true" tabindex="-1"></a><span class="dv">20</span>        Total  Total   business  <span class="dv">181</span>  <span class="dv">599181</span>       <span class="sc">-</span>          <span class="sc">-</span></span>
+<span id="cb10-31"><a href="#cb10-31" aria-hidden="true" tabindex="-1"></a><span class="dv">21</span>        Total  Total individual  <span class="dv">229</span>  <span class="dv">657346</span>       <span class="sc">-</span>          <span class="sc">-</span></span>
+<span id="cb10-32"><a href="#cb10-32" aria-hidden="true" tabindex="-1"></a><span class="dv">22</span>        Total  Total      other   <span class="dv">82</span>  <span class="dv">208383</span>       <span class="sc">-</span>          <span class="sc">-</span></span>
+<span id="cb10-33"><a href="#cb10-33" aria-hidden="true" tabindex="-1"></a><span class="dv">23</span>        Total  Total     public   <span class="dv">90</span>  <span class="dv">186462</span>       <span class="sc">-</span>          <span class="sc">-</span></span>
+<span id="cb10-34"><a href="#cb10-34" aria-hidden="true" tabindex="-1"></a><span class="dv">24</span>    Trondelag  Total      Total  <span class="dv">413</span> <span class="dv">1200726</span>       <span class="sc">-</span>          <span class="sc">-</span></span>
+<span id="cb10-35"><a href="#cb10-35" aria-hidden="true" tabindex="-1"></a><span class="dv">25</span>        Viken  Total      Total  <span class="dv">169</span>  <span class="dv">450646</span>       <span class="sc">-</span>          <span class="sc">-</span></span>
+<span id="cb10-36"><a href="#cb10-36" aria-hidden="true" tabindex="-1"></a><span class="dv">26</span>            <span class="dv">1</span> m01m05      Total  <span class="dv">352</span> <span class="dv">1117596</span>       <span class="sc">-</span>          <span class="sc">-</span></span>
+<span id="cb10-37"><a href="#cb10-37" aria-hidden="true" tabindex="-1"></a><span class="dv">27</span>            <span class="dv">1</span> m06m09      Total   <span class="dv">98</span>  <span class="dv">206402</span>       <span class="sc">-</span>          <span class="sc">-</span></span>
+<span id="cb10-38"><a href="#cb10-38" aria-hidden="true" tabindex="-1"></a><span class="dv">28</span>            <span class="dv">1</span> m10m12      Total   <span class="dv">63</span>  <span class="dv">129100</span>       <span class="sc">-</span>          <span class="sc">-</span></span>
+<span id="cb10-39"><a href="#cb10-39" aria-hidden="true" tabindex="-1"></a><span class="dv">29</span>            <span class="dv">2</span> m01m05      Total    <span class="dv">3</span>     <span class="dv">561</span>       <span class="sc">-</span>       <span class="cn">TRUE</span></span>
+<span id="cb10-40"><a href="#cb10-40" aria-hidden="true" tabindex="-1"></a><span class="dv">30</span>            <span class="dv">2</span> m06m09      Total    <span class="dv">1</span>     <span class="dv">391</span>    <span class="cn">TRUE</span>       <span class="cn">TRUE</span></span>
+<span id="cb10-41"><a href="#cb10-41" aria-hidden="true" tabindex="-1"></a><span class="dv">31</span>            <span class="dv">2</span> m10m12      Total    <span class="dv">2</span>    <span class="dv">6826</span>    <span class="cn">TRUE</span>       <span class="cn">TRUE</span></span>
+<span id="cb10-42"><a href="#cb10-42" aria-hidden="true" tabindex="-1"></a><span class="dv">32</span>            <span class="dv">3</span> m01m05      Total   <span class="dv">38</span>  <span class="dv">115612</span>       <span class="sc">-</span>       <span class="cn">TRUE</span></span>
+<span id="cb10-43"><a href="#cb10-43" aria-hidden="true" tabindex="-1"></a><span class="dv">33</span>            <span class="dv">3</span> m06m09      Total   <span class="dv">13</span>   <span class="dv">34667</span>       <span class="sc">-</span>       <span class="cn">TRUE</span></span>
+<span id="cb10-44"><a href="#cb10-44" aria-hidden="true" tabindex="-1"></a><span class="dv">34</span>            <span class="dv">3</span> m10m12      Total   <span class="dv">12</span>   <span class="dv">40217</span>       <span class="sc">-</span>       <span class="cn">TRUE</span></span>
+<span id="cb10-45"><a href="#cb10-45" aria-hidden="true" tabindex="-1"></a><span class="dv">35</span>    Trondelag  Total   business  <span class="dv">126</span>  <span class="dv">419600</span>       <span class="sc">-</span>          <span class="sc">-</span></span>
+<span id="cb10-46"><a href="#cb10-46" aria-hidden="true" tabindex="-1"></a><span class="dv">36</span>        Viken  Total   business   <span class="dv">55</span>  <span class="dv">179581</span>       <span class="sc">-</span>          <span class="sc">-</span></span>
+<span id="cb10-47"><a href="#cb10-47" aria-hidden="true" tabindex="-1"></a><span class="dv">37</span>    Trondelag  Total individual  <span class="dv">167</span>  <span class="dv">512674</span>       <span class="sc">-</span>          <span class="sc">-</span></span>
+<span id="cb10-48"><a href="#cb10-48" aria-hidden="true" tabindex="-1"></a><span class="dv">38</span>        Viken  Total individual   <span class="dv">62</span>  <span class="dv">144672</span>       <span class="sc">-</span>          <span class="sc">-</span></span>
+<span id="cb10-49"><a href="#cb10-49" aria-hidden="true" tabindex="-1"></a><span class="dv">39</span>    Trondelag  Total      other   <span class="dv">63</span>  <span class="dv">162565</span>       <span class="sc">-</span>          <span class="sc">-</span></span>
+<span id="cb10-50"><a href="#cb10-50" aria-hidden="true" tabindex="-1"></a><span class="dv">40</span>        Viken  Total      other   <span class="dv">19</span>   <span class="dv">45818</span>       <span class="sc">-</span>          <span class="sc">-</span></span>
+<span id="cb10-51"><a href="#cb10-51" aria-hidden="true" tabindex="-1"></a><span class="dv">41</span>    Trondelag  Total     public   <span class="dv">57</span>  <span class="dv">105887</span>       <span class="sc">-</span>          <span class="sc">-</span></span>
+<span id="cb10-52"><a href="#cb10-52" aria-hidden="true" tabindex="-1"></a><span class="dv">42</span>        Viken  Total     public   <span class="dv">33</span>   <span class="dv">80575</span>       <span class="sc">-</span>          <span class="sc">-</span></span></code></pre></div>
+<div id="solution-2" class="section level4">
+<h4>Solution:</h4>
+<p>A trick is to create a new numeric variable where all the values for
+Skiptvet are set to 0.</p>
+<p>Warning below, but this can be avoided with <code>dominanceVar</code>
+(and <code>candidatesVar</code>).</p>
+<p>No suppression since the figures from Skiptvet are the basis for all
+primary suppressed cells.</p>
+<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>sdc_cars[[<span class="st">&quot;value2&quot;</span>]] <span class="ot">&lt;-</span> sdc_cars[[<span class="st">&quot;value&quot;</span>]]</span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>sdc_cars[sdc_cars[[<span class="st">&quot;municipality&quot;</span>]] <span class="sc">==</span> <span class="st">&quot;Skiptvet&quot;</span>, <span class="st">&quot;value2&quot;</span>] <span class="ot">&lt;-</span> <span class="dv">0</span></span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>out101b <span class="ot">&lt;-</span> <span class="fu">SuppressDominantCells</span>(sdc_cars,</span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>                               <span class="at">n =</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">2</span>, <span class="at">k =</span> <span class="fu">c</span>(<span class="dv">85</span>, <span class="dv">95</span>),</span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a>                               <span class="at">numVar =</span> <span class="fu">c</span>(<span class="st">&quot;value2&quot;</span>,<span class="st">&quot;value&quot;</span>),</span>
+<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a>                               <span class="at">formula =</span> <span class="sc">~</span>municipality <span class="sc">+</span> k_group<span class="sc">*</span>months <span class="sc">+</span> sector<span class="sc">*</span>county,</span>
+<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a>                               <span class="at">contributorVar =</span> <span class="st">&quot;car_brand&quot;</span>)</span>
+<span id="cb11-9"><a href="#cb11-9" aria-hidden="true" tabindex="-1"></a>[preAggregate <span class="dv">582</span><span class="sc">*</span><span class="dv">10</span><span class="ot">-&gt;</span><span class="dv">582</span><span class="sc">*</span><span class="dv">9</span>]</span>
+<span id="cb11-10"><a href="#cb11-10" aria-hidden="true" tabindex="-1"></a>Warning <span class="cf">in</span> <span class="fu">candidates</span>(<span class="at">crossTable =</span> crossTable, <span class="at">x =</span> x, <span class="at">freq =</span> freq, <span class="at">num =</span> num, <span class="sc">:</span></span>
+<span id="cb11-11"><a href="#cb11-11" aria-hidden="true" tabindex="-1"></a>Multiple numVar were supplied, only the first is used <span class="cf">in</span> candidates function.</span>
+<span id="cb11-12"><a href="#cb11-12" aria-hidden="true" tabindex="-1"></a>Warning <span class="cf">in</span> <span class="fu">MagnitudeRule</span>(<span class="at">data =</span> data, <span class="at">n =</span> n, <span class="at">k =</span> k, <span class="at">protectZeros =</span></span>
+<span id="cb11-13"><a href="#cb11-13" aria-hidden="true" tabindex="-1"></a>protectZeros, <span class="sc">:</span> Multiple numVar were supplied, only the first is suppressed.</span>
+<span id="cb11-14"><a href="#cb11-14" aria-hidden="true" tabindex="-1"></a>[extraAggregate <span class="dv">582</span><span class="sc">*</span><span class="dv">9</span><span class="ot">-&gt;</span><span class="dv">103</span><span class="sc">*</span><span class="dv">9</span>] Checking .....</span>
+<span id="cb11-15"><a href="#cb11-15" aria-hidden="true" tabindex="-1"></a><span class="fu">Print</span>(out101b)</span>
+<span id="cb11-16"><a href="#cb11-16" aria-hidden="true" tabindex="-1"></a>   municipality months     sector freq  value2   value primary suppressed</span>
+<span id="cb11-17"><a href="#cb11-17" aria-hidden="true" tabindex="-1"></a><span class="dv">1</span>         Total  Total      Total  <span class="dv">582</span> <span class="dv">1644155</span> <span class="dv">1651372</span>       <span class="sc">-</span>          <span class="sc">-</span></span>
+<span id="cb11-18"><a href="#cb11-18" aria-hidden="true" tabindex="-1"></a><span class="dv">2</span>       Drammen  Total      Total   <span class="dv">17</span>   <span class="dv">49979</span>   <span class="dv">49979</span>       <span class="sc">-</span>          <span class="sc">-</span></span>
+<span id="cb11-19"><a href="#cb11-19" aria-hidden="true" tabindex="-1"></a><span class="dv">3</span>        Frosta  Total      Total  <span class="dv">135</span>  <span class="dv">483443</span>  <span class="dv">483443</span>       <span class="sc">-</span>          <span class="sc">-</span></span>
+<span id="cb11-20"><a href="#cb11-20" aria-hidden="true" tabindex="-1"></a><span class="dv">4</span>        Malvik  Total      Total    <span class="dv">9</span>   <span class="dv">41920</span>   <span class="dv">41920</span>       <span class="sc">-</span>          <span class="sc">-</span></span>
+<span id="cb11-21"><a href="#cb11-21" aria-hidden="true" tabindex="-1"></a><span class="dv">5</span>        Marker  Total      Total   <span class="dv">96</span>  <span class="dv">273243</span>  <span class="dv">273243</span>       <span class="sc">-</span>          <span class="sc">-</span></span>
+<span id="cb11-22"><a href="#cb11-22" aria-hidden="true" tabindex="-1"></a><span class="dv">6</span>        Oppdal  Total      Total   <span class="dv">43</span>   <span class="dv">93190</span>   <span class="dv">93190</span>       <span class="sc">-</span>          <span class="sc">-</span></span>
+<span id="cb11-23"><a href="#cb11-23" aria-hidden="true" tabindex="-1"></a><span class="dv">7</span>          Osen  Total      Total   <span class="dv">37</span>   <span class="dv">98597</span>   <span class="dv">98597</span>       <span class="sc">-</span>          <span class="sc">-</span></span>
+<span id="cb11-24"><a href="#cb11-24" aria-hidden="true" tabindex="-1"></a><span class="dv">8</span>     Sarpsborg  Total      Total   <span class="dv">50</span>  <span class="dv">119646</span>  <span class="dv">119646</span>       <span class="sc">-</span>          <span class="sc">-</span></span>
+<span id="cb11-25"><a href="#cb11-25" aria-hidden="true" tabindex="-1"></a><span class="dv">9</span>         Selbu  Total      Total   <span class="dv">67</span>  <span class="dv">151412</span>  <span class="dv">151412</span>       <span class="sc">-</span>          <span class="sc">-</span></span>
+<span id="cb11-26"><a href="#cb11-26" aria-hidden="true" tabindex="-1"></a><span class="dv">10</span>        Skaun  Total      Total   <span class="dv">87</span>  <span class="dv">234433</span>  <span class="dv">234433</span>       <span class="sc">-</span>          <span class="sc">-</span></span>
+<span id="cb11-27"><a href="#cb11-27" aria-hidden="true" tabindex="-1"></a><span class="dv">11</span>     Skiptvet  Total      Total    <span class="dv">3</span>       <span class="dv">0</span>    <span class="dv">7217</span>       <span class="sc">-</span>          <span class="sc">-</span></span>
+<span id="cb11-28"><a href="#cb11-28" aria-hidden="true" tabindex="-1"></a><span class="dv">12</span>    Steinkjer  Total      Total   <span class="dv">35</span>   <span class="dv">97731</span>   <span class="dv">97731</span>       <span class="sc">-</span>          <span class="sc">-</span></span>
+<span id="cb11-29"><a href="#cb11-29" aria-hidden="true" tabindex="-1"></a><span class="dv">13</span>   Ullensaker  Total      Total    <span class="dv">3</span>     <span class="dv">561</span>     <span class="dv">561</span>       <span class="sc">-</span>          <span class="sc">-</span></span>
+<span id="cb11-30"><a href="#cb11-30" aria-hidden="true" tabindex="-1"></a><span class="dv">14</span>            <span class="dv">1</span>  Total      Total  <span class="dv">513</span> <span class="dv">1453098</span> <span class="dv">1453098</span>       <span class="sc">-</span>          <span class="sc">-</span></span>
+<span id="cb11-31"><a href="#cb11-31" aria-hidden="true" tabindex="-1"></a><span class="dv">15</span>            <span class="dv">2</span>  Total      Total    <span class="dv">6</span>     <span class="dv">561</span>    <span class="dv">7778</span>       <span class="sc">-</span>          <span class="sc">-</span></span>
+<span id="cb11-32"><a href="#cb11-32" aria-hidden="true" tabindex="-1"></a><span class="dv">16</span>            <span class="dv">3</span>  Total      Total   <span class="dv">63</span>  <span class="dv">190496</span>  <span class="dv">190496</span>       <span class="sc">-</span>          <span class="sc">-</span></span>
+<span id="cb11-33"><a href="#cb11-33" aria-hidden="true" tabindex="-1"></a><span class="dv">17</span>        Total m01m05      Total  <span class="dv">393</span> <span class="dv">1233769</span> <span class="dv">1233769</span>       <span class="sc">-</span>          <span class="sc">-</span></span>
+<span id="cb11-34"><a href="#cb11-34" aria-hidden="true" tabindex="-1"></a><span class="dv">18</span>        Total m06m09      Total  <span class="dv">112</span>  <span class="dv">241069</span>  <span class="dv">241460</span>       <span class="sc">-</span>          <span class="sc">-</span></span>
+<span id="cb11-35"><a href="#cb11-35" aria-hidden="true" tabindex="-1"></a><span class="dv">19</span>        Total m10m12      Total   <span class="dv">77</span>  <span class="dv">169317</span>  <span class="dv">176143</span>       <span class="sc">-</span>          <span class="sc">-</span></span>
+<span id="cb11-36"><a href="#cb11-36" aria-hidden="true" tabindex="-1"></a><span class="dv">20</span>        Total  Total   business  <span class="dv">181</span>  <span class="dv">598790</span>  <span class="dv">599181</span>       <span class="sc">-</span>          <span class="sc">-</span></span>
+<span id="cb11-37"><a href="#cb11-37" aria-hidden="true" tabindex="-1"></a><span class="dv">21</span>        Total  Total individual  <span class="dv">229</span>  <span class="dv">650520</span>  <span class="dv">657346</span>       <span class="sc">-</span>          <span class="sc">-</span></span>
+<span id="cb11-38"><a href="#cb11-38" aria-hidden="true" tabindex="-1"></a><span class="dv">22</span>        Total  Total      other   <span class="dv">82</span>  <span class="dv">208383</span>  <span class="dv">208383</span>       <span class="sc">-</span>          <span class="sc">-</span></span>
+<span id="cb11-39"><a href="#cb11-39" aria-hidden="true" tabindex="-1"></a><span class="dv">23</span>        Total  Total     public   <span class="dv">90</span>  <span class="dv">186462</span>  <span class="dv">186462</span>       <span class="sc">-</span>          <span class="sc">-</span></span>
+<span id="cb11-40"><a href="#cb11-40" aria-hidden="true" tabindex="-1"></a><span class="dv">24</span>    Trondelag  Total      Total  <span class="dv">413</span> <span class="dv">1200726</span> <span class="dv">1200726</span>       <span class="sc">-</span>          <span class="sc">-</span></span>
+<span id="cb11-41"><a href="#cb11-41" aria-hidden="true" tabindex="-1"></a><span class="dv">25</span>        Viken  Total      Total  <span class="dv">169</span>  <span class="dv">443429</span>  <span class="dv">450646</span>       <span class="sc">-</span>          <span class="sc">-</span></span>
+<span id="cb11-42"><a href="#cb11-42" aria-hidden="true" tabindex="-1"></a><span class="dv">26</span>            <span class="dv">1</span> m01m05      Total  <span class="dv">352</span> <span class="dv">1117596</span> <span class="dv">1117596</span>       <span class="sc">-</span>          <span class="sc">-</span></span>
+<span id="cb11-43"><a href="#cb11-43" aria-hidden="true" tabindex="-1"></a><span class="dv">27</span>            <span class="dv">1</span> m06m09      Total   <span class="dv">98</span>  <span class="dv">206402</span>  <span class="dv">206402</span>       <span class="sc">-</span>          <span class="sc">-</span></span>
+<span id="cb11-44"><a href="#cb11-44" aria-hidden="true" tabindex="-1"></a><span class="dv">28</span>            <span class="dv">1</span> m10m12      Total   <span class="dv">63</span>  <span class="dv">129100</span>  <span class="dv">129100</span>       <span class="sc">-</span>          <span class="sc">-</span></span>
+<span id="cb11-45"><a href="#cb11-45" aria-hidden="true" tabindex="-1"></a><span class="dv">29</span>            <span class="dv">2</span> m01m05      Total    <span class="dv">3</span>     <span class="dv">561</span>     <span class="dv">561</span>       <span class="sc">-</span>          <span class="sc">-</span></span>
+<span id="cb11-46"><a href="#cb11-46" aria-hidden="true" tabindex="-1"></a><span class="dv">30</span>            <span class="dv">2</span> m06m09      Total    <span class="dv">1</span>       <span class="dv">0</span>     <span class="dv">391</span>       <span class="sc">-</span>          <span class="sc">-</span></span>
+<span id="cb11-47"><a href="#cb11-47" aria-hidden="true" tabindex="-1"></a><span class="dv">31</span>            <span class="dv">2</span> m10m12      Total    <span class="dv">2</span>       <span class="dv">0</span>    <span class="dv">6826</span>       <span class="sc">-</span>          <span class="sc">-</span></span>
+<span id="cb11-48"><a href="#cb11-48" aria-hidden="true" tabindex="-1"></a><span class="dv">32</span>            <span class="dv">3</span> m01m05      Total   <span class="dv">38</span>  <span class="dv">115612</span>  <span class="dv">115612</span>       <span class="sc">-</span>          <span class="sc">-</span></span>
+<span id="cb11-49"><a href="#cb11-49" aria-hidden="true" tabindex="-1"></a><span class="dv">33</span>            <span class="dv">3</span> m06m09      Total   <span class="dv">13</span>   <span class="dv">34667</span>   <span class="dv">34667</span>       <span class="sc">-</span>          <span class="sc">-</span></span>
+<span id="cb11-50"><a href="#cb11-50" aria-hidden="true" tabindex="-1"></a><span class="dv">34</span>            <span class="dv">3</span> m10m12      Total   <span class="dv">12</span>   <span class="dv">40217</span>   <span class="dv">40217</span>       <span class="sc">-</span>          <span class="sc">-</span></span>
+<span id="cb11-51"><a href="#cb11-51" aria-hidden="true" tabindex="-1"></a><span class="dv">35</span>    Trondelag  Total   business  <span class="dv">126</span>  <span class="dv">419600</span>  <span class="dv">419600</span>       <span class="sc">-</span>          <span class="sc">-</span></span>
+<span id="cb11-52"><a href="#cb11-52" aria-hidden="true" tabindex="-1"></a><span class="dv">36</span>        Viken  Total   business   <span class="dv">55</span>  <span class="dv">179190</span>  <span class="dv">179581</span>       <span class="sc">-</span>          <span class="sc">-</span></span>
+<span id="cb11-53"><a href="#cb11-53" aria-hidden="true" tabindex="-1"></a><span class="dv">37</span>    Trondelag  Total individual  <span class="dv">167</span>  <span class="dv">512674</span>  <span class="dv">512674</span>       <span class="sc">-</span>          <span class="sc">-</span></span>
+<span id="cb11-54"><a href="#cb11-54" aria-hidden="true" tabindex="-1"></a><span class="dv">38</span>        Viken  Total individual   <span class="dv">62</span>  <span class="dv">137846</span>  <span class="dv">144672</span>       <span class="sc">-</span>          <span class="sc">-</span></span>
+<span id="cb11-55"><a href="#cb11-55" aria-hidden="true" tabindex="-1"></a><span class="dv">39</span>    Trondelag  Total      other   <span class="dv">63</span>  <span class="dv">162565</span>  <span class="dv">162565</span>       <span class="sc">-</span>          <span class="sc">-</span></span>
+<span id="cb11-56"><a href="#cb11-56" aria-hidden="true" tabindex="-1"></a><span class="dv">40</span>        Viken  Total      other   <span class="dv">19</span>   <span class="dv">45818</span>   <span class="dv">45818</span>       <span class="sc">-</span>          <span class="sc">-</span></span>
+<span id="cb11-57"><a href="#cb11-57" aria-hidden="true" tabindex="-1"></a><span class="dv">41</span>    Trondelag  Total     public   <span class="dv">57</span>  <span class="dv">105887</span>  <span class="dv">105887</span>       <span class="sc">-</span>          <span class="sc">-</span></span>
+<span id="cb11-58"><a href="#cb11-58" aria-hidden="true" tabindex="-1"></a><span class="dv">42</span>        Viken  Total     public   <span class="dv">33</span>   <span class="dv">80575</span>   <span class="dv">80575</span>       <span class="sc">-</span>          <span class="sc">-</span></span></code></pre></div>
+</div>
+</div>
+<div id="exercise-6" class="section level3">
+<h3>Exercise 6</h3>
+<p>Load the dataset <code>social</code>. Tip:
+<code>load(&quot;data/social.RData&quot;)</code></p>
+<p>Run this analysis where only the first 50 data rows are used:</p>
+<pre><code>SuppressSmallCounts(social[1:50, ], 
+                    dimVar = c(&quot;municipality&quot;, &quot;main_income&quot;), 
+                    maxN=1)
+</code></pre>
+<p>Also run a corresponding analysis where you enter
+<code>singletonMethod = &quot;none&quot;</code>.</p>
+<p>Can you explain the difference between these two analyzes?</p>
+<p>By looking at the output, are you able to explain which the
+suppression pattern is different?</p>
+<div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a><span class="fu">load</span>(<span class="st">&quot;../data/social.RData&quot;</span>)</span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>k1 <span class="ot">=</span> <span class="fu">SuppressSmallCounts</span>(social[<span class="dv">1</span><span class="sc">:</span><span class="dv">50</span>, ], </span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a>                    <span class="at">dimVar =</span> <span class="fu">c</span>(<span class="st">&quot;municipality&quot;</span>, <span class="st">&quot;main_income&quot;</span>), </span>
+<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a>                    <span class="at">maxN=</span><span class="dv">1</span>)</span>
+<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a>[preAggregate <span class="dv">50</span><span class="sc">*</span><span class="dv">6</span><span class="ot">-&gt;</span><span class="dv">24</span><span class="sc">*</span><span class="dv">3</span>]</span>
+<span id="cb13-8"><a href="#cb13-8" aria-hidden="true" tabindex="-1"></a>[extend0 <span class="dv">24</span><span class="sc">*</span><span class="dv">3</span><span class="ot">-&gt;</span><span class="dv">36</span><span class="sc">*</span><span class="dv">3</span>]</span>
+<span id="cb13-9"><a href="#cb13-9" aria-hidden="true" tabindex="-1"></a>GaussSuppression_anySum<span class="sc">:</span> ..........................</span>
+<span id="cb13-10"><a href="#cb13-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-11"><a href="#cb13-11" aria-hidden="true" tabindex="-1"></a><span class="fu">Print</span>(k1)</span>
+<span id="cb13-12"><a href="#cb13-12" aria-hidden="true" tabindex="-1"></a>   municipality main_income freq primary suppressed</span>
+<span id="cb13-13"><a href="#cb13-13" aria-hidden="true" tabindex="-1"></a><span class="dv">1</span>         Total       Total   <span class="dv">50</span>       <span class="sc">-</span>          <span class="sc">-</span></span>
+<span id="cb13-14"><a href="#cb13-14" aria-hidden="true" tabindex="-1"></a><span class="dv">2</span>         Total  assistance   <span class="dv">27</span>       <span class="sc">-</span>          <span class="sc">-</span></span>
+<span id="cb13-15"><a href="#cb13-15" aria-hidden="true" tabindex="-1"></a><span class="dv">3</span>         Total       other    <span class="dv">6</span>       <span class="sc">-</span>          <span class="sc">-</span></span>
+<span id="cb13-16"><a href="#cb13-16" aria-hidden="true" tabindex="-1"></a><span class="dv">4</span>         Total    pensions   <span class="dv">12</span>       <span class="sc">-</span>          <span class="sc">-</span></span>
+<span id="cb13-17"><a href="#cb13-17" aria-hidden="true" tabindex="-1"></a><span class="dv">5</span>         Total       wages    <span class="dv">5</span>       <span class="sc">-</span>          <span class="sc">-</span></span>
+<span id="cb13-18"><a href="#cb13-18" aria-hidden="true" tabindex="-1"></a><span class="dv">6</span>       Drammen       Total    <span class="dv">2</span>       <span class="sc">-</span>          <span class="sc">-</span></span>
+<span id="cb13-19"><a href="#cb13-19" aria-hidden="true" tabindex="-1"></a><span class="dv">7</span>       Drammen  assistance    <span class="dv">1</span>    <span class="cn">TRUE</span>       <span class="cn">TRUE</span></span>
+<span id="cb13-20"><a href="#cb13-20" aria-hidden="true" tabindex="-1"></a><span class="dv">8</span>       Drammen       other    <span class="dv">0</span>    <span class="cn">TRUE</span>       <span class="cn">TRUE</span></span>
+<span id="cb13-21"><a href="#cb13-21" aria-hidden="true" tabindex="-1"></a><span class="dv">9</span>       Drammen    pensions    <span class="dv">1</span>    <span class="cn">TRUE</span>       <span class="cn">TRUE</span></span>
+<span id="cb13-22"><a href="#cb13-22" aria-hidden="true" tabindex="-1"></a><span class="dv">10</span>      Drammen       wages    <span class="dv">0</span>    <span class="cn">TRUE</span>       <span class="cn">TRUE</span></span>
+<span id="cb13-23"><a href="#cb13-23" aria-hidden="true" tabindex="-1"></a><span class="dv">11</span>       Frosta       Total   <span class="dv">15</span>       <span class="sc">-</span>          <span class="sc">-</span></span>
+<span id="cb13-24"><a href="#cb13-24" aria-hidden="true" tabindex="-1"></a><span class="dv">12</span>       Frosta  assistance    <span class="dv">7</span>       <span class="sc">-</span>          <span class="sc">-</span></span>
+<span id="cb13-25"><a href="#cb13-25" aria-hidden="true" tabindex="-1"></a><span class="dv">13</span>       Frosta       other    <span class="dv">2</span>       <span class="sc">-</span>       <span class="cn">TRUE</span></span>
+<span id="cb13-26"><a href="#cb13-26" aria-hidden="true" tabindex="-1"></a><span class="dv">14</span>       Frosta    pensions    <span class="dv">5</span>       <span class="sc">-</span>          <span class="sc">-</span></span>
+<span id="cb13-27"><a href="#cb13-27" aria-hidden="true" tabindex="-1"></a><span class="dv">15</span>       Frosta       wages    <span class="dv">1</span>    <span class="cn">TRUE</span>       <span class="cn">TRUE</span></span>
+<span id="cb13-28"><a href="#cb13-28" aria-hidden="true" tabindex="-1"></a><span class="dv">16</span>       Marker       Total    <span class="dv">8</span>       <span class="sc">-</span>          <span class="sc">-</span></span>
+<span id="cb13-29"><a href="#cb13-29" aria-hidden="true" tabindex="-1"></a><span class="dv">17</span>       Marker  assistance    <span class="dv">6</span>       <span class="sc">-</span>          <span class="sc">-</span></span>
+<span id="cb13-30"><a href="#cb13-30" aria-hidden="true" tabindex="-1"></a><span class="dv">18</span>       Marker       other    <span class="dv">0</span>    <span class="cn">TRUE</span>       <span class="cn">TRUE</span></span>
+<span id="cb13-31"><a href="#cb13-31" aria-hidden="true" tabindex="-1"></a><span class="dv">19</span>       Marker    pensions    <span class="dv">1</span>    <span class="cn">TRUE</span>       <span class="cn">TRUE</span></span>
+<span id="cb13-32"><a href="#cb13-32" aria-hidden="true" tabindex="-1"></a><span class="dv">20</span>       Marker       wages    <span class="dv">1</span>    <span class="cn">TRUE</span>       <span class="cn">TRUE</span></span>
+<span id="cb13-33"><a href="#cb13-33" aria-hidden="true" tabindex="-1"></a><span class="dv">21</span>       Oppdal       Total    <span class="dv">3</span>       <span class="sc">-</span>          <span class="sc">-</span></span>
+<span id="cb13-34"><a href="#cb13-34" aria-hidden="true" tabindex="-1"></a><span class="dv">22</span>       Oppdal  assistance    <span class="dv">1</span>    <span class="cn">TRUE</span>       <span class="cn">TRUE</span></span>
+<span id="cb13-35"><a href="#cb13-35" aria-hidden="true" tabindex="-1"></a><span class="dv">23</span>       Oppdal       other    <span class="dv">2</span>       <span class="sc">-</span>          <span class="sc">-</span></span>
+<span id="cb13-36"><a href="#cb13-36" aria-hidden="true" tabindex="-1"></a><span class="dv">24</span>       Oppdal    pensions    <span class="dv">0</span>    <span class="cn">TRUE</span>       <span class="cn">TRUE</span></span>
+<span id="cb13-37"><a href="#cb13-37" aria-hidden="true" tabindex="-1"></a><span class="dv">25</span>       Oppdal       wages    <span class="dv">0</span>    <span class="cn">TRUE</span>       <span class="cn">TRUE</span></span>
+<span id="cb13-38"><a href="#cb13-38" aria-hidden="true" tabindex="-1"></a><span class="dv">26</span>         Osen       Total    <span class="dv">4</span>       <span class="sc">-</span>          <span class="sc">-</span></span>
+<span id="cb13-39"><a href="#cb13-39" aria-hidden="true" tabindex="-1"></a><span class="dv">27</span>         Osen  assistance    <span class="dv">4</span>       <span class="sc">-</span>       <span class="cn">TRUE</span></span>
+<span id="cb13-40"><a href="#cb13-40" aria-hidden="true" tabindex="-1"></a><span class="dv">28</span>         Osen       other    <span class="dv">0</span>    <span class="cn">TRUE</span>       <span class="cn">TRUE</span></span>
+<span id="cb13-41"><a href="#cb13-41" aria-hidden="true" tabindex="-1"></a><span class="dv">29</span>         Osen    pensions    <span class="dv">0</span>    <span class="cn">TRUE</span>       <span class="cn">TRUE</span></span>
+<span id="cb13-42"><a href="#cb13-42" aria-hidden="true" tabindex="-1"></a><span class="dv">30</span>         Osen       wages    <span class="dv">0</span>    <span class="cn">TRUE</span>       <span class="cn">TRUE</span></span>
+<span id="cb13-43"><a href="#cb13-43" aria-hidden="true" tabindex="-1"></a><span class="dv">31</span>    Sarpsborg       Total    <span class="dv">6</span>       <span class="sc">-</span>          <span class="sc">-</span></span>
+<span id="cb13-44"><a href="#cb13-44" aria-hidden="true" tabindex="-1"></a><span class="dv">32</span>    Sarpsborg  assistance    <span class="dv">2</span>       <span class="sc">-</span>          <span class="sc">-</span></span>
+<span id="cb13-45"><a href="#cb13-45" aria-hidden="true" tabindex="-1"></a><span class="dv">33</span>    Sarpsborg       other    <span class="dv">1</span>    <span class="cn">TRUE</span>       <span class="cn">TRUE</span></span>
+<span id="cb13-46"><a href="#cb13-46" aria-hidden="true" tabindex="-1"></a><span class="dv">34</span>    Sarpsborg    pensions    <span class="dv">2</span>       <span class="sc">-</span>          <span class="sc">-</span></span>
+<span id="cb13-47"><a href="#cb13-47" aria-hidden="true" tabindex="-1"></a><span class="dv">35</span>    Sarpsborg       wages    <span class="dv">1</span>    <span class="cn">TRUE</span>       <span class="cn">TRUE</span></span>
+<span id="cb13-48"><a href="#cb13-48" aria-hidden="true" tabindex="-1"></a><span class="dv">36</span>        Selbu       Total    <span class="dv">4</span>       <span class="sc">-</span>          <span class="sc">-</span></span>
+<span id="cb13-49"><a href="#cb13-49" aria-hidden="true" tabindex="-1"></a><span class="dv">37</span>        Selbu  assistance    <span class="dv">2</span>       <span class="sc">-</span>          <span class="sc">-</span></span>
+<span id="cb13-50"><a href="#cb13-50" aria-hidden="true" tabindex="-1"></a><span class="dv">38</span>        Selbu       other    <span class="dv">1</span>    <span class="cn">TRUE</span>       <span class="cn">TRUE</span></span>
+<span id="cb13-51"><a href="#cb13-51" aria-hidden="true" tabindex="-1"></a><span class="dv">39</span>        Selbu    pensions    <span class="dv">0</span>    <span class="cn">TRUE</span>       <span class="cn">TRUE</span></span>
+<span id="cb13-52"><a href="#cb13-52" aria-hidden="true" tabindex="-1"></a><span class="dv">40</span>        Selbu       wages    <span class="dv">1</span>    <span class="cn">TRUE</span>       <span class="cn">TRUE</span></span>
+<span id="cb13-53"><a href="#cb13-53" aria-hidden="true" tabindex="-1"></a><span class="dv">41</span>        Skaun       Total    <span class="dv">5</span>       <span class="sc">-</span>          <span class="sc">-</span></span>
+<span id="cb13-54"><a href="#cb13-54" aria-hidden="true" tabindex="-1"></a><span class="dv">42</span>        Skaun  assistance    <span class="dv">2</span>       <span class="sc">-</span>          <span class="sc">-</span></span>
+<span id="cb13-55"><a href="#cb13-55" aria-hidden="true" tabindex="-1"></a><span class="dv">43</span>        Skaun       other    <span class="dv">0</span>    <span class="cn">TRUE</span>       <span class="cn">TRUE</span></span>
+<span id="cb13-56"><a href="#cb13-56" aria-hidden="true" tabindex="-1"></a><span class="dv">44</span>        Skaun    pensions    <span class="dv">2</span>       <span class="sc">-</span>          <span class="sc">-</span></span>
+<span id="cb13-57"><a href="#cb13-57" aria-hidden="true" tabindex="-1"></a><span class="dv">45</span>        Skaun       wages    <span class="dv">1</span>    <span class="cn">TRUE</span>       <span class="cn">TRUE</span></span>
+<span id="cb13-58"><a href="#cb13-58" aria-hidden="true" tabindex="-1"></a><span class="dv">46</span>    Steinkjer       Total    <span class="dv">3</span>       <span class="sc">-</span>          <span class="sc">-</span></span>
+<span id="cb13-59"><a href="#cb13-59" aria-hidden="true" tabindex="-1"></a><span class="dv">47</span>    Steinkjer  assistance    <span class="dv">2</span>       <span class="sc">-</span>          <span class="sc">-</span></span>
+<span id="cb13-60"><a href="#cb13-60" aria-hidden="true" tabindex="-1"></a><span class="dv">48</span>    Steinkjer       other    <span class="dv">0</span>    <span class="cn">TRUE</span>       <span class="cn">TRUE</span></span>
+<span id="cb13-61"><a href="#cb13-61" aria-hidden="true" tabindex="-1"></a><span class="dv">49</span>    Steinkjer    pensions    <span class="dv">1</span>    <span class="cn">TRUE</span>       <span class="cn">TRUE</span></span>
+<span id="cb13-62"><a href="#cb13-62" aria-hidden="true" tabindex="-1"></a><span class="dv">50</span>    Steinkjer       wages    <span class="dv">0</span>    <span class="cn">TRUE</span>       <span class="cn">TRUE</span></span></code></pre></div>
+<div id="solution-3" class="section level4">
+<h4>Solution</h4>
+<p>With no singleton method <code>Osen:assistance</code> is not
+suppressed. Then the primary suppressed zeros in Osen can be easily
+revealed. <code>Osen:Total = 4</code> and
+<code>Osen:assistance = 4</code>. Everything else in Osen must therefore
+be <code>0</code>.</p>
+<div class="sourceCode" id="cb14"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>k2 <span class="ot">=</span> <span class="fu">SuppressSmallCounts</span>(social[<span class="dv">1</span><span class="sc">:</span><span class="dv">50</span>, ], </span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a>                    <span class="at">dimVar =</span> <span class="fu">c</span>(<span class="st">&quot;municipality&quot;</span>, <span class="st">&quot;main_income&quot;</span>), </span>
+<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a>                    <span class="at">maxN=</span><span class="dv">1</span>, </span>
+<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a>                    <span class="at">singletonMethod =</span> <span class="st">&quot;none&quot;</span>)</span>
+<span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a>[preAggregate <span class="dv">50</span><span class="sc">*</span><span class="dv">6</span><span class="ot">-&gt;</span><span class="dv">24</span><span class="sc">*</span><span class="dv">3</span>]</span>
+<span id="cb14-8"><a href="#cb14-8" aria-hidden="true" tabindex="-1"></a>[extend0 <span class="dv">24</span><span class="sc">*</span><span class="dv">3</span><span class="ot">-&gt;</span><span class="dv">36</span><span class="sc">*</span><span class="dv">3</span>]</span>
+<span id="cb14-9"><a href="#cb14-9" aria-hidden="true" tabindex="-1"></a>GaussSuppression_none<span class="sc">:</span> ..........................</span>
+<span id="cb14-10"><a href="#cb14-10" aria-hidden="true" tabindex="-1"></a><span class="fu">Print</span>(k2)</span>
+<span id="cb14-11"><a href="#cb14-11" aria-hidden="true" tabindex="-1"></a>   municipality main_income freq primary suppressed</span>
+<span id="cb14-12"><a href="#cb14-12" aria-hidden="true" tabindex="-1"></a><span class="dv">1</span>         Total       Total   <span class="dv">50</span>       <span class="sc">-</span>          <span class="sc">-</span></span>
+<span id="cb14-13"><a href="#cb14-13" aria-hidden="true" tabindex="-1"></a><span class="dv">2</span>         Total  assistance   <span class="dv">27</span>       <span class="sc">-</span>          <span class="sc">-</span></span>
+<span id="cb14-14"><a href="#cb14-14" aria-hidden="true" tabindex="-1"></a><span class="dv">3</span>         Total       other    <span class="dv">6</span>       <span class="sc">-</span>          <span class="sc">-</span></span>
+<span id="cb14-15"><a href="#cb14-15" aria-hidden="true" tabindex="-1"></a><span class="dv">4</span>         Total    pensions   <span class="dv">12</span>       <span class="sc">-</span>          <span class="sc">-</span></span>
+<span id="cb14-16"><a href="#cb14-16" aria-hidden="true" tabindex="-1"></a><span class="dv">5</span>         Total       wages    <span class="dv">5</span>       <span class="sc">-</span>          <span class="sc">-</span></span>
+<span id="cb14-17"><a href="#cb14-17" aria-hidden="true" tabindex="-1"></a><span class="dv">6</span>       Drammen       Total    <span class="dv">2</span>       <span class="sc">-</span>          <span class="sc">-</span></span>
+<span id="cb14-18"><a href="#cb14-18" aria-hidden="true" tabindex="-1"></a><span class="dv">7</span>       Drammen  assistance    <span class="dv">1</span>    <span class="cn">TRUE</span>       <span class="cn">TRUE</span></span>
+<span id="cb14-19"><a href="#cb14-19" aria-hidden="true" tabindex="-1"></a><span class="dv">8</span>       Drammen       other    <span class="dv">0</span>    <span class="cn">TRUE</span>       <span class="cn">TRUE</span></span>
+<span id="cb14-20"><a href="#cb14-20" aria-hidden="true" tabindex="-1"></a><span class="dv">9</span>       Drammen    pensions    <span class="dv">1</span>    <span class="cn">TRUE</span>       <span class="cn">TRUE</span></span>
+<span id="cb14-21"><a href="#cb14-21" aria-hidden="true" tabindex="-1"></a><span class="dv">10</span>      Drammen       wages    <span class="dv">0</span>    <span class="cn">TRUE</span>       <span class="cn">TRUE</span></span>
+<span id="cb14-22"><a href="#cb14-22" aria-hidden="true" tabindex="-1"></a><span class="dv">11</span>       Frosta       Total   <span class="dv">15</span>       <span class="sc">-</span>          <span class="sc">-</span></span>
+<span id="cb14-23"><a href="#cb14-23" aria-hidden="true" tabindex="-1"></a><span class="dv">12</span>       Frosta  assistance    <span class="dv">7</span>       <span class="sc">-</span>          <span class="sc">-</span></span>
+<span id="cb14-24"><a href="#cb14-24" aria-hidden="true" tabindex="-1"></a><span class="dv">13</span>       Frosta       other    <span class="dv">2</span>       <span class="sc">-</span>       <span class="cn">TRUE</span></span>
+<span id="cb14-25"><a href="#cb14-25" aria-hidden="true" tabindex="-1"></a><span class="dv">14</span>       Frosta    pensions    <span class="dv">5</span>       <span class="sc">-</span>          <span class="sc">-</span></span>
+<span id="cb14-26"><a href="#cb14-26" aria-hidden="true" tabindex="-1"></a><span class="dv">15</span>       Frosta       wages    <span class="dv">1</span>    <span class="cn">TRUE</span>       <span class="cn">TRUE</span></span>
+<span id="cb14-27"><a href="#cb14-27" aria-hidden="true" tabindex="-1"></a><span class="dv">16</span>       Marker       Total    <span class="dv">8</span>       <span class="sc">-</span>          <span class="sc">-</span></span>
+<span id="cb14-28"><a href="#cb14-28" aria-hidden="true" tabindex="-1"></a><span class="dv">17</span>       Marker  assistance    <span class="dv">6</span>       <span class="sc">-</span>          <span class="sc">-</span></span>
+<span id="cb14-29"><a href="#cb14-29" aria-hidden="true" tabindex="-1"></a><span class="dv">18</span>       Marker       other    <span class="dv">0</span>    <span class="cn">TRUE</span>       <span class="cn">TRUE</span></span>
+<span id="cb14-30"><a href="#cb14-30" aria-hidden="true" tabindex="-1"></a><span class="dv">19</span>       Marker    pensions    <span class="dv">1</span>    <span class="cn">TRUE</span>       <span class="cn">TRUE</span></span>
+<span id="cb14-31"><a href="#cb14-31" aria-hidden="true" tabindex="-1"></a><span class="dv">20</span>       Marker       wages    <span class="dv">1</span>    <span class="cn">TRUE</span>       <span class="cn">TRUE</span></span>
+<span id="cb14-32"><a href="#cb14-32" aria-hidden="true" tabindex="-1"></a><span class="dv">21</span>       Oppdal       Total    <span class="dv">3</span>       <span class="sc">-</span>          <span class="sc">-</span></span>
+<span id="cb14-33"><a href="#cb14-33" aria-hidden="true" tabindex="-1"></a><span class="dv">22</span>       Oppdal  assistance    <span class="dv">1</span>    <span class="cn">TRUE</span>       <span class="cn">TRUE</span></span>
+<span id="cb14-34"><a href="#cb14-34" aria-hidden="true" tabindex="-1"></a><span class="dv">23</span>       Oppdal       other    <span class="dv">2</span>       <span class="sc">-</span>          <span class="sc">-</span></span>
+<span id="cb14-35"><a href="#cb14-35" aria-hidden="true" tabindex="-1"></a><span class="dv">24</span>       Oppdal    pensions    <span class="dv">0</span>    <span class="cn">TRUE</span>       <span class="cn">TRUE</span></span>
+<span id="cb14-36"><a href="#cb14-36" aria-hidden="true" tabindex="-1"></a><span class="dv">25</span>       Oppdal       wages    <span class="dv">0</span>    <span class="cn">TRUE</span>       <span class="cn">TRUE</span></span>
+<span id="cb14-37"><a href="#cb14-37" aria-hidden="true" tabindex="-1"></a><span class="dv">26</span>         Osen       Total    <span class="dv">4</span>       <span class="sc">-</span>          <span class="sc">-</span></span>
+<span id="cb14-38"><a href="#cb14-38" aria-hidden="true" tabindex="-1"></a><span class="dv">27</span>         Osen  assistance    <span class="dv">4</span>       <span class="sc">-</span>          <span class="sc">-</span></span>
+<span id="cb14-39"><a href="#cb14-39" aria-hidden="true" tabindex="-1"></a><span class="dv">28</span>         Osen       other    <span class="dv">0</span>    <span class="cn">TRUE</span>       <span class="cn">TRUE</span></span>
+<span id="cb14-40"><a href="#cb14-40" aria-hidden="true" tabindex="-1"></a><span class="dv">29</span>         Osen    pensions    <span class="dv">0</span>    <span class="cn">TRUE</span>       <span class="cn">TRUE</span></span>
+<span id="cb14-41"><a href="#cb14-41" aria-hidden="true" tabindex="-1"></a><span class="dv">30</span>         Osen       wages    <span class="dv">0</span>    <span class="cn">TRUE</span>       <span class="cn">TRUE</span></span>
+<span id="cb14-42"><a href="#cb14-42" aria-hidden="true" tabindex="-1"></a><span class="dv">31</span>    Sarpsborg       Total    <span class="dv">6</span>       <span class="sc">-</span>          <span class="sc">-</span></span>
+<span id="cb14-43"><a href="#cb14-43" aria-hidden="true" tabindex="-1"></a><span class="dv">32</span>    Sarpsborg  assistance    <span class="dv">2</span>       <span class="sc">-</span>          <span class="sc">-</span></span>
+<span id="cb14-44"><a href="#cb14-44" aria-hidden="true" tabindex="-1"></a><span class="dv">33</span>    Sarpsborg       other    <span class="dv">1</span>    <span class="cn">TRUE</span>       <span class="cn">TRUE</span></span>
+<span id="cb14-45"><a href="#cb14-45" aria-hidden="true" tabindex="-1"></a><span class="dv">34</span>    Sarpsborg    pensions    <span class="dv">2</span>       <span class="sc">-</span>          <span class="sc">-</span></span>
+<span id="cb14-46"><a href="#cb14-46" aria-hidden="true" tabindex="-1"></a><span class="dv">35</span>    Sarpsborg       wages    <span class="dv">1</span>    <span class="cn">TRUE</span>       <span class="cn">TRUE</span></span>
+<span id="cb14-47"><a href="#cb14-47" aria-hidden="true" tabindex="-1"></a><span class="dv">36</span>        Selbu       Total    <span class="dv">4</span>       <span class="sc">-</span>          <span class="sc">-</span></span>
+<span id="cb14-48"><a href="#cb14-48" aria-hidden="true" tabindex="-1"></a><span class="dv">37</span>        Selbu  assistance    <span class="dv">2</span>       <span class="sc">-</span>          <span class="sc">-</span></span>
+<span id="cb14-49"><a href="#cb14-49" aria-hidden="true" tabindex="-1"></a><span class="dv">38</span>        Selbu       other    <span class="dv">1</span>    <span class="cn">TRUE</span>       <span class="cn">TRUE</span></span>
+<span id="cb14-50"><a href="#cb14-50" aria-hidden="true" tabindex="-1"></a><span class="dv">39</span>        Selbu    pensions    <span class="dv">0</span>    <span class="cn">TRUE</span>       <span class="cn">TRUE</span></span>
+<span id="cb14-51"><a href="#cb14-51" aria-hidden="true" tabindex="-1"></a><span class="dv">40</span>        Selbu       wages    <span class="dv">1</span>    <span class="cn">TRUE</span>       <span class="cn">TRUE</span></span>
+<span id="cb14-52"><a href="#cb14-52" aria-hidden="true" tabindex="-1"></a><span class="dv">41</span>        Skaun       Total    <span class="dv">5</span>       <span class="sc">-</span>          <span class="sc">-</span></span>
+<span id="cb14-53"><a href="#cb14-53" aria-hidden="true" tabindex="-1"></a><span class="dv">42</span>        Skaun  assistance    <span class="dv">2</span>       <span class="sc">-</span>          <span class="sc">-</span></span>
+<span id="cb14-54"><a href="#cb14-54" aria-hidden="true" tabindex="-1"></a><span class="dv">43</span>        Skaun       other    <span class="dv">0</span>    <span class="cn">TRUE</span>       <span class="cn">TRUE</span></span>
+<span id="cb14-55"><a href="#cb14-55" aria-hidden="true" tabindex="-1"></a><span class="dv">44</span>        Skaun    pensions    <span class="dv">2</span>       <span class="sc">-</span>          <span class="sc">-</span></span>
+<span id="cb14-56"><a href="#cb14-56" aria-hidden="true" tabindex="-1"></a><span class="dv">45</span>        Skaun       wages    <span class="dv">1</span>    <span class="cn">TRUE</span>       <span class="cn">TRUE</span></span>
+<span id="cb14-57"><a href="#cb14-57" aria-hidden="true" tabindex="-1"></a><span class="dv">46</span>    Steinkjer       Total    <span class="dv">3</span>       <span class="sc">-</span>          <span class="sc">-</span></span>
+<span id="cb14-58"><a href="#cb14-58" aria-hidden="true" tabindex="-1"></a><span class="dv">47</span>    Steinkjer  assistance    <span class="dv">2</span>       <span class="sc">-</span>          <span class="sc">-</span></span>
+<span id="cb14-59"><a href="#cb14-59" aria-hidden="true" tabindex="-1"></a><span class="dv">48</span>    Steinkjer       other    <span class="dv">0</span>    <span class="cn">TRUE</span>       <span class="cn">TRUE</span></span>
+<span id="cb14-60"><a href="#cb14-60" aria-hidden="true" tabindex="-1"></a><span class="dv">49</span>    Steinkjer    pensions    <span class="dv">1</span>    <span class="cn">TRUE</span>       <span class="cn">TRUE</span></span>
+<span id="cb14-61"><a href="#cb14-61" aria-hidden="true" tabindex="-1"></a><span class="dv">50</span>    Steinkjer       wages    <span class="dv">0</span>    <span class="cn">TRUE</span>       <span class="cn">TRUE</span></span></code></pre></div>
+</div>
+</div>
+
+
+
+<!-- code folding -->
+
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>

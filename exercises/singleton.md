@@ -7,7 +7,7 @@ If you run the following code, you can use a `Print` function
 This function might make  inspecting the output of GaussSuppression
 easier by replacing FALSE with - in the suppressed and primary columns.
 
-`source("/R/Print.R")`
+`source("R/Print.R")`
 
 
 
@@ -105,6 +105,7 @@ Try to use what you have learned to take this into account.
 Look at the result.
 What was it that happened?
 
+**Correction:** This exercise might be overly complex. The necessary knowledge to solve it was not covered in the presentation.
 
 
 ### Exercise 6

@@ -1,0 +1,324 @@
+---
+title: "Exercises about Structural Zeros"
+author: ""
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{frekvens-kurs-oppgaver}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+options(rmarkdown.html_vignette.check_title = FALSE)
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = NA
+)
+
+```
+
+
+If you run the following code, you can use a `Print` function
+This function might make  inspecting the output of GaussSuppression
+easier by replacing FALSE with - in the suppressed and primary columns.
+
+`source("R/Print.R")`
+
+
+```{r}
+source("../R/Print.R")  # Here,  "../" is included since this document is generated from a subfolder
+```
+
+
+
+
+### Exercise 1
+
+Load the dataset `pregnant_micro` and take a look at it. Tip: `load("data/pregnant_micro.RData")`
+
+Run this analysis:
+`SuppressSmallCounts(pregnant_micro, maxN = 1, formula = ~county*gender*pregnant)`
+
+Are you satisfied with the result?
+
+```{r}
+load("../data/pregnant_micro.RData")
+pregnant_micro
+```
+
+#### Solution
+No, not happy with the result. Pregnant men are suppressed.
+
+
+```{r}
+library(GaussSuppression)
+out1 <- SuppressSmallCounts(pregnant_micro,
+                             maxN = 1,
+                             formula = ~county*gender*pregnant)
+Print(out1)
+```
+
+
+### Exercise 2
+
+Run the same analysis with the formula interface.
+Is the result the same?
+
+
+#### Solution
+Yes, same, but different sorting.
+
+
+```{r}
+out2 <- SuppressSmallCounts(pregnant_micro,
+                             maxN = 1,
+                             formula = ~county*gender*pregnant)
+Print(out2)
+```
+
+
+
+### Exercise 3
+
+Run the analyzes in Exercise 1 and Exercise 2 again and enter the parameter `extend0 = FALSE`.
+
+Why isn't the answer the same?
+
+Are you happy with any of the results?
+
+
+#### Solution:
+
+Not the same since 0s in missing combinations are not added to the data.
+
+Happy with formula. All 0s that are pregnante men are gone from the table. Not happy with `dimVar`. Now pregnante men are primary suppressed.
+
+
+```{r}
+out3a <- SuppressSmallCounts(pregnant_micro,
+                             maxN = 1,
+                             dimVar = c("county", "gender", "pregnant"),
+                             extend0 = FALSE)
+
+Print(out3a)
+
+
+out3b <- SuppressSmallCounts(pregnant_micro,
+                             maxN = 1,
+                             formula = ~county*gender*pregnant,
+                             extend0 = FALSE)
+
+Print(out3b)
+
+```
+
+
+
+### Exercise 4
+
+Still use `extend0 = FALSE`. Now, also try using the parameter`removeEmpty` parameter
+which can be `TRUE` or `FALSE`.
+
+Use the parameter to fix any problems in Exercise 3.
+
+#### Solution:
+
+Default `removeEmpty` is FALSE for `dimVar` and TRUE for formula.
+
+Satisfied when `removeEmpty` is TRUE. Otherwise pregnante men will be the primary suppressed.
+
+Fix needed when `dimVar`
+
+
+```{r}
+out4a <- SuppressSmallCounts(pregnant_micro,
+                             maxN = 1,
+                             dimVar = c("county", "gender", "pregnant"),
+                             extend0 = FALSE,
+                             removeEmpty = TRUE)
+
+Print(out4a)
+
+
+```
+
+
+### Exercise 5
+
+
+Still use `extend0 = FALSE`.
+
+Run both interfaces as in Exercise 3.
+
+Select parameter setting for `removeEmpty` which gives warning of the type
+``Suppressed cells with empty input will not be protected. Extend input data with zeros?`
+
+Add `structuralEmpty = TRUE` as extra parameter in addition to everything else.
+
+Do you think the result is acceptable?
+
+
+#### Solution:
+
+Warning when `removeEmpty = FALSE`, which is the default for `dimVar`.
+
+With `structuralEmpty = TRUE`, the result is acceptable. Pregnant men are not suppressed.
+
+It is perhaps pointless to include 0 pregnante men in a table. But it's not wrong, so it's acceptable.
+
+
+```{r}
+out5a <- SuppressSmallCounts(pregnant_micro,
+                             maxN = 1,
+                             dimVar = c("county", "gender", "pregnant"),
+                             extend0 = FALSE,
+                             structuralEmpty = TRUE)
+
+Print(out5a)
+
+
+out5b <- SuppressSmallCounts(pregnant_micro,
+                             maxN = 1,
+                             formula = ~county*gender*pregnant,
+                             extend0 = FALSE,
+                             removeEmpty = FALSE,
+                             structuralEmpty = TRUE)
+
+Print(out5b)
+
+```
+
+
+### Exercise 6
+
+
+Find code in Exercise 4 where you think the result can be used.
+Also find code in Exercise 5 where you think the result can be used.
+
+Run the code again with a change where `county` is replaced by `municipality`. 
+
+Look at the results for women from Drammen and Ullensaker.
+
+What's going wrong here?
+
+#### Solution:
+
+Previously, all 0s were pregnante men and it was nice that these were not suppressed and perhaps also that these numbers were not shown.
+
+But now the same applies to 0s for women. In other words, women who are not pregnant in Ullensaker or women who are pregnant in Drammen. This will be wrong. Such 0s must be included and suppressed.
+
+
+
+```{r}
+
+out6a <- SuppressSmallCounts(pregnant_micro,
+                             maxN = 1,
+                             dimVar = c("municipality", "gender", "pregnant"),
+                             extend0 = FALSE,
+                             removeEmpty = TRUE)
+
+Print(out6a)
+
+
+out6b <- SuppressSmallCounts(pregnant_micro,
+                             maxN = 1,
+                             formula = ~municipality*gender*pregnant,
+                             extend0 = FALSE)
+
+Print(out6b)
+
+out6c <- SuppressSmallCounts(pregnant_micro,
+                             maxN = 1,
+                             dimVar = c("municipality", "gender", "pregnant"),
+                             extend0 = FALSE,
+                             structuralEmpty = TRUE)
+
+Print(out6c)
+
+
+out6d <- SuppressSmallCounts(pregnant_micro,
+                             maxN = 1,
+                             formula = ~municipality*gender*pregnant,
+                             extend0 = FALSE,
+                             removeEmpty = FALSE,
+                             structuralEmpty = TRUE)
+
+Print(out6d)
+
+```
+
+
+
+
+### Exercise 7
+
+Load the dataset `pregnant' and take a look at it. Tip: `load("data/pregnant.RData")`
+
+Here there is a frequency variable called `freq` and there are rows where `freq=0`.
+
+Why are there only four rows in this data set with `pregnant=yes`?
+
+
+Run analysis with the variables "municipality", "gender" and "pregnant" in a similar way as before.
+But now use this frequency data set instead. Hint: Specify `freqVar`.
+Use the parameters  `structuralEmpty` and `extend0` to achieve the desired output.
+
+Do you see that the problem from Exercise 6 has now been solved?
+
+
+```{r}
+load("../data/pregnant.RData")
+pregnant
+```
+
+
+#### Solution:
+
+Only four rows because `pregnant=yes` combined with other combinations of gender and age are structural 0s. 
+In other words, these are zeros that are publicly known or, with a very high probability, known to be zeros.
+
+Yes, the problem is solved because the structural and non-structural zeros are treated differently.
+
+
+```{r}
+out7a <- SuppressSmallCounts(pregnant,
+                             maxN = 1,
+                             freqVar = "freq",
+                             dimVar = c("municipality", "gender", "pregnant"),
+                             extend0 = FALSE,
+                             structuralEmpty = TRUE)
+
+Print(out7a)
+
+
+out7b <- SuppressSmallCounts(pregnant,
+                             maxN = 1,
+                             freqVar = "freq",
+                             formula = ~municipality*gender*pregnant,
+                             extend0 = FALSE,
+                             structuralEmpty = TRUE)
+
+Print(out7b)
+
+```
+
+
+### Exercise 8
+
+
+Based on Exercise 7. Try different settings of `removeEmpty`.
+
+What do you think is the right choice?
+
+
+#### Solution:
+
+With `removeEmpty=FALSE` pregnante men are included in the table. Since this is the default for `dimVar`, the result of this can be seen in Exercise 7 (out7a).
+
+With `removeEmpty=TRUE` pregnante men are NOT included in the table. Since this is the default for the formula interface, the result of this can be seen in Exercise 7 (out7b).
+
+Not including pregnant men ensures that only interesting and meaningful numbers are shown, which is likely the best approach.
+
+Including pregnant men is not incorrect. In certain scenarios, incorporating all intersections of variables may be necessary to ensure the data is compatible with a specific program or system
+
+

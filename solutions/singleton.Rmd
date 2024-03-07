@@ -1,0 +1,298 @@
+---
+title: "Exercises about singleton, aggregation and weightVar"
+author: ""
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{frekvens-kurs-oppgaver}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+options(rmarkdown.html_vignette.check_title = FALSE)
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = NA
+)
+
+```
+
+
+If you run the following code, you can use a `Print` function
+This function might make  inspecting the output of GaussSuppression
+easier by replacing FALSE with - in the suppressed and primary columns.
+
+`source("R/Print.R")`
+
+
+```{r}
+source("../R/Print.R") # Here,  "../" is included since this document is generated from a subfolder
+```
+
+
+
+### Exercise 1
+Load the dataset `sdc_cars`. Tip: `load("data/sdc_cars.RData")`
+
+Run this analysis:
+```
+  SuppressDominantCells(sdc_cars, 
+                        n = 1:2, k = c(50, 60), 
+                        numVar = "value", 
+                        dimVar = c("months", "k_group"), 
+                        contributorVar = "car_brand")
+```
+
+Also run a corresponding analysis where you enter `singletonMethod = "none"`.
+
+Do you see that the answer was different?
+
+Are you able to understand the disclosure that can be found at `singletonMethod = "none"`.
+
+#### Solution
+
+With `singletonMethod = "none"` only two values are suppressed in m06m09.
+One of these is a single contribution since freq=1.
+This contributor knows his own number and can thus calculate the second suppressed number in m06m09.
+
+```{r}
+library(GaussSuppression)
+
+load("../data/sdc_cars.RData")
+
+out8a <- SuppressDominantCells(sdc_cars,
+                                n = 1:2, k = c(50, 60),
+                                numVar = "value",
+                                dimVar = c("months", "k_group"),
+                                contributorVar = "car_brand")
+Print(out8a)
+
+out8b <- SuppressDominantCells(sdc_cars,
+                                n = 1:2, k = c(50, 60),
+                                numVar = "value",
+                                dimVar = c("months", "k_group"),
+                                contributorVar = "car_brand",
+                                singletonMethod = "none")
+Print(out8b)
+```
+
+
+
+
+### Exercise 2
+
+
+In Exercise 1, the total value for `k_group` 3 is suppressed. Suppose it is very important that this does not happen.
+
+Use the `weightVar` parameter to ensure that the suppression will be different.
+
+
+
+```{r}
+
+sdc_cars[["w"]] <- 1
+sdc_cars[["w"]][sdc_cars[["k_group"]] == 3] <- 10000
+
+out9 <- SuppressDominantCells(sdc_cars,
+                               n = 1:2, k = c(50, 60),
+                               numVar = "value",
+                               dimVar = c("months", "k_group"),
+                               contributorVar = "car_brand",
+                               weightVar = "w")
+Print(out9)
+```
+
+### Exercise 3
+
+Run this analysis:
+
+```
+  SuppressDominantCells(sdc_cars, 
+                        n = 1:2, k = c(85, 95), 
+                        numVar = "value", 
+                        dimVar = c("sector", "k_group"), 
+                        contributorVar = "car_brand")
+```
+
+See that the combination of `other` and `k_group` 3 is suppressed. Suppose it is very important that this does not happen.
+
+Use the `weightVar` parameter to ensure that the suppression will be different.
+
+#### Solution
+
+Can use the same weight variable as above.
+
+
+```{r}
+out3a <- SuppressDominantCells(sdc_cars,
+                               n = 1:2, k = c(85, 95),
+                               numVar = "value",
+                               dimVar = c("sector", "k_group"),
+                               contributorVar = "car_brand")
+Print(out3a)
+
+out3b <- SuppressDominantCells(sdc_cars,
+                                n = 1:2, k = c(85, 95),
+                                numVar = "value",
+                                dimVar = c("sector", "k_group"),
+                                contributorVar = "car_brand",
+                                weightVar = "w")
+Print(out3b)
+```
+`
+
+### Exercise 4
+
+By using the output parameter it is possible to get other datasets as output.
+
+We now modify the analysis above and create two data frames by the code:
+
+```
+  data1 <- SuppressDominantCells(sdc_cars, 
+                        n = 1:2, k = c(85, 95), 
+                        numVar = "value", 
+                        dimVar = c("sector", "k_group"), 
+                        contributorVar = "car_brand", output = "inner")
+                    
+  
+  data2 <- SuppressDominantCells(sdc_cars, 
+                        n = 1:2, k = c(85, 95), 
+                        numVar = "value", 
+                        dimVar = c("sector", "k_group"), 
+                        contributorVar = "car_brand", output = "all")$inner
+                        
+```
+
+Can you explain what kind of data this is?
+
+Can you explain all the variables in `data2`?
+
+```{r}
+  data1 <- SuppressDominantCells(sdc_cars, 
+                        n = 1:2, k = c(85, 95), 
+                        numVar = "value", 
+                        dimVar = c("sector", "k_group"), 
+                        contributorVar = "car_brand", output = "inner")
+
+Print(data1)                    
+  
+  data2 <- SuppressDominantCells(sdc_cars, 
+                        n = 1:2, k = c(85, 95), 
+                        numVar = "value", 
+                        dimVar = c("sector", "k_group"), 
+                        contributorVar = "car_brand", output = "all")$inner
+Print(data2)
+  
+```
+
+
+### Exercise 5
+
+First run this analysis
+
+```
+SuppressDominantCells(sdc_cars,
+                       n = 1:2, k = c(85, 95),
+                       numVar = "value",
+                       formula = ~municipality + k_group*months + sector*county,
+                       contributorVar = "car_brand")
+```
+
+Assume that all the data for `Skiptvet` is openly available.
+Try to use what you have learned to take this into account.
+Look at the result.
+What was it that happened?
+
+**Correction:** This exercise might be overly complex. The necessary knowledge to solve it was not covered in the presentation.
+
+
+```{r}
+out101a <- SuppressDominantCells(sdc_cars,
+                               n = 1:2, k = c(85, 95),
+                               numVar = "value",
+                               formula = ~municipality + k_group*months + sector*county,
+                               contributorVar = "car_brand")
+Print(out101a)
+```
+
+#### Solution:
+
+A trick is to create a new numeric variable where all the values for Skiptvet are set to 0.
+
+Warning below, but this can be avoided with `dominanceVar` (and `candidatesVar`).
+
+No suppression since the figures from Skiptvet are the basis for all primary suppressed cells.
+
+
+```{r}
+sdc_cars[["value2"]] <- sdc_cars[["value"]]
+sdc_cars[sdc_cars[["municipality"]] == "Skiptvet", "value2"] <- 0
+
+out101b <- SuppressDominantCells(sdc_cars,
+                               n = 1:2, k = c(85, 95),
+                               numVar = c("value2","value"),
+                               formula = ~municipality + k_group*months + sector*county,
+                               contributorVar = "car_brand")
+Print(out101b)
+
+```
+
+
+
+
+### Exercise 6
+
+Load the dataset `social`. Tip: `load("data/social.RData")`
+
+
+Run this analysis where only the first 50 data rows are used:
+
+```
+SuppressSmallCounts(social[1:50, ], 
+                    dimVar = c("municipality", "main_income"), 
+                    maxN=1)
+
+```
+
+Also run a corresponding analysis where you enter `singletonMethod = "none"`.
+
+Can you explain the difference between these two analyzes?
+
+
+By looking at the output, are you able to explain which the suppression pattern is different?
+
+
+
+
+```{r}
+
+load("../data/social.RData")
+
+k1 = SuppressSmallCounts(social[1:50, ], 
+                    dimVar = c("municipality", "main_income"), 
+                    maxN=1)
+
+Print(k1)
+
+```
+
+
+#### Solution
+
+With no singleton method `Osen:assistance` is not suppressed. 
+Then the primary suppressed zeros in Osen can be easily revealed.
+ `Osen:Total = 4` and `Osen:assistance = 4`. Everything else in Osen must therefore be `0`.
+
+
+
+```{r}
+
+
+k2 = SuppressSmallCounts(social[1:50, ], 
+                    dimVar = c("municipality", "main_income"), 
+                    maxN=1, 
+                    singletonMethod = "none")
+Print(k2)
+
+```
+
