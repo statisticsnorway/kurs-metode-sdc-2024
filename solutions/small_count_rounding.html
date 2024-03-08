@@ -1,0 +1,1144 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+
+<meta name="author" content />
+
+
+<title>Exercises with the SmallCountRounding package</title>
+
+<script>// Pandoc 2.9 adds attributes on both header and div. We remove the former (to
+// be compatible with the behavior of Pandoc < 2.8).
+document.addEventListener('DOMContentLoaded', function(e) {
+  var hs = document.querySelectorAll("div.section[class*='level'] > :first-child");
+  var i, h, a;
+  for (i = 0; i < hs.length; i++) {
+    h = hs[i];
+    if (!/^h[1-6]$/i.test(h.tagName)) continue;  // it should be a header h1-h6
+    a = h.attributes;
+    while (a.length > 0) h.removeAttribute(a[0].name);
+  }
+});
+</script>
+
+<style type="text/css">
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+span.underline{text-decoration: underline;}
+div.column{display: inline-block; vertical-align: top; width: 50%;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+</style>
+
+
+
+<style type="text/css">
+code {
+white-space: pre;
+}
+.sourceCode {
+overflow: visible;
+}
+</style>
+<style type="text/css" data-origin="pandoc">
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+{ counter-reset: source-line 0; }
+pre.numberSource code > span
+{ position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+{ content: counter(source-line);
+position: relative; left: -1em; text-align: right; vertical-align: baseline;
+border: none; display: inline-block;
+-webkit-touch-callout: none; -webkit-user-select: none;
+-khtml-user-select: none; -moz-user-select: none;
+-ms-user-select: none; user-select: none;
+padding: 0 4px; width: 4em;
+color: #aaaaaa;
+}
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa; padding-left: 4px; }
+div.sourceCode
+{ }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } 
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.at { color: #7d9029; } 
+code span.bn { color: #40a070; } 
+code span.bu { color: #008000; } 
+code span.cf { color: #007020; font-weight: bold; } 
+code span.ch { color: #4070a0; } 
+code span.cn { color: #880000; } 
+code span.co { color: #60a0b0; font-style: italic; } 
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.do { color: #ba2121; font-style: italic; } 
+code span.dt { color: #902000; } 
+code span.dv { color: #40a070; } 
+code span.er { color: #ff0000; font-weight: bold; } 
+code span.ex { } 
+code span.fl { color: #40a070; } 
+code span.fu { color: #06287e; } 
+code span.im { color: #008000; font-weight: bold; } 
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.kw { color: #007020; font-weight: bold; } 
+code span.op { color: #666666; } 
+code span.ot { color: #007020; } 
+code span.pp { color: #bc7a00; } 
+code span.sc { color: #4070a0; } 
+code span.ss { color: #bb6688; } 
+code span.st { color: #4070a0; } 
+code span.va { color: #19177c; } 
+code span.vs { color: #4070a0; } 
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } 
+</style>
+<script>
+// apply pandoc div.sourceCode style to pre.sourceCode instead
+(function() {
+  var sheets = document.styleSheets;
+  for (var i = 0; i < sheets.length; i++) {
+    if (sheets[i].ownerNode.dataset["origin"] !== "pandoc") continue;
+    try { var rules = sheets[i].cssRules; } catch (e) { continue; }
+    var j = 0;
+    while (j < rules.length) {
+      var rule = rules[j];
+      // check if there is a div.sourceCode rule
+      if (rule.type !== rule.STYLE_RULE || rule.selectorText !== "div.sourceCode") {
+        j++;
+        continue;
+      }
+      var style = rule.style.cssText;
+      // check if color or background-color is set
+      if (rule.style.color === '' && rule.style.backgroundColor === '') {
+        j++;
+        continue;
+      }
+      // replace div.sourceCode by a pre.sourceCode rule
+      sheets[i].deleteRule(j);
+      sheets[i].insertRule('pre.sourceCode{' + style + '}', j);
+    }
+  }
+})();
+</script>
+
+
+
+
+<style type="text/css">body {
+background-color: #fff;
+margin: 1em auto;
+max-width: 700px;
+overflow: visible;
+padding-left: 2em;
+padding-right: 2em;
+font-family: "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+font-size: 14px;
+line-height: 1.35;
+}
+#TOC {
+clear: both;
+margin: 0 0 10px 10px;
+padding: 4px;
+width: 400px;
+border: 1px solid #CCCCCC;
+border-radius: 5px;
+background-color: #f6f6f6;
+font-size: 13px;
+line-height: 1.3;
+}
+#TOC .toctitle {
+font-weight: bold;
+font-size: 15px;
+margin-left: 5px;
+}
+#TOC ul {
+padding-left: 40px;
+margin-left: -1.5em;
+margin-top: 5px;
+margin-bottom: 5px;
+}
+#TOC ul ul {
+margin-left: -2em;
+}
+#TOC li {
+line-height: 16px;
+}
+table {
+margin: 1em auto;
+border-width: 1px;
+border-color: #DDDDDD;
+border-style: outset;
+border-collapse: collapse;
+}
+table th {
+border-width: 2px;
+padding: 5px;
+border-style: inset;
+}
+table td {
+border-width: 1px;
+border-style: inset;
+line-height: 18px;
+padding: 5px 5px;
+}
+table, table th, table td {
+border-left-style: none;
+border-right-style: none;
+}
+table thead, table tr.even {
+background-color: #f7f7f7;
+}
+p {
+margin: 0.5em 0;
+}
+blockquote {
+background-color: #f6f6f6;
+padding: 0.25em 0.75em;
+}
+hr {
+border-style: solid;
+border: none;
+border-top: 1px solid #777;
+margin: 28px 0;
+}
+dl {
+margin-left: 0;
+}
+dl dd {
+margin-bottom: 13px;
+margin-left: 13px;
+}
+dl dt {
+font-weight: bold;
+}
+ul {
+margin-top: 0;
+}
+ul li {
+list-style: circle outside;
+}
+ul ul {
+margin-bottom: 0;
+}
+pre, code {
+background-color: #f7f7f7;
+border-radius: 3px;
+color: #333;
+white-space: pre-wrap; 
+}
+pre {
+border-radius: 3px;
+margin: 5px 0px 10px 0px;
+padding: 10px;
+}
+pre:not([class]) {
+background-color: #f7f7f7;
+}
+code {
+font-family: Consolas, Monaco, 'Courier New', monospace;
+font-size: 85%;
+}
+p > code, li > code {
+padding: 2px 0px;
+}
+div.figure {
+text-align: center;
+}
+img {
+background-color: #FFFFFF;
+padding: 2px;
+border: 1px solid #DDDDDD;
+border-radius: 3px;
+border: 1px solid #CCCCCC;
+margin: 0 5px;
+}
+h1 {
+margin-top: 0;
+font-size: 35px;
+line-height: 40px;
+}
+h2 {
+border-bottom: 4px solid #f7f7f7;
+padding-top: 10px;
+padding-bottom: 2px;
+font-size: 145%;
+}
+h3 {
+border-bottom: 2px solid #f7f7f7;
+padding-top: 10px;
+font-size: 120%;
+}
+h4 {
+border-bottom: 1px solid #f7f7f7;
+margin-left: 8px;
+font-size: 105%;
+}
+h5, h6 {
+border-bottom: 1px solid #ccc;
+font-size: 105%;
+}
+a {
+color: #0033dd;
+text-decoration: none;
+}
+a:hover {
+color: #6666ff; }
+a:visited {
+color: #800080; }
+a:visited:hover {
+color: #BB00BB; }
+a[href^="http:"] {
+text-decoration: underline; }
+a[href^="https:"] {
+text-decoration: underline; }
+
+code > span.kw { color: #555; font-weight: bold; } 
+code > span.dt { color: #902000; } 
+code > span.dv { color: #40a070; } 
+code > span.bn { color: #d14; } 
+code > span.fl { color: #d14; } 
+code > span.ch { color: #d14; } 
+code > span.st { color: #d14; } 
+code > span.co { color: #888888; font-style: italic; } 
+code > span.ot { color: #007020; } 
+code > span.al { color: #ff0000; font-weight: bold; } 
+code > span.fu { color: #900; font-weight: bold; } 
+code > span.er { color: #a61717; background-color: #e3d2d2; } 
+</style>
+
+
+
+
+</head>
+
+<body>
+
+
+
+
+<h1 class="title toc-ignore">Exercises with the SmallCountRounding
+package</h1>
+<h4 class="author"></h4>
+
+
+
+<div id="exercise-1" class="section level3">
+<h3>Exercise 1</h3>
+<p>Load the dataset <code>pregnant_micro</code>. Tip:
+<code>load(&quot;data/pregnant_micro.RData&quot;)</code></p>
+<p>Run this analysis:</p>
+<pre><code>PLSroundingPublish(pregnant_micro, 
+                   roundBase = 5, 
+                   formula = ~municipality*gender*pregnant)</code></pre>
+<p>Also try <code>removeEmpty = FALSE</code></p>
+<p>What is the difference?</p>
+<p><strong>Correction:</strong> We have changed from
+<code>roundBase = 5</code> to <code>roundBase = 5</code> so that the
+results are more interesting</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="fu">load</span>(<span class="st">&quot;../data/pregnant_micro.RData&quot;</span>)</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>pregnant_micro</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>       county municipality mun_id   age gender pregnant</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="dv">1</span>   Trondelag       Oppdal   <span class="dv">5021</span>  <span class="sc">&lt;=</span><span class="dv">50</span> female       no</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="dv">2</span>   Trondelag    Steinkjer   <span class="dv">5006</span> <span class="dv">51-69</span>   male       no</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a><span class="dv">3</span>   Trondelag       Oppdal   <span class="dv">5021</span>  <span class="sc">&lt;=</span><span class="dv">50</span>   male       no</span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a><span class="dv">4</span>       Viken      Drammen   <span class="dv">3005</span>  <span class="sc">&lt;=</span><span class="dv">50</span> female       no</span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a><span class="dv">5</span>   Trondelag    Steinkjer   <span class="dv">5006</span> <span class="dv">51-69</span> female       no</span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a><span class="dv">6</span>   Trondelag    Steinkjer   <span class="dv">5006</span>  <span class="sc">&lt;=</span><span class="dv">50</span>   male       no</span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a><span class="dv">7</span>   Trondelag    Steinkjer   <span class="dv">5006</span>  <span class="sc">&lt;=</span><span class="dv">50</span>   male       no</span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a><span class="dv">8</span>   Trondelag    Steinkjer   <span class="dv">5006</span>  <span class="sc">&lt;=</span><span class="dv">50</span>   male       no</span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a><span class="dv">9</span>   Trondelag    Steinkjer   <span class="dv">5006</span>  <span class="sc">&gt;=</span><span class="dv">70</span>   male       no</span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a><span class="dv">10</span>  Trondelag    Steinkjer   <span class="dv">5006</span>  <span class="sc">&lt;=</span><span class="dv">50</span> female       no</span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a><span class="dv">11</span>  Trondelag       Oppdal   <span class="dv">5021</span>  <span class="sc">&gt;=</span><span class="dv">70</span> female       no</span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a><span class="dv">12</span>  Trondelag       Oppdal   <span class="dv">5021</span>  <span class="sc">&gt;=</span><span class="dv">70</span> female       no</span>
+<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a><span class="dv">13</span>  Trondelag       Oppdal   <span class="dv">5021</span> <span class="dv">51-69</span> female       no</span>
+<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a><span class="dv">14</span>  Trondelag       Oppdal   <span class="dv">5021</span>  <span class="sc">&lt;=</span><span class="dv">50</span>   male       no</span>
+<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a><span class="dv">15</span>  Trondelag       Oppdal   <span class="dv">5021</span>  <span class="sc">&lt;=</span><span class="dv">50</span> female      yes</span>
+<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a><span class="dv">16</span>  Trondelag       Oppdal   <span class="dv">5021</span> <span class="dv">51-69</span> female       no</span>
+<span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a><span class="dv">17</span>  Trondelag    Steinkjer   <span class="dv">5006</span>  <span class="sc">&lt;=</span><span class="dv">50</span> female       no</span>
+<span id="cb2-21"><a href="#cb2-21" aria-hidden="true" tabindex="-1"></a><span class="dv">18</span>  Trondelag    Steinkjer   <span class="dv">5006</span>  <span class="sc">&lt;=</span><span class="dv">50</span> female      yes</span>
+<span id="cb2-22"><a href="#cb2-22" aria-hidden="true" tabindex="-1"></a><span class="dv">19</span>  Trondelag    Steinkjer   <span class="dv">5006</span>  <span class="sc">&gt;=</span><span class="dv">70</span>   male       no</span>
+<span id="cb2-23"><a href="#cb2-23" aria-hidden="true" tabindex="-1"></a><span class="dv">20</span>  Trondelag       Oppdal   <span class="dv">5021</span>  <span class="sc">&gt;=</span><span class="dv">70</span> female       no</span>
+<span id="cb2-24"><a href="#cb2-24" aria-hidden="true" tabindex="-1"></a><span class="dv">21</span>      Viken      Drammen   <span class="dv">3005</span>  <span class="sc">&gt;=</span><span class="dv">70</span> female       no</span>
+<span id="cb2-25"><a href="#cb2-25" aria-hidden="true" tabindex="-1"></a><span class="dv">22</span>  Trondelag       Oppdal   <span class="dv">5021</span>  <span class="sc">&lt;=</span><span class="dv">50</span> female       no</span>
+<span id="cb2-26"><a href="#cb2-26" aria-hidden="true" tabindex="-1"></a><span class="dv">23</span>  Trondelag    Steinkjer   <span class="dv">5006</span> <span class="dv">51-69</span>   male       no</span>
+<span id="cb2-27"><a href="#cb2-27" aria-hidden="true" tabindex="-1"></a><span class="dv">24</span>      Viken   Ullensaker   <span class="dv">3033</span>  <span class="sc">&gt;=</span><span class="dv">70</span>   male       no</span>
+<span id="cb2-28"><a href="#cb2-28" aria-hidden="true" tabindex="-1"></a><span class="dv">25</span>      Viken      Drammen   <span class="dv">3005</span> <span class="dv">51-69</span>   male       no</span>
+<span id="cb2-29"><a href="#cb2-29" aria-hidden="true" tabindex="-1"></a><span class="dv">26</span>      Viken      Drammen   <span class="dv">3005</span>  <span class="sc">&lt;=</span><span class="dv">50</span> female       no</span>
+<span id="cb2-30"><a href="#cb2-30" aria-hidden="true" tabindex="-1"></a><span class="dv">27</span>  Trondelag       Oppdal   <span class="dv">5021</span>  <span class="sc">&lt;=</span><span class="dv">50</span> female       no</span>
+<span id="cb2-31"><a href="#cb2-31" aria-hidden="true" tabindex="-1"></a><span class="dv">28</span>      Viken      Drammen   <span class="dv">3005</span>  <span class="sc">&gt;=</span><span class="dv">70</span> female       no</span>
+<span id="cb2-32"><a href="#cb2-32" aria-hidden="true" tabindex="-1"></a><span class="dv">29</span>      Viken      Drammen   <span class="dv">3005</span>  <span class="sc">&gt;=</span><span class="dv">70</span> female       no</span>
+<span id="cb2-33"><a href="#cb2-33" aria-hidden="true" tabindex="-1"></a><span class="dv">30</span>      Viken   Ullensaker   <span class="dv">3033</span>  <span class="sc">&lt;=</span><span class="dv">50</span>   male       no</span>
+<span id="cb2-34"><a href="#cb2-34" aria-hidden="true" tabindex="-1"></a><span class="dv">31</span>  Trondelag    Steinkjer   <span class="dv">5006</span>  <span class="sc">&lt;=</span><span class="dv">50</span> female       no</span>
+<span id="cb2-35"><a href="#cb2-35" aria-hidden="true" tabindex="-1"></a><span class="dv">32</span>  Trondelag    Steinkjer   <span class="dv">5006</span>  <span class="sc">&lt;=</span><span class="dv">50</span> female       no</span>
+<span id="cb2-36"><a href="#cb2-36" aria-hidden="true" tabindex="-1"></a><span class="dv">33</span>  Trondelag       Oppdal   <span class="dv">5021</span>  <span class="sc">&lt;=</span><span class="dv">50</span>   male       no</span>
+<span id="cb2-37"><a href="#cb2-37" aria-hidden="true" tabindex="-1"></a><span class="dv">34</span>  Trondelag       Oppdal   <span class="dv">5021</span>  <span class="sc">&lt;=</span><span class="dv">50</span>   male       no</span>
+<span id="cb2-38"><a href="#cb2-38" aria-hidden="true" tabindex="-1"></a><span class="dv">35</span>  Trondelag       Oppdal   <span class="dv">5021</span>  <span class="sc">&gt;=</span><span class="dv">70</span>   male       no</span>
+<span id="cb2-39"><a href="#cb2-39" aria-hidden="true" tabindex="-1"></a><span class="dv">36</span>  Trondelag       Oppdal   <span class="dv">5021</span> <span class="dv">51-69</span> female       no</span>
+<span id="cb2-40"><a href="#cb2-40" aria-hidden="true" tabindex="-1"></a><span class="dv">37</span>  Trondelag       Oppdal   <span class="dv">5021</span>  <span class="sc">&gt;=</span><span class="dv">70</span> female       no</span>
+<span id="cb2-41"><a href="#cb2-41" aria-hidden="true" tabindex="-1"></a><span class="dv">38</span>      Viken      Drammen   <span class="dv">3005</span>  <span class="sc">&lt;=</span><span class="dv">50</span>   male       no</span>
+<span id="cb2-42"><a href="#cb2-42" aria-hidden="true" tabindex="-1"></a><span class="dv">39</span>  Trondelag       Oppdal   <span class="dv">5021</span>  <span class="sc">&lt;=</span><span class="dv">50</span> female       no</span>
+<span id="cb2-43"><a href="#cb2-43" aria-hidden="true" tabindex="-1"></a><span class="dv">40</span>  Trondelag    Steinkjer   <span class="dv">5006</span>  <span class="sc">&lt;=</span><span class="dv">50</span> female       no</span>
+<span id="cb2-44"><a href="#cb2-44" aria-hidden="true" tabindex="-1"></a><span class="dv">41</span>  Trondelag    Steinkjer   <span class="dv">5006</span>  <span class="sc">&lt;=</span><span class="dv">50</span> female      yes</span>
+<span id="cb2-45"><a href="#cb2-45" aria-hidden="true" tabindex="-1"></a><span class="dv">42</span>  Trondelag    Steinkjer   <span class="dv">5006</span>  <span class="sc">&lt;=</span><span class="dv">50</span> female      yes</span>
+<span id="cb2-46"><a href="#cb2-46" aria-hidden="true" tabindex="-1"></a><span class="dv">43</span>  Trondelag       Oppdal   <span class="dv">5021</span>  <span class="sc">&lt;=</span><span class="dv">50</span> female      yes</span>
+<span id="cb2-47"><a href="#cb2-47" aria-hidden="true" tabindex="-1"></a><span class="dv">44</span>      Viken      Drammen   <span class="dv">3005</span>  <span class="sc">&lt;=</span><span class="dv">50</span> female       no</span>
+<span id="cb2-48"><a href="#cb2-48" aria-hidden="true" tabindex="-1"></a><span class="dv">45</span>      Viken      Drammen   <span class="dv">3005</span>  <span class="sc">&lt;=</span><span class="dv">50</span> female       no</span>
+<span id="cb2-49"><a href="#cb2-49" aria-hidden="true" tabindex="-1"></a><span class="dv">46</span>  Trondelag       Oppdal   <span class="dv">5021</span>  <span class="sc">&lt;=</span><span class="dv">50</span> female       no</span>
+<span id="cb2-50"><a href="#cb2-50" aria-hidden="true" tabindex="-1"></a><span class="dv">47</span>      Viken      Drammen   <span class="dv">3005</span>  <span class="sc">&gt;=</span><span class="dv">70</span>   male       no</span>
+<span id="cb2-51"><a href="#cb2-51" aria-hidden="true" tabindex="-1"></a><span class="dv">48</span>  Trondelag    Steinkjer   <span class="dv">5006</span>  <span class="sc">&gt;=</span><span class="dv">70</span>   male       no</span>
+<span id="cb2-52"><a href="#cb2-52" aria-hidden="true" tabindex="-1"></a><span class="dv">49</span>      Viken   Ullensaker   <span class="dv">3033</span>  <span class="sc">&gt;=</span><span class="dv">70</span>   male       no</span>
+<span id="cb2-53"><a href="#cb2-53" aria-hidden="true" tabindex="-1"></a><span class="dv">50</span>  Trondelag    Steinkjer   <span class="dv">5006</span> <span class="dv">51-69</span> female       no</span>
+<span id="cb2-54"><a href="#cb2-54" aria-hidden="true" tabindex="-1"></a><span class="dv">51</span>  Trondelag    Steinkjer   <span class="dv">5006</span>  <span class="sc">&lt;=</span><span class="dv">50</span> female       no</span>
+<span id="cb2-55"><a href="#cb2-55" aria-hidden="true" tabindex="-1"></a><span class="dv">52</span>  Trondelag    Steinkjer   <span class="dv">5006</span> <span class="dv">51-69</span>   male       no</span>
+<span id="cb2-56"><a href="#cb2-56" aria-hidden="true" tabindex="-1"></a><span class="dv">53</span>      Viken      Drammen   <span class="dv">3005</span> <span class="dv">51-69</span>   male       no</span>
+<span id="cb2-57"><a href="#cb2-57" aria-hidden="true" tabindex="-1"></a><span class="dv">54</span>  Trondelag    Steinkjer   <span class="dv">5006</span>  <span class="sc">&lt;=</span><span class="dv">50</span>   male       no</span>
+<span id="cb2-58"><a href="#cb2-58" aria-hidden="true" tabindex="-1"></a><span class="dv">55</span>      Viken      Drammen   <span class="dv">3005</span>  <span class="sc">&gt;=</span><span class="dv">70</span> female       no</span>
+<span id="cb2-59"><a href="#cb2-59" aria-hidden="true" tabindex="-1"></a><span class="dv">56</span>  Trondelag       Oppdal   <span class="dv">5021</span>  <span class="sc">&gt;=</span><span class="dv">70</span>   male       no</span>
+<span id="cb2-60"><a href="#cb2-60" aria-hidden="true" tabindex="-1"></a><span class="dv">57</span>      Viken      Drammen   <span class="dv">3005</span>  <span class="sc">&lt;=</span><span class="dv">50</span> female       no</span>
+<span id="cb2-61"><a href="#cb2-61" aria-hidden="true" tabindex="-1"></a><span class="dv">58</span>  Trondelag    Steinkjer   <span class="dv">5006</span>  <span class="sc">&lt;=</span><span class="dv">50</span> female       no</span>
+<span id="cb2-62"><a href="#cb2-62" aria-hidden="true" tabindex="-1"></a><span class="dv">59</span>  Trondelag    Steinkjer   <span class="dv">5006</span>  <span class="sc">&lt;=</span><span class="dv">50</span> female      yes</span>
+<span id="cb2-63"><a href="#cb2-63" aria-hidden="true" tabindex="-1"></a><span class="dv">60</span>  Trondelag    Steinkjer   <span class="dv">5006</span> <span class="dv">51-69</span>   male       no</span>
+<span id="cb2-64"><a href="#cb2-64" aria-hidden="true" tabindex="-1"></a><span class="dv">61</span>  Trondelag       Oppdal   <span class="dv">5021</span>  <span class="sc">&lt;=</span><span class="dv">50</span>   male       no</span>
+<span id="cb2-65"><a href="#cb2-65" aria-hidden="true" tabindex="-1"></a><span class="dv">62</span>  Trondelag    Steinkjer   <span class="dv">5006</span>  <span class="sc">&lt;=</span><span class="dv">50</span> female       no</span>
+<span id="cb2-66"><a href="#cb2-66" aria-hidden="true" tabindex="-1"></a><span class="dv">63</span>      Viken      Drammen   <span class="dv">3005</span>  <span class="sc">&gt;=</span><span class="dv">70</span> female       no</span>
+<span id="cb2-67"><a href="#cb2-67" aria-hidden="true" tabindex="-1"></a><span class="dv">64</span>      Viken      Drammen   <span class="dv">3005</span>  <span class="sc">&lt;=</span><span class="dv">50</span>   male       no</span>
+<span id="cb2-68"><a href="#cb2-68" aria-hidden="true" tabindex="-1"></a><span class="dv">65</span>  Trondelag    Steinkjer   <span class="dv">5006</span>  <span class="sc">&lt;=</span><span class="dv">50</span>   male       no</span>
+<span id="cb2-69"><a href="#cb2-69" aria-hidden="true" tabindex="-1"></a><span class="dv">66</span>      Viken      Drammen   <span class="dv">3005</span>  <span class="sc">&lt;=</span><span class="dv">50</span> female       no</span>
+<span id="cb2-70"><a href="#cb2-70" aria-hidden="true" tabindex="-1"></a><span class="dv">67</span>  Trondelag       Oppdal   <span class="dv">5021</span>  <span class="sc">&lt;=</span><span class="dv">50</span>   male       no</span>
+<span id="cb2-71"><a href="#cb2-71" aria-hidden="true" tabindex="-1"></a><span class="dv">68</span>  Trondelag    Steinkjer   <span class="dv">5006</span>  <span class="sc">&lt;=</span><span class="dv">50</span> female      yes</span>
+<span id="cb2-72"><a href="#cb2-72" aria-hidden="true" tabindex="-1"></a><span class="dv">69</span>  Trondelag       Oppdal   <span class="dv">5021</span> <span class="dv">51-69</span> female       no</span>
+<span id="cb2-73"><a href="#cb2-73" aria-hidden="true" tabindex="-1"></a><span class="dv">70</span>  Trondelag       Oppdal   <span class="dv">5021</span>  <span class="sc">&lt;=</span><span class="dv">50</span>   male       no</span>
+<span id="cb2-74"><a href="#cb2-74" aria-hidden="true" tabindex="-1"></a><span class="dv">71</span>  Trondelag       Oppdal   <span class="dv">5021</span>  <span class="sc">&lt;=</span><span class="dv">50</span>   male       no</span>
+<span id="cb2-75"><a href="#cb2-75" aria-hidden="true" tabindex="-1"></a><span class="dv">72</span>  Trondelag    Steinkjer   <span class="dv">5006</span>  <span class="sc">&lt;=</span><span class="dv">50</span> female       no</span>
+<span id="cb2-76"><a href="#cb2-76" aria-hidden="true" tabindex="-1"></a><span class="dv">73</span>  Trondelag       Oppdal   <span class="dv">5021</span>  <span class="sc">&gt;=</span><span class="dv">70</span>   male       no</span>
+<span id="cb2-77"><a href="#cb2-77" aria-hidden="true" tabindex="-1"></a><span class="dv">74</span>  Trondelag       Oppdal   <span class="dv">5021</span>  <span class="sc">&lt;=</span><span class="dv">50</span>   male       no</span>
+<span id="cb2-78"><a href="#cb2-78" aria-hidden="true" tabindex="-1"></a><span class="dv">75</span>      Viken   Ullensaker   <span class="dv">3033</span>  <span class="sc">&gt;=</span><span class="dv">70</span>   male       no</span>
+<span id="cb2-79"><a href="#cb2-79" aria-hidden="true" tabindex="-1"></a><span class="dv">76</span>  Trondelag    Steinkjer   <span class="dv">5006</span>  <span class="sc">&lt;=</span><span class="dv">50</span>   male       no</span>
+<span id="cb2-80"><a href="#cb2-80" aria-hidden="true" tabindex="-1"></a><span class="dv">77</span>      Viken      Drammen   <span class="dv">3005</span> <span class="dv">51-69</span>   male       no</span>
+<span id="cb2-81"><a href="#cb2-81" aria-hidden="true" tabindex="-1"></a><span class="dv">78</span>      Viken   Ullensaker   <span class="dv">3033</span>  <span class="sc">&lt;=</span><span class="dv">50</span> female      yes</span>
+<span id="cb2-82"><a href="#cb2-82" aria-hidden="true" tabindex="-1"></a><span class="dv">79</span>  Trondelag    Steinkjer   <span class="dv">5006</span>  <span class="sc">&lt;=</span><span class="dv">50</span>   male       no</span>
+<span id="cb2-83"><a href="#cb2-83" aria-hidden="true" tabindex="-1"></a><span class="dv">80</span>  Trondelag    Steinkjer   <span class="dv">5006</span>  <span class="sc">&gt;=</span><span class="dv">70</span>   male       no</span>
+<span id="cb2-84"><a href="#cb2-84" aria-hidden="true" tabindex="-1"></a><span class="dv">81</span>  Trondelag       Oppdal   <span class="dv">5021</span>  <span class="sc">&lt;=</span><span class="dv">50</span>   male       no</span>
+<span id="cb2-85"><a href="#cb2-85" aria-hidden="true" tabindex="-1"></a><span class="dv">82</span>  Trondelag       Oppdal   <span class="dv">5021</span>  <span class="sc">&lt;=</span><span class="dv">50</span>   male       no</span>
+<span id="cb2-86"><a href="#cb2-86" aria-hidden="true" tabindex="-1"></a><span class="dv">83</span>  Trondelag    Steinkjer   <span class="dv">5006</span>  <span class="sc">&lt;=</span><span class="dv">50</span>   male       no</span>
+<span id="cb2-87"><a href="#cb2-87" aria-hidden="true" tabindex="-1"></a><span class="dv">84</span>      Viken   Ullensaker   <span class="dv">3033</span>  <span class="sc">&lt;=</span><span class="dv">50</span>   male       no</span>
+<span id="cb2-88"><a href="#cb2-88" aria-hidden="true" tabindex="-1"></a><span class="dv">85</span>      Viken      Drammen   <span class="dv">3005</span>  <span class="sc">&gt;=</span><span class="dv">70</span>   male       no</span>
+<span id="cb2-89"><a href="#cb2-89" aria-hidden="true" tabindex="-1"></a><span class="dv">86</span>  Trondelag       Oppdal   <span class="dv">5021</span> <span class="dv">51-69</span> female       no</span>
+<span id="cb2-90"><a href="#cb2-90" aria-hidden="true" tabindex="-1"></a><span class="dv">87</span>  Trondelag       Oppdal   <span class="dv">5021</span>  <span class="sc">&lt;=</span><span class="dv">50</span>   male       no</span>
+<span id="cb2-91"><a href="#cb2-91" aria-hidden="true" tabindex="-1"></a><span class="dv">88</span>  Trondelag       Oppdal   <span class="dv">5021</span>  <span class="sc">&lt;=</span><span class="dv">50</span> female       no</span>
+<span id="cb2-92"><a href="#cb2-92" aria-hidden="true" tabindex="-1"></a><span class="dv">89</span>  Trondelag    Steinkjer   <span class="dv">5006</span>  <span class="sc">&lt;=</span><span class="dv">50</span> female       no</span>
+<span id="cb2-93"><a href="#cb2-93" aria-hidden="true" tabindex="-1"></a><span class="dv">90</span>  Trondelag    Steinkjer   <span class="dv">5006</span>  <span class="sc">&lt;=</span><span class="dv">50</span> female       no</span>
+<span id="cb2-94"><a href="#cb2-94" aria-hidden="true" tabindex="-1"></a><span class="dv">91</span>  Trondelag       Oppdal   <span class="dv">5021</span>  <span class="sc">&lt;=</span><span class="dv">50</span>   male       no</span>
+<span id="cb2-95"><a href="#cb2-95" aria-hidden="true" tabindex="-1"></a><span class="dv">92</span>  Trondelag       Oppdal   <span class="dv">5021</span>  <span class="sc">&lt;=</span><span class="dv">50</span> female      yes</span>
+<span id="cb2-96"><a href="#cb2-96" aria-hidden="true" tabindex="-1"></a><span class="dv">93</span>      Viken   Ullensaker   <span class="dv">3033</span>  <span class="sc">&lt;=</span><span class="dv">50</span> female      yes</span>
+<span id="cb2-97"><a href="#cb2-97" aria-hidden="true" tabindex="-1"></a><span class="dv">94</span>  Trondelag       Oppdal   <span class="dv">5021</span>  <span class="sc">&lt;=</span><span class="dv">50</span>   male       no</span>
+<span id="cb2-98"><a href="#cb2-98" aria-hidden="true" tabindex="-1"></a><span class="dv">95</span>  Trondelag       Oppdal   <span class="dv">5021</span>  <span class="sc">&lt;=</span><span class="dv">50</span> female      yes</span>
+<span id="cb2-99"><a href="#cb2-99" aria-hidden="true" tabindex="-1"></a><span class="dv">96</span>      Viken      Drammen   <span class="dv">3005</span> <span class="dv">51-69</span>   male       no</span>
+<span id="cb2-100"><a href="#cb2-100" aria-hidden="true" tabindex="-1"></a><span class="dv">97</span>  Trondelag    Steinkjer   <span class="dv">5006</span>  <span class="sc">&lt;=</span><span class="dv">50</span>   male       no</span>
+<span id="cb2-101"><a href="#cb2-101" aria-hidden="true" tabindex="-1"></a><span class="dv">98</span>      Viken      Drammen   <span class="dv">3005</span>  <span class="sc">&gt;=</span><span class="dv">70</span> female       no</span>
+<span id="cb2-102"><a href="#cb2-102" aria-hidden="true" tabindex="-1"></a><span class="dv">99</span>  Trondelag    Steinkjer   <span class="dv">5006</span>  <span class="sc">&lt;=</span><span class="dv">50</span> female       no</span>
+<span id="cb2-103"><a href="#cb2-103" aria-hidden="true" tabindex="-1"></a><span class="dv">100</span> Trondelag    Steinkjer   <span class="dv">5006</span> <span class="dv">51-69</span>   male       no</span>
+<span id="cb2-104"><a href="#cb2-104" aria-hidden="true" tabindex="-1"></a><span class="dv">101</span>     Viken   Ullensaker   <span class="dv">3033</span>  <span class="sc">&lt;=</span><span class="dv">50</span> female      yes</span>
+<span id="cb2-105"><a href="#cb2-105" aria-hidden="true" tabindex="-1"></a><span class="dv">102</span> Trondelag       Oppdal   <span class="dv">5021</span>  <span class="sc">&lt;=</span><span class="dv">50</span>   male       no</span>
+<span id="cb2-106"><a href="#cb2-106" aria-hidden="true" tabindex="-1"></a><span class="dv">103</span> Trondelag       Oppdal   <span class="dv">5021</span>  <span class="sc">&lt;=</span><span class="dv">50</span> female       no</span></code></pre></div>
+<div id="solution" class="section level4">
+<h4>Solution</h4>
+<p>With <code>removeEmpty = FALSE</code>, five extra rows of zeros are
+included. This is as in the suppression functions.</p>
+<p><strong>Note:</strong> With <code>roundBase = 3</code>, the
+<code>rounded</code> values are equal to the <code>original</code>
+values for all rows, as there are neither ones nor twos present.</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(SmallCountRounding)</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>Warning<span class="sc">:</span> package <span class="st">&#39;SmallCountRounding&#39;</span> was built under R version <span class="dv">4</span>.<span class="fl">3.2</span></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>Loading required package<span class="sc">:</span> Matrix</span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>Warning<span class="sc">:</span> package <span class="st">&#39;Matrix&#39;</span> was built under R version <span class="dv">4</span>.<span class="fl">3.1</span></span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>Loading required package<span class="sc">:</span> SSBtools</span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a><span class="fu">PLSroundingPublish</span>(pregnant_micro, </span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>                   <span class="at">roundBase =</span> <span class="dv">5</span>, </span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>                   <span class="at">formula =</span> <span class="sc">~</span>municipality<span class="sc">*</span>gender<span class="sc">*</span>pregnant)</span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a>   municipality gender pregnant original rounded difference</span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a><span class="dv">1</span>         Total  Total    Total      <span class="dv">103</span>     <span class="dv">101</span>         <span class="sc">-</span><span class="dv">2</span></span>
+<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a><span class="dv">2</span>       Drammen  Total    Total       <span class="dv">20</span>      <span class="dv">20</span>          <span class="dv">0</span></span>
+<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a><span class="dv">3</span>        Oppdal  Total    Total       <span class="dv">38</span>      <span class="dv">39</span>          <span class="dv">1</span></span>
+<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a><span class="dv">4</span>     Steinkjer  Total    Total       <span class="dv">37</span>      <span class="dv">37</span>          <span class="dv">0</span></span>
+<span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a><span class="dv">5</span>    Ullensaker  Total    Total        <span class="dv">8</span>       <span class="dv">5</span>         <span class="sc">-</span><span class="dv">3</span></span>
+<span id="cb3-17"><a href="#cb3-17" aria-hidden="true" tabindex="-1"></a><span class="dv">6</span>         Total female    Total       <span class="dv">54</span>      <span class="dv">52</span>         <span class="sc">-</span><span class="dv">2</span></span>
+<span id="cb3-18"><a href="#cb3-18" aria-hidden="true" tabindex="-1"></a><span class="dv">7</span>         Total   male    Total       <span class="dv">49</span>      <span class="dv">49</span>          <span class="dv">0</span></span>
+<span id="cb3-19"><a href="#cb3-19" aria-hidden="true" tabindex="-1"></a><span class="dv">8</span>         Total  Total       no       <span class="dv">91</span>      <span class="dv">91</span>          <span class="dv">0</span></span>
+<span id="cb3-20"><a href="#cb3-20" aria-hidden="true" tabindex="-1"></a><span class="dv">9</span>         Total  Total      yes       <span class="dv">12</span>      <span class="dv">10</span>         <span class="sc">-</span><span class="dv">2</span></span>
+<span id="cb3-21"><a href="#cb3-21" aria-hidden="true" tabindex="-1"></a><span class="dv">10</span>      Drammen female    Total       <span class="dv">12</span>      <span class="dv">12</span>          <span class="dv">0</span></span>
+<span id="cb3-22"><a href="#cb3-22" aria-hidden="true" tabindex="-1"></a><span class="dv">11</span>      Drammen   male    Total        <span class="dv">8</span>       <span class="dv">8</span>          <span class="dv">0</span></span>
+<span id="cb3-23"><a href="#cb3-23" aria-hidden="true" tabindex="-1"></a><span class="dv">12</span>       Oppdal female    Total       <span class="dv">20</span>      <span class="dv">21</span>          <span class="dv">1</span></span>
+<span id="cb3-24"><a href="#cb3-24" aria-hidden="true" tabindex="-1"></a><span class="dv">13</span>       Oppdal   male    Total       <span class="dv">18</span>      <span class="dv">18</span>          <span class="dv">0</span></span>
+<span id="cb3-25"><a href="#cb3-25" aria-hidden="true" tabindex="-1"></a><span class="dv">14</span>    Steinkjer female    Total       <span class="dv">19</span>      <span class="dv">19</span>          <span class="dv">0</span></span>
+<span id="cb3-26"><a href="#cb3-26" aria-hidden="true" tabindex="-1"></a><span class="dv">15</span>    Steinkjer   male    Total       <span class="dv">18</span>      <span class="dv">18</span>          <span class="dv">0</span></span>
+<span id="cb3-27"><a href="#cb3-27" aria-hidden="true" tabindex="-1"></a><span class="dv">16</span>   Ullensaker female    Total        <span class="dv">3</span>       <span class="dv">0</span>         <span class="sc">-</span><span class="dv">3</span></span>
+<span id="cb3-28"><a href="#cb3-28" aria-hidden="true" tabindex="-1"></a><span class="dv">17</span>   Ullensaker   male    Total        <span class="dv">5</span>       <span class="dv">5</span>          <span class="dv">0</span></span>
+<span id="cb3-29"><a href="#cb3-29" aria-hidden="true" tabindex="-1"></a><span class="dv">18</span>      Drammen  Total       no       <span class="dv">20</span>      <span class="dv">20</span>          <span class="dv">0</span></span>
+<span id="cb3-30"><a href="#cb3-30" aria-hidden="true" tabindex="-1"></a><span class="dv">19</span>       Oppdal  Total       no       <span class="dv">34</span>      <span class="dv">34</span>          <span class="dv">0</span></span>
+<span id="cb3-31"><a href="#cb3-31" aria-hidden="true" tabindex="-1"></a><span class="dv">20</span>       Oppdal  Total      yes        <span class="dv">4</span>       <span class="dv">5</span>          <span class="dv">1</span></span>
+<span id="cb3-32"><a href="#cb3-32" aria-hidden="true" tabindex="-1"></a><span class="dv">21</span>    Steinkjer  Total       no       <span class="dv">32</span>      <span class="dv">32</span>          <span class="dv">0</span></span>
+<span id="cb3-33"><a href="#cb3-33" aria-hidden="true" tabindex="-1"></a><span class="dv">22</span>    Steinkjer  Total      yes        <span class="dv">5</span>       <span class="dv">5</span>          <span class="dv">0</span></span>
+<span id="cb3-34"><a href="#cb3-34" aria-hidden="true" tabindex="-1"></a><span class="dv">23</span>   Ullensaker  Total       no        <span class="dv">5</span>       <span class="dv">5</span>          <span class="dv">0</span></span>
+<span id="cb3-35"><a href="#cb3-35" aria-hidden="true" tabindex="-1"></a><span class="dv">24</span>   Ullensaker  Total      yes        <span class="dv">3</span>       <span class="dv">0</span>         <span class="sc">-</span><span class="dv">3</span></span>
+<span id="cb3-36"><a href="#cb3-36" aria-hidden="true" tabindex="-1"></a><span class="dv">25</span>        Total female       no       <span class="dv">42</span>      <span class="dv">42</span>          <span class="dv">0</span></span>
+<span id="cb3-37"><a href="#cb3-37" aria-hidden="true" tabindex="-1"></a><span class="dv">26</span>        Total female      yes       <span class="dv">12</span>      <span class="dv">10</span>         <span class="sc">-</span><span class="dv">2</span></span>
+<span id="cb3-38"><a href="#cb3-38" aria-hidden="true" tabindex="-1"></a><span class="dv">27</span>        Total   male       no       <span class="dv">49</span>      <span class="dv">49</span>          <span class="dv">0</span></span>
+<span id="cb3-39"><a href="#cb3-39" aria-hidden="true" tabindex="-1"></a><span class="dv">28</span>      Drammen female       no       <span class="dv">12</span>      <span class="dv">12</span>          <span class="dv">0</span></span>
+<span id="cb3-40"><a href="#cb3-40" aria-hidden="true" tabindex="-1"></a><span class="dv">29</span>      Drammen   male       no        <span class="dv">8</span>       <span class="dv">8</span>          <span class="dv">0</span></span>
+<span id="cb3-41"><a href="#cb3-41" aria-hidden="true" tabindex="-1"></a><span class="dv">30</span>       Oppdal female       no       <span class="dv">16</span>      <span class="dv">16</span>          <span class="dv">0</span></span>
+<span id="cb3-42"><a href="#cb3-42" aria-hidden="true" tabindex="-1"></a><span class="dv">31</span>       Oppdal female      yes        <span class="dv">4</span>       <span class="dv">5</span>          <span class="dv">1</span></span>
+<span id="cb3-43"><a href="#cb3-43" aria-hidden="true" tabindex="-1"></a><span class="dv">32</span>       Oppdal   male       no       <span class="dv">18</span>      <span class="dv">18</span>          <span class="dv">0</span></span>
+<span id="cb3-44"><a href="#cb3-44" aria-hidden="true" tabindex="-1"></a><span class="dv">33</span>    Steinkjer female       no       <span class="dv">14</span>      <span class="dv">14</span>          <span class="dv">0</span></span>
+<span id="cb3-45"><a href="#cb3-45" aria-hidden="true" tabindex="-1"></a><span class="dv">34</span>    Steinkjer female      yes        <span class="dv">5</span>       <span class="dv">5</span>          <span class="dv">0</span></span>
+<span id="cb3-46"><a href="#cb3-46" aria-hidden="true" tabindex="-1"></a><span class="dv">35</span>    Steinkjer   male       no       <span class="dv">18</span>      <span class="dv">18</span>          <span class="dv">0</span></span>
+<span id="cb3-47"><a href="#cb3-47" aria-hidden="true" tabindex="-1"></a><span class="dv">36</span>   Ullensaker female      yes        <span class="dv">3</span>       <span class="dv">0</span>         <span class="sc">-</span><span class="dv">3</span></span>
+<span id="cb3-48"><a href="#cb3-48" aria-hidden="true" tabindex="-1"></a><span class="dv">37</span>   Ullensaker   male       no        <span class="dv">5</span>       <span class="dv">5</span>          <span class="dv">0</span></span>
+<span id="cb3-49"><a href="#cb3-49" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-50"><a href="#cb3-50" aria-hidden="true" tabindex="-1"></a><span class="fu">PLSroundingPublish</span>(pregnant_micro, </span>
+<span id="cb3-51"><a href="#cb3-51" aria-hidden="true" tabindex="-1"></a>                   <span class="at">roundBase =</span> <span class="dv">5</span>, </span>
+<span id="cb3-52"><a href="#cb3-52" aria-hidden="true" tabindex="-1"></a>                   <span class="at">formula =</span> <span class="sc">~</span>municipality<span class="sc">*</span>gender<span class="sc">*</span>pregnant,</span>
+<span id="cb3-53"><a href="#cb3-53" aria-hidden="true" tabindex="-1"></a>                   <span class="at">removeEmpty =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb3-54"><a href="#cb3-54" aria-hidden="true" tabindex="-1"></a>   municipality gender pregnant original rounded difference</span>
+<span id="cb3-55"><a href="#cb3-55" aria-hidden="true" tabindex="-1"></a><span class="dv">1</span>         Total  Total    Total      <span class="dv">103</span>     <span class="dv">101</span>         <span class="sc">-</span><span class="dv">2</span></span>
+<span id="cb3-56"><a href="#cb3-56" aria-hidden="true" tabindex="-1"></a><span class="dv">2</span>       Drammen  Total    Total       <span class="dv">20</span>      <span class="dv">20</span>          <span class="dv">0</span></span>
+<span id="cb3-57"><a href="#cb3-57" aria-hidden="true" tabindex="-1"></a><span class="dv">3</span>        Oppdal  Total    Total       <span class="dv">38</span>      <span class="dv">39</span>          <span class="dv">1</span></span>
+<span id="cb3-58"><a href="#cb3-58" aria-hidden="true" tabindex="-1"></a><span class="dv">4</span>     Steinkjer  Total    Total       <span class="dv">37</span>      <span class="dv">37</span>          <span class="dv">0</span></span>
+<span id="cb3-59"><a href="#cb3-59" aria-hidden="true" tabindex="-1"></a><span class="dv">5</span>    Ullensaker  Total    Total        <span class="dv">8</span>       <span class="dv">5</span>         <span class="sc">-</span><span class="dv">3</span></span>
+<span id="cb3-60"><a href="#cb3-60" aria-hidden="true" tabindex="-1"></a><span class="dv">6</span>         Total female    Total       <span class="dv">54</span>      <span class="dv">52</span>         <span class="sc">-</span><span class="dv">2</span></span>
+<span id="cb3-61"><a href="#cb3-61" aria-hidden="true" tabindex="-1"></a><span class="dv">7</span>         Total   male    Total       <span class="dv">49</span>      <span class="dv">49</span>          <span class="dv">0</span></span>
+<span id="cb3-62"><a href="#cb3-62" aria-hidden="true" tabindex="-1"></a><span class="dv">8</span>         Total  Total       no       <span class="dv">91</span>      <span class="dv">91</span>          <span class="dv">0</span></span>
+<span id="cb3-63"><a href="#cb3-63" aria-hidden="true" tabindex="-1"></a><span class="dv">9</span>         Total  Total      yes       <span class="dv">12</span>      <span class="dv">10</span>         <span class="sc">-</span><span class="dv">2</span></span>
+<span id="cb3-64"><a href="#cb3-64" aria-hidden="true" tabindex="-1"></a><span class="dv">10</span>      Drammen female    Total       <span class="dv">12</span>      <span class="dv">12</span>          <span class="dv">0</span></span>
+<span id="cb3-65"><a href="#cb3-65" aria-hidden="true" tabindex="-1"></a><span class="dv">11</span>      Drammen   male    Total        <span class="dv">8</span>       <span class="dv">8</span>          <span class="dv">0</span></span>
+<span id="cb3-66"><a href="#cb3-66" aria-hidden="true" tabindex="-1"></a><span class="dv">12</span>       Oppdal female    Total       <span class="dv">20</span>      <span class="dv">21</span>          <span class="dv">1</span></span>
+<span id="cb3-67"><a href="#cb3-67" aria-hidden="true" tabindex="-1"></a><span class="dv">13</span>       Oppdal   male    Total       <span class="dv">18</span>      <span class="dv">18</span>          <span class="dv">0</span></span>
+<span id="cb3-68"><a href="#cb3-68" aria-hidden="true" tabindex="-1"></a><span class="dv">14</span>    Steinkjer female    Total       <span class="dv">19</span>      <span class="dv">19</span>          <span class="dv">0</span></span>
+<span id="cb3-69"><a href="#cb3-69" aria-hidden="true" tabindex="-1"></a><span class="dv">15</span>    Steinkjer   male    Total       <span class="dv">18</span>      <span class="dv">18</span>          <span class="dv">0</span></span>
+<span id="cb3-70"><a href="#cb3-70" aria-hidden="true" tabindex="-1"></a><span class="dv">16</span>   Ullensaker female    Total        <span class="dv">3</span>       <span class="dv">0</span>         <span class="sc">-</span><span class="dv">3</span></span>
+<span id="cb3-71"><a href="#cb3-71" aria-hidden="true" tabindex="-1"></a><span class="dv">17</span>   Ullensaker   male    Total        <span class="dv">5</span>       <span class="dv">5</span>          <span class="dv">0</span></span>
+<span id="cb3-72"><a href="#cb3-72" aria-hidden="true" tabindex="-1"></a><span class="dv">18</span>      Drammen  Total       no       <span class="dv">20</span>      <span class="dv">20</span>          <span class="dv">0</span></span>
+<span id="cb3-73"><a href="#cb3-73" aria-hidden="true" tabindex="-1"></a><span class="dv">19</span>      Drammen  Total      yes        <span class="dv">0</span>       <span class="dv">0</span>          <span class="dv">0</span></span>
+<span id="cb3-74"><a href="#cb3-74" aria-hidden="true" tabindex="-1"></a><span class="dv">20</span>       Oppdal  Total       no       <span class="dv">34</span>      <span class="dv">34</span>          <span class="dv">0</span></span>
+<span id="cb3-75"><a href="#cb3-75" aria-hidden="true" tabindex="-1"></a><span class="dv">21</span>       Oppdal  Total      yes        <span class="dv">4</span>       <span class="dv">5</span>          <span class="dv">1</span></span>
+<span id="cb3-76"><a href="#cb3-76" aria-hidden="true" tabindex="-1"></a><span class="dv">22</span>    Steinkjer  Total       no       <span class="dv">32</span>      <span class="dv">32</span>          <span class="dv">0</span></span>
+<span id="cb3-77"><a href="#cb3-77" aria-hidden="true" tabindex="-1"></a><span class="dv">23</span>    Steinkjer  Total      yes        <span class="dv">5</span>       <span class="dv">5</span>          <span class="dv">0</span></span>
+<span id="cb3-78"><a href="#cb3-78" aria-hidden="true" tabindex="-1"></a><span class="dv">24</span>   Ullensaker  Total       no        <span class="dv">5</span>       <span class="dv">5</span>          <span class="dv">0</span></span>
+<span id="cb3-79"><a href="#cb3-79" aria-hidden="true" tabindex="-1"></a><span class="dv">25</span>   Ullensaker  Total      yes        <span class="dv">3</span>       <span class="dv">0</span>         <span class="sc">-</span><span class="dv">3</span></span>
+<span id="cb3-80"><a href="#cb3-80" aria-hidden="true" tabindex="-1"></a><span class="dv">26</span>        Total female       no       <span class="dv">42</span>      <span class="dv">42</span>          <span class="dv">0</span></span>
+<span id="cb3-81"><a href="#cb3-81" aria-hidden="true" tabindex="-1"></a><span class="dv">27</span>        Total female      yes       <span class="dv">12</span>      <span class="dv">10</span>         <span class="sc">-</span><span class="dv">2</span></span>
+<span id="cb3-82"><a href="#cb3-82" aria-hidden="true" tabindex="-1"></a><span class="dv">28</span>        Total   male       no       <span class="dv">49</span>      <span class="dv">49</span>          <span class="dv">0</span></span>
+<span id="cb3-83"><a href="#cb3-83" aria-hidden="true" tabindex="-1"></a><span class="dv">29</span>        Total   male      yes        <span class="dv">0</span>       <span class="dv">0</span>          <span class="dv">0</span></span>
+<span id="cb3-84"><a href="#cb3-84" aria-hidden="true" tabindex="-1"></a><span class="dv">30</span>      Drammen female       no       <span class="dv">12</span>      <span class="dv">12</span>          <span class="dv">0</span></span>
+<span id="cb3-85"><a href="#cb3-85" aria-hidden="true" tabindex="-1"></a><span class="dv">31</span>      Drammen female      yes        <span class="dv">0</span>       <span class="dv">0</span>          <span class="dv">0</span></span>
+<span id="cb3-86"><a href="#cb3-86" aria-hidden="true" tabindex="-1"></a><span class="dv">32</span>      Drammen   male       no        <span class="dv">8</span>       <span class="dv">8</span>          <span class="dv">0</span></span>
+<span id="cb3-87"><a href="#cb3-87" aria-hidden="true" tabindex="-1"></a><span class="dv">33</span>      Drammen   male      yes        <span class="dv">0</span>       <span class="dv">0</span>          <span class="dv">0</span></span>
+<span id="cb3-88"><a href="#cb3-88" aria-hidden="true" tabindex="-1"></a><span class="dv">34</span>       Oppdal female       no       <span class="dv">16</span>      <span class="dv">16</span>          <span class="dv">0</span></span>
+<span id="cb3-89"><a href="#cb3-89" aria-hidden="true" tabindex="-1"></a><span class="dv">35</span>       Oppdal female      yes        <span class="dv">4</span>       <span class="dv">5</span>          <span class="dv">1</span></span>
+<span id="cb3-90"><a href="#cb3-90" aria-hidden="true" tabindex="-1"></a><span class="dv">36</span>       Oppdal   male       no       <span class="dv">18</span>      <span class="dv">18</span>          <span class="dv">0</span></span>
+<span id="cb3-91"><a href="#cb3-91" aria-hidden="true" tabindex="-1"></a><span class="dv">37</span>       Oppdal   male      yes        <span class="dv">0</span>       <span class="dv">0</span>          <span class="dv">0</span></span>
+<span id="cb3-92"><a href="#cb3-92" aria-hidden="true" tabindex="-1"></a><span class="dv">38</span>    Steinkjer female       no       <span class="dv">14</span>      <span class="dv">14</span>          <span class="dv">0</span></span>
+<span id="cb3-93"><a href="#cb3-93" aria-hidden="true" tabindex="-1"></a><span class="dv">39</span>    Steinkjer female      yes        <span class="dv">5</span>       <span class="dv">5</span>          <span class="dv">0</span></span>
+<span id="cb3-94"><a href="#cb3-94" aria-hidden="true" tabindex="-1"></a><span class="dv">40</span>    Steinkjer   male       no       <span class="dv">18</span>      <span class="dv">18</span>          <span class="dv">0</span></span>
+<span id="cb3-95"><a href="#cb3-95" aria-hidden="true" tabindex="-1"></a><span class="dv">41</span>    Steinkjer   male      yes        <span class="dv">0</span>       <span class="dv">0</span>          <span class="dv">0</span></span>
+<span id="cb3-96"><a href="#cb3-96" aria-hidden="true" tabindex="-1"></a><span class="dv">42</span>   Ullensaker female       no        <span class="dv">0</span>       <span class="dv">0</span>          <span class="dv">0</span></span>
+<span id="cb3-97"><a href="#cb3-97" aria-hidden="true" tabindex="-1"></a><span class="dv">43</span>   Ullensaker female      yes        <span class="dv">3</span>       <span class="dv">0</span>         <span class="sc">-</span><span class="dv">3</span></span>
+<span id="cb3-98"><a href="#cb3-98" aria-hidden="true" tabindex="-1"></a><span class="dv">44</span>   Ullensaker   male       no        <span class="dv">5</span>       <span class="dv">5</span>          <span class="dv">0</span></span>
+<span id="cb3-99"><a href="#cb3-99" aria-hidden="true" tabindex="-1"></a><span class="dv">45</span>   Ullensaker   male      yes        <span class="dv">0</span>       <span class="dv">0</span>          <span class="dv">0</span></span></code></pre></div>
+</div>
+</div>
+<div id="exercise-2" class="section level3">
+<h3>Exercise 2</h3>
+<p>Load the dataset <code>pregnant</code>. Tip:
+<code>load(&quot;data/pregnant.RData&quot;)</code></p>
+<p>Use this dataset and run the same analyses?</p>
+<p>How should this be done?</p>
+<p>What is the difference in the results?</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="fu">load</span>(<span class="st">&quot;../data/pregnant.RData&quot;</span>)</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>pregnant</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>      county municipality mun_id   age gender pregnant freq</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a><span class="dv">1</span>      Viken      Drammen   <span class="dv">3005</span>  <span class="sc">&lt;=</span><span class="dv">50</span> female      yes    <span class="dv">0</span></span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a><span class="dv">2</span>      Viken   Ullensaker   <span class="dv">3033</span>  <span class="sc">&lt;=</span><span class="dv">50</span> female      yes    <span class="dv">3</span></span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a><span class="dv">3</span>  Trondelag    Steinkjer   <span class="dv">5006</span>  <span class="sc">&lt;=</span><span class="dv">50</span> female      yes    <span class="dv">5</span></span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a><span class="dv">4</span>  Trondelag       Oppdal   <span class="dv">5021</span>  <span class="sc">&lt;=</span><span class="dv">50</span> female      yes    <span class="dv">4</span></span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a><span class="dv">5</span>      Viken      Drammen   <span class="dv">3005</span>  <span class="sc">&lt;=</span><span class="dv">50</span> female       no    <span class="dv">6</span></span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a><span class="dv">6</span>      Viken   Ullensaker   <span class="dv">3033</span>  <span class="sc">&lt;=</span><span class="dv">50</span> female       no    <span class="dv">0</span></span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a><span class="dv">7</span>  Trondelag    Steinkjer   <span class="dv">5006</span>  <span class="sc">&lt;=</span><span class="dv">50</span> female       no   <span class="dv">12</span></span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a><span class="dv">8</span>  Trondelag       Oppdal   <span class="dv">5021</span>  <span class="sc">&lt;=</span><span class="dv">50</span> female       no    <span class="dv">7</span></span>
+<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a><span class="dv">9</span>      Viken      Drammen   <span class="dv">3005</span>  <span class="sc">&lt;=</span><span class="dv">50</span>   male       no    <span class="dv">2</span></span>
+<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a><span class="dv">10</span>     Viken   Ullensaker   <span class="dv">3033</span>  <span class="sc">&lt;=</span><span class="dv">50</span>   male       no    <span class="dv">2</span></span>
+<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a><span class="dv">11</span> Trondelag    Steinkjer   <span class="dv">5006</span>  <span class="sc">&lt;=</span><span class="dv">50</span>   male       no    <span class="dv">9</span></span>
+<span id="cb4-15"><a href="#cb4-15" aria-hidden="true" tabindex="-1"></a><span class="dv">12</span> Trondelag       Oppdal   <span class="dv">5021</span>  <span class="sc">&lt;=</span><span class="dv">50</span>   male       no   <span class="dv">15</span></span>
+<span id="cb4-16"><a href="#cb4-16" aria-hidden="true" tabindex="-1"></a><span class="dv">13</span>     Viken      Drammen   <span class="dv">3005</span> <span class="dv">51-69</span> female       no    <span class="dv">0</span></span>
+<span id="cb4-17"><a href="#cb4-17" aria-hidden="true" tabindex="-1"></a><span class="dv">14</span>     Viken   Ullensaker   <span class="dv">3033</span> <span class="dv">51-69</span> female       no    <span class="dv">0</span></span>
+<span id="cb4-18"><a href="#cb4-18" aria-hidden="true" tabindex="-1"></a><span class="dv">15</span> Trondelag    Steinkjer   <span class="dv">5006</span> <span class="dv">51-69</span> female       no    <span class="dv">2</span></span>
+<span id="cb4-19"><a href="#cb4-19" aria-hidden="true" tabindex="-1"></a><span class="dv">16</span> Trondelag       Oppdal   <span class="dv">5021</span> <span class="dv">51-69</span> female       no    <span class="dv">5</span></span>
+<span id="cb4-20"><a href="#cb4-20" aria-hidden="true" tabindex="-1"></a><span class="dv">17</span>     Viken      Drammen   <span class="dv">3005</span> <span class="dv">51-69</span>   male       no    <span class="dv">4</span></span>
+<span id="cb4-21"><a href="#cb4-21" aria-hidden="true" tabindex="-1"></a><span class="dv">18</span>     Viken   Ullensaker   <span class="dv">3033</span> <span class="dv">51-69</span>   male       no    <span class="dv">0</span></span>
+<span id="cb4-22"><a href="#cb4-22" aria-hidden="true" tabindex="-1"></a><span class="dv">19</span> Trondelag    Steinkjer   <span class="dv">5006</span> <span class="dv">51-69</span>   male       no    <span class="dv">5</span></span>
+<span id="cb4-23"><a href="#cb4-23" aria-hidden="true" tabindex="-1"></a><span class="dv">20</span> Trondelag       Oppdal   <span class="dv">5021</span> <span class="dv">51-69</span>   male       no    <span class="dv">0</span></span>
+<span id="cb4-24"><a href="#cb4-24" aria-hidden="true" tabindex="-1"></a><span class="dv">21</span>     Viken      Drammen   <span class="dv">3005</span>  <span class="sc">&gt;=</span><span class="dv">70</span> female       no    <span class="dv">6</span></span>
+<span id="cb4-25"><a href="#cb4-25" aria-hidden="true" tabindex="-1"></a><span class="dv">22</span>     Viken   Ullensaker   <span class="dv">3033</span>  <span class="sc">&gt;=</span><span class="dv">70</span> female       no    <span class="dv">0</span></span>
+<span id="cb4-26"><a href="#cb4-26" aria-hidden="true" tabindex="-1"></a><span class="dv">23</span> Trondelag    Steinkjer   <span class="dv">5006</span>  <span class="sc">&gt;=</span><span class="dv">70</span> female       no    <span class="dv">0</span></span>
+<span id="cb4-27"><a href="#cb4-27" aria-hidden="true" tabindex="-1"></a><span class="dv">24</span> Trondelag       Oppdal   <span class="dv">5021</span>  <span class="sc">&gt;=</span><span class="dv">70</span> female       no    <span class="dv">4</span></span>
+<span id="cb4-28"><a href="#cb4-28" aria-hidden="true" tabindex="-1"></a><span class="dv">25</span>     Viken      Drammen   <span class="dv">3005</span>  <span class="sc">&gt;=</span><span class="dv">70</span>   male       no    <span class="dv">2</span></span>
+<span id="cb4-29"><a href="#cb4-29" aria-hidden="true" tabindex="-1"></a><span class="dv">26</span>     Viken   Ullensaker   <span class="dv">3033</span>  <span class="sc">&gt;=</span><span class="dv">70</span>   male       no    <span class="dv">3</span></span>
+<span id="cb4-30"><a href="#cb4-30" aria-hidden="true" tabindex="-1"></a><span class="dv">27</span> Trondelag    Steinkjer   <span class="dv">5006</span>  <span class="sc">&gt;=</span><span class="dv">70</span>   male       no    <span class="dv">4</span></span>
+<span id="cb4-31"><a href="#cb4-31" aria-hidden="true" tabindex="-1"></a><span class="dv">28</span> Trondelag       Oppdal   <span class="dv">5021</span>  <span class="sc">&gt;=</span><span class="dv">70</span>   male       no    <span class="dv">3</span></span></code></pre></div>
+<div id="solution-1" class="section level4">
+<h4>Solution</h4>
+<p>Now it is important to use <code>freqVar = &quot;freq&quot;</code></p>
+<p>With <code>removeEmpty = FALSE</code>, the results remain unchanged.
+With default (<code>removeEmpty = TRUE</code>), three extra rows of
+zeros are included. This corresponds to the non-structural zeros in the
+input data.</p>
+<p><em>Note:</em> Even better to include
+<code>preAggregate = TRUE</code>. See Exercise 4.</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="fu">PLSroundingPublish</span>(pregnant, </span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>                   <span class="at">roundBase =</span> <span class="dv">5</span>, </span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>                   <span class="at">formula =</span> <span class="sc">~</span>municipality<span class="sc">*</span>gender<span class="sc">*</span>pregnant,</span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>                   <span class="at">freqVar =</span> <span class="st">&quot;freq&quot;</span>)</span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>   municipality gender pregnant original rounded difference</span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a><span class="dv">1</span>         Total  Total    Total      <span class="dv">103</span>     <span class="dv">101</span>         <span class="sc">-</span><span class="dv">2</span></span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a><span class="dv">2</span>       Drammen  Total    Total       <span class="dv">20</span>      <span class="dv">20</span>          <span class="dv">0</span></span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a><span class="dv">3</span>        Oppdal  Total    Total       <span class="dv">38</span>      <span class="dv">39</span>          <span class="dv">1</span></span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a><span class="dv">4</span>     Steinkjer  Total    Total       <span class="dv">37</span>      <span class="dv">37</span>          <span class="dv">0</span></span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a><span class="dv">5</span>    Ullensaker  Total    Total        <span class="dv">8</span>       <span class="dv">5</span>         <span class="sc">-</span><span class="dv">3</span></span>
+<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a><span class="dv">6</span>         Total female    Total       <span class="dv">54</span>      <span class="dv">52</span>         <span class="sc">-</span><span class="dv">2</span></span>
+<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a><span class="dv">7</span>         Total   male    Total       <span class="dv">49</span>      <span class="dv">49</span>          <span class="dv">0</span></span>
+<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a><span class="dv">8</span>         Total  Total       no       <span class="dv">91</span>      <span class="dv">91</span>          <span class="dv">0</span></span>
+<span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a><span class="dv">9</span>         Total  Total      yes       <span class="dv">12</span>      <span class="dv">10</span>         <span class="sc">-</span><span class="dv">2</span></span>
+<span id="cb5-15"><a href="#cb5-15" aria-hidden="true" tabindex="-1"></a><span class="dv">10</span>      Drammen female    Total       <span class="dv">12</span>      <span class="dv">12</span>          <span class="dv">0</span></span>
+<span id="cb5-16"><a href="#cb5-16" aria-hidden="true" tabindex="-1"></a><span class="dv">11</span>      Drammen   male    Total        <span class="dv">8</span>       <span class="dv">8</span>          <span class="dv">0</span></span>
+<span id="cb5-17"><a href="#cb5-17" aria-hidden="true" tabindex="-1"></a><span class="dv">12</span>       Oppdal female    Total       <span class="dv">20</span>      <span class="dv">21</span>          <span class="dv">1</span></span>
+<span id="cb5-18"><a href="#cb5-18" aria-hidden="true" tabindex="-1"></a><span class="dv">13</span>       Oppdal   male    Total       <span class="dv">18</span>      <span class="dv">18</span>          <span class="dv">0</span></span>
+<span id="cb5-19"><a href="#cb5-19" aria-hidden="true" tabindex="-1"></a><span class="dv">14</span>    Steinkjer female    Total       <span class="dv">19</span>      <span class="dv">19</span>          <span class="dv">0</span></span>
+<span id="cb5-20"><a href="#cb5-20" aria-hidden="true" tabindex="-1"></a><span class="dv">15</span>    Steinkjer   male    Total       <span class="dv">18</span>      <span class="dv">18</span>          <span class="dv">0</span></span>
+<span id="cb5-21"><a href="#cb5-21" aria-hidden="true" tabindex="-1"></a><span class="dv">16</span>   Ullensaker female    Total        <span class="dv">3</span>       <span class="dv">0</span>         <span class="sc">-</span><span class="dv">3</span></span>
+<span id="cb5-22"><a href="#cb5-22" aria-hidden="true" tabindex="-1"></a><span class="dv">17</span>   Ullensaker   male    Total        <span class="dv">5</span>       <span class="dv">5</span>          <span class="dv">0</span></span>
+<span id="cb5-23"><a href="#cb5-23" aria-hidden="true" tabindex="-1"></a><span class="dv">18</span>      Drammen  Total       no       <span class="dv">20</span>      <span class="dv">20</span>          <span class="dv">0</span></span>
+<span id="cb5-24"><a href="#cb5-24" aria-hidden="true" tabindex="-1"></a><span class="dv">19</span>      Drammen  Total      yes        <span class="dv">0</span>       <span class="dv">0</span>          <span class="dv">0</span></span>
+<span id="cb5-25"><a href="#cb5-25" aria-hidden="true" tabindex="-1"></a><span class="dv">20</span>       Oppdal  Total       no       <span class="dv">34</span>      <span class="dv">34</span>          <span class="dv">0</span></span>
+<span id="cb5-26"><a href="#cb5-26" aria-hidden="true" tabindex="-1"></a><span class="dv">21</span>       Oppdal  Total      yes        <span class="dv">4</span>       <span class="dv">5</span>          <span class="dv">1</span></span>
+<span id="cb5-27"><a href="#cb5-27" aria-hidden="true" tabindex="-1"></a><span class="dv">22</span>    Steinkjer  Total       no       <span class="dv">32</span>      <span class="dv">32</span>          <span class="dv">0</span></span>
+<span id="cb5-28"><a href="#cb5-28" aria-hidden="true" tabindex="-1"></a><span class="dv">23</span>    Steinkjer  Total      yes        <span class="dv">5</span>       <span class="dv">5</span>          <span class="dv">0</span></span>
+<span id="cb5-29"><a href="#cb5-29" aria-hidden="true" tabindex="-1"></a><span class="dv">24</span>   Ullensaker  Total       no        <span class="dv">5</span>       <span class="dv">5</span>          <span class="dv">0</span></span>
+<span id="cb5-30"><a href="#cb5-30" aria-hidden="true" tabindex="-1"></a><span class="dv">25</span>   Ullensaker  Total      yes        <span class="dv">3</span>       <span class="dv">0</span>         <span class="sc">-</span><span class="dv">3</span></span>
+<span id="cb5-31"><a href="#cb5-31" aria-hidden="true" tabindex="-1"></a><span class="dv">26</span>        Total female       no       <span class="dv">42</span>      <span class="dv">42</span>          <span class="dv">0</span></span>
+<span id="cb5-32"><a href="#cb5-32" aria-hidden="true" tabindex="-1"></a><span class="dv">27</span>        Total female      yes       <span class="dv">12</span>      <span class="dv">10</span>         <span class="sc">-</span><span class="dv">2</span></span>
+<span id="cb5-33"><a href="#cb5-33" aria-hidden="true" tabindex="-1"></a><span class="dv">28</span>        Total   male       no       <span class="dv">49</span>      <span class="dv">49</span>          <span class="dv">0</span></span>
+<span id="cb5-34"><a href="#cb5-34" aria-hidden="true" tabindex="-1"></a><span class="dv">29</span>      Drammen female       no       <span class="dv">12</span>      <span class="dv">12</span>          <span class="dv">0</span></span>
+<span id="cb5-35"><a href="#cb5-35" aria-hidden="true" tabindex="-1"></a><span class="dv">30</span>      Drammen female      yes        <span class="dv">0</span>       <span class="dv">0</span>          <span class="dv">0</span></span>
+<span id="cb5-36"><a href="#cb5-36" aria-hidden="true" tabindex="-1"></a><span class="dv">31</span>      Drammen   male       no        <span class="dv">8</span>       <span class="dv">8</span>          <span class="dv">0</span></span>
+<span id="cb5-37"><a href="#cb5-37" aria-hidden="true" tabindex="-1"></a><span class="dv">32</span>       Oppdal female       no       <span class="dv">16</span>      <span class="dv">16</span>          <span class="dv">0</span></span>
+<span id="cb5-38"><a href="#cb5-38" aria-hidden="true" tabindex="-1"></a><span class="dv">33</span>       Oppdal female      yes        <span class="dv">4</span>       <span class="dv">5</span>          <span class="dv">1</span></span>
+<span id="cb5-39"><a href="#cb5-39" aria-hidden="true" tabindex="-1"></a><span class="dv">34</span>       Oppdal   male       no       <span class="dv">18</span>      <span class="dv">18</span>          <span class="dv">0</span></span>
+<span id="cb5-40"><a href="#cb5-40" aria-hidden="true" tabindex="-1"></a><span class="dv">35</span>    Steinkjer female       no       <span class="dv">14</span>      <span class="dv">14</span>          <span class="dv">0</span></span>
+<span id="cb5-41"><a href="#cb5-41" aria-hidden="true" tabindex="-1"></a><span class="dv">36</span>    Steinkjer female      yes        <span class="dv">5</span>       <span class="dv">5</span>          <span class="dv">0</span></span>
+<span id="cb5-42"><a href="#cb5-42" aria-hidden="true" tabindex="-1"></a><span class="dv">37</span>    Steinkjer   male       no       <span class="dv">18</span>      <span class="dv">18</span>          <span class="dv">0</span></span>
+<span id="cb5-43"><a href="#cb5-43" aria-hidden="true" tabindex="-1"></a><span class="dv">38</span>   Ullensaker female       no        <span class="dv">0</span>       <span class="dv">0</span>          <span class="dv">0</span></span>
+<span id="cb5-44"><a href="#cb5-44" aria-hidden="true" tabindex="-1"></a><span class="dv">39</span>   Ullensaker female      yes        <span class="dv">3</span>       <span class="dv">0</span>         <span class="sc">-</span><span class="dv">3</span></span>
+<span id="cb5-45"><a href="#cb5-45" aria-hidden="true" tabindex="-1"></a><span class="dv">40</span>   Ullensaker   male       no        <span class="dv">5</span>       <span class="dv">5</span>          <span class="dv">0</span></span>
+<span id="cb5-46"><a href="#cb5-46" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-47"><a href="#cb5-47" aria-hidden="true" tabindex="-1"></a><span class="fu">PLSroundingPublish</span>(pregnant, </span>
+<span id="cb5-48"><a href="#cb5-48" aria-hidden="true" tabindex="-1"></a>                   <span class="at">roundBase =</span> <span class="dv">5</span>, </span>
+<span id="cb5-49"><a href="#cb5-49" aria-hidden="true" tabindex="-1"></a>                   <span class="at">formula =</span> <span class="sc">~</span>municipality<span class="sc">*</span>gender<span class="sc">*</span>pregnant,</span>
+<span id="cb5-50"><a href="#cb5-50" aria-hidden="true" tabindex="-1"></a>                   <span class="at">freqVar =</span> <span class="st">&quot;freq&quot;</span>,</span>
+<span id="cb5-51"><a href="#cb5-51" aria-hidden="true" tabindex="-1"></a>                   <span class="at">removeEmpty =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb5-52"><a href="#cb5-52" aria-hidden="true" tabindex="-1"></a>   municipality gender pregnant original rounded difference</span>
+<span id="cb5-53"><a href="#cb5-53" aria-hidden="true" tabindex="-1"></a><span class="dv">1</span>         Total  Total    Total      <span class="dv">103</span>     <span class="dv">101</span>         <span class="sc">-</span><span class="dv">2</span></span>
+<span id="cb5-54"><a href="#cb5-54" aria-hidden="true" tabindex="-1"></a><span class="dv">2</span>       Drammen  Total    Total       <span class="dv">20</span>      <span class="dv">20</span>          <span class="dv">0</span></span>
+<span id="cb5-55"><a href="#cb5-55" aria-hidden="true" tabindex="-1"></a><span class="dv">3</span>        Oppdal  Total    Total       <span class="dv">38</span>      <span class="dv">39</span>          <span class="dv">1</span></span>
+<span id="cb5-56"><a href="#cb5-56" aria-hidden="true" tabindex="-1"></a><span class="dv">4</span>     Steinkjer  Total    Total       <span class="dv">37</span>      <span class="dv">37</span>          <span class="dv">0</span></span>
+<span id="cb5-57"><a href="#cb5-57" aria-hidden="true" tabindex="-1"></a><span class="dv">5</span>    Ullensaker  Total    Total        <span class="dv">8</span>       <span class="dv">5</span>         <span class="sc">-</span><span class="dv">3</span></span>
+<span id="cb5-58"><a href="#cb5-58" aria-hidden="true" tabindex="-1"></a><span class="dv">6</span>         Total female    Total       <span class="dv">54</span>      <span class="dv">52</span>         <span class="sc">-</span><span class="dv">2</span></span>
+<span id="cb5-59"><a href="#cb5-59" aria-hidden="true" tabindex="-1"></a><span class="dv">7</span>         Total   male    Total       <span class="dv">49</span>      <span class="dv">49</span>          <span class="dv">0</span></span>
+<span id="cb5-60"><a href="#cb5-60" aria-hidden="true" tabindex="-1"></a><span class="dv">8</span>         Total  Total       no       <span class="dv">91</span>      <span class="dv">91</span>          <span class="dv">0</span></span>
+<span id="cb5-61"><a href="#cb5-61" aria-hidden="true" tabindex="-1"></a><span class="dv">9</span>         Total  Total      yes       <span class="dv">12</span>      <span class="dv">10</span>         <span class="sc">-</span><span class="dv">2</span></span>
+<span id="cb5-62"><a href="#cb5-62" aria-hidden="true" tabindex="-1"></a><span class="dv">10</span>      Drammen female    Total       <span class="dv">12</span>      <span class="dv">12</span>          <span class="dv">0</span></span>
+<span id="cb5-63"><a href="#cb5-63" aria-hidden="true" tabindex="-1"></a><span class="dv">11</span>      Drammen   male    Total        <span class="dv">8</span>       <span class="dv">8</span>          <span class="dv">0</span></span>
+<span id="cb5-64"><a href="#cb5-64" aria-hidden="true" tabindex="-1"></a><span class="dv">12</span>       Oppdal female    Total       <span class="dv">20</span>      <span class="dv">21</span>          <span class="dv">1</span></span>
+<span id="cb5-65"><a href="#cb5-65" aria-hidden="true" tabindex="-1"></a><span class="dv">13</span>       Oppdal   male    Total       <span class="dv">18</span>      <span class="dv">18</span>          <span class="dv">0</span></span>
+<span id="cb5-66"><a href="#cb5-66" aria-hidden="true" tabindex="-1"></a><span class="dv">14</span>    Steinkjer female    Total       <span class="dv">19</span>      <span class="dv">19</span>          <span class="dv">0</span></span>
+<span id="cb5-67"><a href="#cb5-67" aria-hidden="true" tabindex="-1"></a><span class="dv">15</span>    Steinkjer   male    Total       <span class="dv">18</span>      <span class="dv">18</span>          <span class="dv">0</span></span>
+<span id="cb5-68"><a href="#cb5-68" aria-hidden="true" tabindex="-1"></a><span class="dv">16</span>   Ullensaker female    Total        <span class="dv">3</span>       <span class="dv">0</span>         <span class="sc">-</span><span class="dv">3</span></span>
+<span id="cb5-69"><a href="#cb5-69" aria-hidden="true" tabindex="-1"></a><span class="dv">17</span>   Ullensaker   male    Total        <span class="dv">5</span>       <span class="dv">5</span>          <span class="dv">0</span></span>
+<span id="cb5-70"><a href="#cb5-70" aria-hidden="true" tabindex="-1"></a><span class="dv">18</span>      Drammen  Total       no       <span class="dv">20</span>      <span class="dv">20</span>          <span class="dv">0</span></span>
+<span id="cb5-71"><a href="#cb5-71" aria-hidden="true" tabindex="-1"></a><span class="dv">19</span>      Drammen  Total      yes        <span class="dv">0</span>       <span class="dv">0</span>          <span class="dv">0</span></span>
+<span id="cb5-72"><a href="#cb5-72" aria-hidden="true" tabindex="-1"></a><span class="dv">20</span>       Oppdal  Total       no       <span class="dv">34</span>      <span class="dv">34</span>          <span class="dv">0</span></span>
+<span id="cb5-73"><a href="#cb5-73" aria-hidden="true" tabindex="-1"></a><span class="dv">21</span>       Oppdal  Total      yes        <span class="dv">4</span>       <span class="dv">5</span>          <span class="dv">1</span></span>
+<span id="cb5-74"><a href="#cb5-74" aria-hidden="true" tabindex="-1"></a><span class="dv">22</span>    Steinkjer  Total       no       <span class="dv">32</span>      <span class="dv">32</span>          <span class="dv">0</span></span>
+<span id="cb5-75"><a href="#cb5-75" aria-hidden="true" tabindex="-1"></a><span class="dv">23</span>    Steinkjer  Total      yes        <span class="dv">5</span>       <span class="dv">5</span>          <span class="dv">0</span></span>
+<span id="cb5-76"><a href="#cb5-76" aria-hidden="true" tabindex="-1"></a><span class="dv">24</span>   Ullensaker  Total       no        <span class="dv">5</span>       <span class="dv">5</span>          <span class="dv">0</span></span>
+<span id="cb5-77"><a href="#cb5-77" aria-hidden="true" tabindex="-1"></a><span class="dv">25</span>   Ullensaker  Total      yes        <span class="dv">3</span>       <span class="dv">0</span>         <span class="sc">-</span><span class="dv">3</span></span>
+<span id="cb5-78"><a href="#cb5-78" aria-hidden="true" tabindex="-1"></a><span class="dv">26</span>        Total female       no       <span class="dv">42</span>      <span class="dv">42</span>          <span class="dv">0</span></span>
+<span id="cb5-79"><a href="#cb5-79" aria-hidden="true" tabindex="-1"></a><span class="dv">27</span>        Total female      yes       <span class="dv">12</span>      <span class="dv">10</span>         <span class="sc">-</span><span class="dv">2</span></span>
+<span id="cb5-80"><a href="#cb5-80" aria-hidden="true" tabindex="-1"></a><span class="dv">28</span>        Total   male       no       <span class="dv">49</span>      <span class="dv">49</span>          <span class="dv">0</span></span>
+<span id="cb5-81"><a href="#cb5-81" aria-hidden="true" tabindex="-1"></a><span class="dv">29</span>        Total   male      yes        <span class="dv">0</span>       <span class="dv">0</span>          <span class="dv">0</span></span>
+<span id="cb5-82"><a href="#cb5-82" aria-hidden="true" tabindex="-1"></a><span class="dv">30</span>      Drammen female       no       <span class="dv">12</span>      <span class="dv">12</span>          <span class="dv">0</span></span>
+<span id="cb5-83"><a href="#cb5-83" aria-hidden="true" tabindex="-1"></a><span class="dv">31</span>      Drammen female      yes        <span class="dv">0</span>       <span class="dv">0</span>          <span class="dv">0</span></span>
+<span id="cb5-84"><a href="#cb5-84" aria-hidden="true" tabindex="-1"></a><span class="dv">32</span>      Drammen   male       no        <span class="dv">8</span>       <span class="dv">8</span>          <span class="dv">0</span></span>
+<span id="cb5-85"><a href="#cb5-85" aria-hidden="true" tabindex="-1"></a><span class="dv">33</span>      Drammen   male      yes        <span class="dv">0</span>       <span class="dv">0</span>          <span class="dv">0</span></span>
+<span id="cb5-86"><a href="#cb5-86" aria-hidden="true" tabindex="-1"></a><span class="dv">34</span>       Oppdal female       no       <span class="dv">16</span>      <span class="dv">16</span>          <span class="dv">0</span></span>
+<span id="cb5-87"><a href="#cb5-87" aria-hidden="true" tabindex="-1"></a><span class="dv">35</span>       Oppdal female      yes        <span class="dv">4</span>       <span class="dv">5</span>          <span class="dv">1</span></span>
+<span id="cb5-88"><a href="#cb5-88" aria-hidden="true" tabindex="-1"></a><span class="dv">36</span>       Oppdal   male       no       <span class="dv">18</span>      <span class="dv">18</span>          <span class="dv">0</span></span>
+<span id="cb5-89"><a href="#cb5-89" aria-hidden="true" tabindex="-1"></a><span class="dv">37</span>       Oppdal   male      yes        <span class="dv">0</span>       <span class="dv">0</span>          <span class="dv">0</span></span>
+<span id="cb5-90"><a href="#cb5-90" aria-hidden="true" tabindex="-1"></a><span class="dv">38</span>    Steinkjer female       no       <span class="dv">14</span>      <span class="dv">14</span>          <span class="dv">0</span></span>
+<span id="cb5-91"><a href="#cb5-91" aria-hidden="true" tabindex="-1"></a><span class="dv">39</span>    Steinkjer female      yes        <span class="dv">5</span>       <span class="dv">5</span>          <span class="dv">0</span></span>
+<span id="cb5-92"><a href="#cb5-92" aria-hidden="true" tabindex="-1"></a><span class="dv">40</span>    Steinkjer   male       no       <span class="dv">18</span>      <span class="dv">18</span>          <span class="dv">0</span></span>
+<span id="cb5-93"><a href="#cb5-93" aria-hidden="true" tabindex="-1"></a><span class="dv">41</span>    Steinkjer   male      yes        <span class="dv">0</span>       <span class="dv">0</span>          <span class="dv">0</span></span>
+<span id="cb5-94"><a href="#cb5-94" aria-hidden="true" tabindex="-1"></a><span class="dv">42</span>   Ullensaker female       no        <span class="dv">0</span>       <span class="dv">0</span>          <span class="dv">0</span></span>
+<span id="cb5-95"><a href="#cb5-95" aria-hidden="true" tabindex="-1"></a><span class="dv">43</span>   Ullensaker female      yes        <span class="dv">3</span>       <span class="dv">0</span>         <span class="sc">-</span><span class="dv">3</span></span>
+<span id="cb5-96"><a href="#cb5-96" aria-hidden="true" tabindex="-1"></a><span class="dv">44</span>   Ullensaker   male       no        <span class="dv">5</span>       <span class="dv">5</span>          <span class="dv">0</span></span>
+<span id="cb5-97"><a href="#cb5-97" aria-hidden="true" tabindex="-1"></a><span class="dv">45</span>   Ullensaker   male      yes        <span class="dv">0</span>       <span class="dv">0</span>          <span class="dv">0</span></span></code></pre></div>
+</div>
+</div>
+<div id="exercise-3" class="section level3">
+<h3>Exercise 3</h3>
+<p>Create a new dataset with this code:</p>
+<pre><code>pregnant2 &lt;- SSBtools::Extend0(pregnant[-3])</code></pre>
+<p>Repeat exercise 2 with this data set.</p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="fu">load</span>(<span class="st">&quot;../data/pregnant.RData&quot;</span>)</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>pregnant2 <span class="ot">&lt;-</span> SSBtools<span class="sc">::</span><span class="fu">Extend0</span>(pregnant[<span class="sc">-</span><span class="dv">3</span>])</span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>pregnant2</span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>      county municipality   age gender pregnant freq</span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a><span class="dv">1</span>      Viken      Drammen  <span class="sc">&lt;=</span><span class="dv">50</span> female      yes    <span class="dv">0</span></span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a><span class="dv">2</span>      Viken   Ullensaker  <span class="sc">&lt;=</span><span class="dv">50</span> female      yes    <span class="dv">3</span></span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a><span class="dv">3</span>  Trondelag    Steinkjer  <span class="sc">&lt;=</span><span class="dv">50</span> female      yes    <span class="dv">5</span></span>
+<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a><span class="dv">4</span>  Trondelag       Oppdal  <span class="sc">&lt;=</span><span class="dv">50</span> female      yes    <span class="dv">4</span></span>
+<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a><span class="dv">5</span>      Viken      Drammen  <span class="sc">&lt;=</span><span class="dv">50</span> female       no    <span class="dv">6</span></span>
+<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a><span class="dv">6</span>      Viken   Ullensaker  <span class="sc">&lt;=</span><span class="dv">50</span> female       no    <span class="dv">0</span></span>
+<span id="cb7-13"><a href="#cb7-13" aria-hidden="true" tabindex="-1"></a><span class="dv">7</span>  Trondelag    Steinkjer  <span class="sc">&lt;=</span><span class="dv">50</span> female       no   <span class="dv">12</span></span>
+<span id="cb7-14"><a href="#cb7-14" aria-hidden="true" tabindex="-1"></a><span class="dv">8</span>  Trondelag       Oppdal  <span class="sc">&lt;=</span><span class="dv">50</span> female       no    <span class="dv">7</span></span>
+<span id="cb7-15"><a href="#cb7-15" aria-hidden="true" tabindex="-1"></a><span class="dv">9</span>      Viken      Drammen  <span class="sc">&lt;=</span><span class="dv">50</span>   male       no    <span class="dv">2</span></span>
+<span id="cb7-16"><a href="#cb7-16" aria-hidden="true" tabindex="-1"></a><span class="dv">10</span>     Viken   Ullensaker  <span class="sc">&lt;=</span><span class="dv">50</span>   male       no    <span class="dv">2</span></span>
+<span id="cb7-17"><a href="#cb7-17" aria-hidden="true" tabindex="-1"></a><span class="dv">11</span> Trondelag    Steinkjer  <span class="sc">&lt;=</span><span class="dv">50</span>   male       no    <span class="dv">9</span></span>
+<span id="cb7-18"><a href="#cb7-18" aria-hidden="true" tabindex="-1"></a><span class="dv">12</span> Trondelag       Oppdal  <span class="sc">&lt;=</span><span class="dv">50</span>   male       no   <span class="dv">15</span></span>
+<span id="cb7-19"><a href="#cb7-19" aria-hidden="true" tabindex="-1"></a><span class="dv">13</span>     Viken      Drammen <span class="dv">51-69</span> female       no    <span class="dv">0</span></span>
+<span id="cb7-20"><a href="#cb7-20" aria-hidden="true" tabindex="-1"></a><span class="dv">14</span>     Viken   Ullensaker <span class="dv">51-69</span> female       no    <span class="dv">0</span></span>
+<span id="cb7-21"><a href="#cb7-21" aria-hidden="true" tabindex="-1"></a><span class="dv">15</span> Trondelag    Steinkjer <span class="dv">51-69</span> female       no    <span class="dv">2</span></span>
+<span id="cb7-22"><a href="#cb7-22" aria-hidden="true" tabindex="-1"></a><span class="dv">16</span> Trondelag       Oppdal <span class="dv">51-69</span> female       no    <span class="dv">5</span></span>
+<span id="cb7-23"><a href="#cb7-23" aria-hidden="true" tabindex="-1"></a><span class="dv">17</span>     Viken      Drammen <span class="dv">51-69</span>   male       no    <span class="dv">4</span></span>
+<span id="cb7-24"><a href="#cb7-24" aria-hidden="true" tabindex="-1"></a><span class="dv">18</span>     Viken   Ullensaker <span class="dv">51-69</span>   male       no    <span class="dv">0</span></span>
+<span id="cb7-25"><a href="#cb7-25" aria-hidden="true" tabindex="-1"></a><span class="dv">19</span> Trondelag    Steinkjer <span class="dv">51-69</span>   male       no    <span class="dv">5</span></span>
+<span id="cb7-26"><a href="#cb7-26" aria-hidden="true" tabindex="-1"></a><span class="dv">20</span> Trondelag       Oppdal <span class="dv">51-69</span>   male       no    <span class="dv">0</span></span>
+<span id="cb7-27"><a href="#cb7-27" aria-hidden="true" tabindex="-1"></a><span class="dv">21</span>     Viken      Drammen  <span class="sc">&gt;=</span><span class="dv">70</span> female       no    <span class="dv">6</span></span>
+<span id="cb7-28"><a href="#cb7-28" aria-hidden="true" tabindex="-1"></a><span class="dv">22</span>     Viken   Ullensaker  <span class="sc">&gt;=</span><span class="dv">70</span> female       no    <span class="dv">0</span></span>
+<span id="cb7-29"><a href="#cb7-29" aria-hidden="true" tabindex="-1"></a><span class="dv">23</span> Trondelag    Steinkjer  <span class="sc">&gt;=</span><span class="dv">70</span> female       no    <span class="dv">0</span></span>
+<span id="cb7-30"><a href="#cb7-30" aria-hidden="true" tabindex="-1"></a><span class="dv">24</span> Trondelag       Oppdal  <span class="sc">&gt;=</span><span class="dv">70</span> female       no    <span class="dv">4</span></span>
+<span id="cb7-31"><a href="#cb7-31" aria-hidden="true" tabindex="-1"></a><span class="dv">25</span>     Viken      Drammen  <span class="sc">&gt;=</span><span class="dv">70</span>   male       no    <span class="dv">2</span></span>
+<span id="cb7-32"><a href="#cb7-32" aria-hidden="true" tabindex="-1"></a><span class="dv">26</span>     Viken   Ullensaker  <span class="sc">&gt;=</span><span class="dv">70</span>   male       no    <span class="dv">3</span></span>
+<span id="cb7-33"><a href="#cb7-33" aria-hidden="true" tabindex="-1"></a><span class="dv">27</span> Trondelag    Steinkjer  <span class="sc">&gt;=</span><span class="dv">70</span>   male       no    <span class="dv">4</span></span>
+<span id="cb7-34"><a href="#cb7-34" aria-hidden="true" tabindex="-1"></a><span class="dv">28</span> Trondelag       Oppdal  <span class="sc">&gt;=</span><span class="dv">70</span>   male       no    <span class="dv">3</span></span>
+<span id="cb7-35"><a href="#cb7-35" aria-hidden="true" tabindex="-1"></a><span class="dv">29</span>     Viken      Drammen <span class="dv">51-69</span> female      yes    <span class="dv">0</span></span>
+<span id="cb7-36"><a href="#cb7-36" aria-hidden="true" tabindex="-1"></a><span class="dv">30</span>     Viken   Ullensaker <span class="dv">51-69</span> female      yes    <span class="dv">0</span></span>
+<span id="cb7-37"><a href="#cb7-37" aria-hidden="true" tabindex="-1"></a><span class="dv">31</span> Trondelag    Steinkjer <span class="dv">51-69</span> female      yes    <span class="dv">0</span></span>
+<span id="cb7-38"><a href="#cb7-38" aria-hidden="true" tabindex="-1"></a><span class="dv">32</span> Trondelag       Oppdal <span class="dv">51-69</span> female      yes    <span class="dv">0</span></span>
+<span id="cb7-39"><a href="#cb7-39" aria-hidden="true" tabindex="-1"></a><span class="dv">33</span>     Viken      Drammen  <span class="sc">&gt;=</span><span class="dv">70</span> female      yes    <span class="dv">0</span></span>
+<span id="cb7-40"><a href="#cb7-40" aria-hidden="true" tabindex="-1"></a><span class="dv">34</span>     Viken   Ullensaker  <span class="sc">&gt;=</span><span class="dv">70</span> female      yes    <span class="dv">0</span></span>
+<span id="cb7-41"><a href="#cb7-41" aria-hidden="true" tabindex="-1"></a><span class="dv">35</span> Trondelag    Steinkjer  <span class="sc">&gt;=</span><span class="dv">70</span> female      yes    <span class="dv">0</span></span>
+<span id="cb7-42"><a href="#cb7-42" aria-hidden="true" tabindex="-1"></a><span class="dv">36</span> Trondelag       Oppdal  <span class="sc">&gt;=</span><span class="dv">70</span> female      yes    <span class="dv">0</span></span>
+<span id="cb7-43"><a href="#cb7-43" aria-hidden="true" tabindex="-1"></a><span class="dv">37</span>     Viken      Drammen  <span class="sc">&lt;=</span><span class="dv">50</span>   male      yes    <span class="dv">0</span></span>
+<span id="cb7-44"><a href="#cb7-44" aria-hidden="true" tabindex="-1"></a><span class="dv">38</span>     Viken   Ullensaker  <span class="sc">&lt;=</span><span class="dv">50</span>   male      yes    <span class="dv">0</span></span>
+<span id="cb7-45"><a href="#cb7-45" aria-hidden="true" tabindex="-1"></a><span class="dv">39</span> Trondelag    Steinkjer  <span class="sc">&lt;=</span><span class="dv">50</span>   male      yes    <span class="dv">0</span></span>
+<span id="cb7-46"><a href="#cb7-46" aria-hidden="true" tabindex="-1"></a><span class="dv">40</span> Trondelag       Oppdal  <span class="sc">&lt;=</span><span class="dv">50</span>   male      yes    <span class="dv">0</span></span>
+<span id="cb7-47"><a href="#cb7-47" aria-hidden="true" tabindex="-1"></a><span class="dv">41</span>     Viken      Drammen <span class="dv">51-69</span>   male      yes    <span class="dv">0</span></span>
+<span id="cb7-48"><a href="#cb7-48" aria-hidden="true" tabindex="-1"></a><span class="dv">42</span>     Viken   Ullensaker <span class="dv">51-69</span>   male      yes    <span class="dv">0</span></span>
+<span id="cb7-49"><a href="#cb7-49" aria-hidden="true" tabindex="-1"></a><span class="dv">43</span> Trondelag    Steinkjer <span class="dv">51-69</span>   male      yes    <span class="dv">0</span></span>
+<span id="cb7-50"><a href="#cb7-50" aria-hidden="true" tabindex="-1"></a><span class="dv">44</span> Trondelag       Oppdal <span class="dv">51-69</span>   male      yes    <span class="dv">0</span></span>
+<span id="cb7-51"><a href="#cb7-51" aria-hidden="true" tabindex="-1"></a><span class="dv">45</span>     Viken      Drammen  <span class="sc">&gt;=</span><span class="dv">70</span>   male      yes    <span class="dv">0</span></span>
+<span id="cb7-52"><a href="#cb7-52" aria-hidden="true" tabindex="-1"></a><span class="dv">46</span>     Viken   Ullensaker  <span class="sc">&gt;=</span><span class="dv">70</span>   male      yes    <span class="dv">0</span></span>
+<span id="cb7-53"><a href="#cb7-53" aria-hidden="true" tabindex="-1"></a><span class="dv">47</span> Trondelag    Steinkjer  <span class="sc">&gt;=</span><span class="dv">70</span>   male      yes    <span class="dv">0</span></span>
+<span id="cb7-54"><a href="#cb7-54" aria-hidden="true" tabindex="-1"></a><span class="dv">48</span> Trondelag       Oppdal  <span class="sc">&gt;=</span><span class="dv">70</span>   male      yes    <span class="dv">0</span></span></code></pre></div>
+<div id="solution-2" class="section level4">
+<h4>Solution</h4>
+<p>Again it is important to use <code>freqVar = &quot;freq&quot;</code></p>
+<p>With default (<code>removeEmpty = TRUE</code>), now same answer as
+<code>removeEmpty = FALSE</code>.</p>
+<p>Since all zeros, structural and non-structural, are included in
+input.</p>
+<p><em>Note:</em> Even better to include
+<code>preAggregate = TRUE</code>. See Exercise 4.</p>
+<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="fu">PLSroundingPublish</span>(pregnant2, </span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>                   <span class="at">roundBase =</span> <span class="dv">5</span>, </span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>                   <span class="at">formula =</span> <span class="sc">~</span>municipality<span class="sc">*</span>gender<span class="sc">*</span>pregnant,</span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>                   <span class="at">freqVar =</span> <span class="st">&quot;freq&quot;</span>)</span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>   municipality gender pregnant original rounded difference</span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a><span class="dv">1</span>         Total  Total    Total      <span class="dv">103</span>     <span class="dv">101</span>         <span class="sc">-</span><span class="dv">2</span></span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a><span class="dv">2</span>       Drammen  Total    Total       <span class="dv">20</span>      <span class="dv">20</span>          <span class="dv">0</span></span>
+<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a><span class="dv">3</span>        Oppdal  Total    Total       <span class="dv">38</span>      <span class="dv">39</span>          <span class="dv">1</span></span>
+<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a><span class="dv">4</span>     Steinkjer  Total    Total       <span class="dv">37</span>      <span class="dv">37</span>          <span class="dv">0</span></span>
+<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a><span class="dv">5</span>    Ullensaker  Total    Total        <span class="dv">8</span>       <span class="dv">5</span>         <span class="sc">-</span><span class="dv">3</span></span>
+<span id="cb8-12"><a href="#cb8-12" aria-hidden="true" tabindex="-1"></a><span class="dv">6</span>         Total female    Total       <span class="dv">54</span>      <span class="dv">52</span>         <span class="sc">-</span><span class="dv">2</span></span>
+<span id="cb8-13"><a href="#cb8-13" aria-hidden="true" tabindex="-1"></a><span class="dv">7</span>         Total   male    Total       <span class="dv">49</span>      <span class="dv">49</span>          <span class="dv">0</span></span>
+<span id="cb8-14"><a href="#cb8-14" aria-hidden="true" tabindex="-1"></a><span class="dv">8</span>         Total  Total       no       <span class="dv">91</span>      <span class="dv">91</span>          <span class="dv">0</span></span>
+<span id="cb8-15"><a href="#cb8-15" aria-hidden="true" tabindex="-1"></a><span class="dv">9</span>         Total  Total      yes       <span class="dv">12</span>      <span class="dv">10</span>         <span class="sc">-</span><span class="dv">2</span></span>
+<span id="cb8-16"><a href="#cb8-16" aria-hidden="true" tabindex="-1"></a><span class="dv">10</span>      Drammen female    Total       <span class="dv">12</span>      <span class="dv">12</span>          <span class="dv">0</span></span>
+<span id="cb8-17"><a href="#cb8-17" aria-hidden="true" tabindex="-1"></a><span class="dv">11</span>      Drammen   male    Total        <span class="dv">8</span>       <span class="dv">8</span>          <span class="dv">0</span></span>
+<span id="cb8-18"><a href="#cb8-18" aria-hidden="true" tabindex="-1"></a><span class="dv">12</span>       Oppdal female    Total       <span class="dv">20</span>      <span class="dv">21</span>          <span class="dv">1</span></span>
+<span id="cb8-19"><a href="#cb8-19" aria-hidden="true" tabindex="-1"></a><span class="dv">13</span>       Oppdal   male    Total       <span class="dv">18</span>      <span class="dv">18</span>          <span class="dv">0</span></span>
+<span id="cb8-20"><a href="#cb8-20" aria-hidden="true" tabindex="-1"></a><span class="dv">14</span>    Steinkjer female    Total       <span class="dv">19</span>      <span class="dv">19</span>          <span class="dv">0</span></span>
+<span id="cb8-21"><a href="#cb8-21" aria-hidden="true" tabindex="-1"></a><span class="dv">15</span>    Steinkjer   male    Total       <span class="dv">18</span>      <span class="dv">18</span>          <span class="dv">0</span></span>
+<span id="cb8-22"><a href="#cb8-22" aria-hidden="true" tabindex="-1"></a><span class="dv">16</span>   Ullensaker female    Total        <span class="dv">3</span>       <span class="dv">0</span>         <span class="sc">-</span><span class="dv">3</span></span>
+<span id="cb8-23"><a href="#cb8-23" aria-hidden="true" tabindex="-1"></a><span class="dv">17</span>   Ullensaker   male    Total        <span class="dv">5</span>       <span class="dv">5</span>          <span class="dv">0</span></span>
+<span id="cb8-24"><a href="#cb8-24" aria-hidden="true" tabindex="-1"></a><span class="dv">18</span>      Drammen  Total       no       <span class="dv">20</span>      <span class="dv">20</span>          <span class="dv">0</span></span>
+<span id="cb8-25"><a href="#cb8-25" aria-hidden="true" tabindex="-1"></a><span class="dv">19</span>      Drammen  Total      yes        <span class="dv">0</span>       <span class="dv">0</span>          <span class="dv">0</span></span>
+<span id="cb8-26"><a href="#cb8-26" aria-hidden="true" tabindex="-1"></a><span class="dv">20</span>       Oppdal  Total       no       <span class="dv">34</span>      <span class="dv">34</span>          <span class="dv">0</span></span>
+<span id="cb8-27"><a href="#cb8-27" aria-hidden="true" tabindex="-1"></a><span class="dv">21</span>       Oppdal  Total      yes        <span class="dv">4</span>       <span class="dv">5</span>          <span class="dv">1</span></span>
+<span id="cb8-28"><a href="#cb8-28" aria-hidden="true" tabindex="-1"></a><span class="dv">22</span>    Steinkjer  Total       no       <span class="dv">32</span>      <span class="dv">32</span>          <span class="dv">0</span></span>
+<span id="cb8-29"><a href="#cb8-29" aria-hidden="true" tabindex="-1"></a><span class="dv">23</span>    Steinkjer  Total      yes        <span class="dv">5</span>       <span class="dv">5</span>          <span class="dv">0</span></span>
+<span id="cb8-30"><a href="#cb8-30" aria-hidden="true" tabindex="-1"></a><span class="dv">24</span>   Ullensaker  Total       no        <span class="dv">5</span>       <span class="dv">5</span>          <span class="dv">0</span></span>
+<span id="cb8-31"><a href="#cb8-31" aria-hidden="true" tabindex="-1"></a><span class="dv">25</span>   Ullensaker  Total      yes        <span class="dv">3</span>       <span class="dv">0</span>         <span class="sc">-</span><span class="dv">3</span></span>
+<span id="cb8-32"><a href="#cb8-32" aria-hidden="true" tabindex="-1"></a><span class="dv">26</span>        Total female       no       <span class="dv">42</span>      <span class="dv">42</span>          <span class="dv">0</span></span>
+<span id="cb8-33"><a href="#cb8-33" aria-hidden="true" tabindex="-1"></a><span class="dv">27</span>        Total female      yes       <span class="dv">12</span>      <span class="dv">10</span>         <span class="sc">-</span><span class="dv">2</span></span>
+<span id="cb8-34"><a href="#cb8-34" aria-hidden="true" tabindex="-1"></a><span class="dv">28</span>        Total   male       no       <span class="dv">49</span>      <span class="dv">49</span>          <span class="dv">0</span></span>
+<span id="cb8-35"><a href="#cb8-35" aria-hidden="true" tabindex="-1"></a><span class="dv">29</span>        Total   male      yes        <span class="dv">0</span>       <span class="dv">0</span>          <span class="dv">0</span></span>
+<span id="cb8-36"><a href="#cb8-36" aria-hidden="true" tabindex="-1"></a><span class="dv">30</span>      Drammen female       no       <span class="dv">12</span>      <span class="dv">12</span>          <span class="dv">0</span></span>
+<span id="cb8-37"><a href="#cb8-37" aria-hidden="true" tabindex="-1"></a><span class="dv">31</span>      Drammen female      yes        <span class="dv">0</span>       <span class="dv">0</span>          <span class="dv">0</span></span>
+<span id="cb8-38"><a href="#cb8-38" aria-hidden="true" tabindex="-1"></a><span class="dv">32</span>      Drammen   male       no        <span class="dv">8</span>       <span class="dv">8</span>          <span class="dv">0</span></span>
+<span id="cb8-39"><a href="#cb8-39" aria-hidden="true" tabindex="-1"></a><span class="dv">33</span>      Drammen   male      yes        <span class="dv">0</span>       <span class="dv">0</span>          <span class="dv">0</span></span>
+<span id="cb8-40"><a href="#cb8-40" aria-hidden="true" tabindex="-1"></a><span class="dv">34</span>       Oppdal female       no       <span class="dv">16</span>      <span class="dv">16</span>          <span class="dv">0</span></span>
+<span id="cb8-41"><a href="#cb8-41" aria-hidden="true" tabindex="-1"></a><span class="dv">35</span>       Oppdal female      yes        <span class="dv">4</span>       <span class="dv">5</span>          <span class="dv">1</span></span>
+<span id="cb8-42"><a href="#cb8-42" aria-hidden="true" tabindex="-1"></a><span class="dv">36</span>       Oppdal   male       no       <span class="dv">18</span>      <span class="dv">18</span>          <span class="dv">0</span></span>
+<span id="cb8-43"><a href="#cb8-43" aria-hidden="true" tabindex="-1"></a><span class="dv">37</span>       Oppdal   male      yes        <span class="dv">0</span>       <span class="dv">0</span>          <span class="dv">0</span></span>
+<span id="cb8-44"><a href="#cb8-44" aria-hidden="true" tabindex="-1"></a><span class="dv">38</span>    Steinkjer female       no       <span class="dv">14</span>      <span class="dv">14</span>          <span class="dv">0</span></span>
+<span id="cb8-45"><a href="#cb8-45" aria-hidden="true" tabindex="-1"></a><span class="dv">39</span>    Steinkjer female      yes        <span class="dv">5</span>       <span class="dv">5</span>          <span class="dv">0</span></span>
+<span id="cb8-46"><a href="#cb8-46" aria-hidden="true" tabindex="-1"></a><span class="dv">40</span>    Steinkjer   male       no       <span class="dv">18</span>      <span class="dv">18</span>          <span class="dv">0</span></span>
+<span id="cb8-47"><a href="#cb8-47" aria-hidden="true" tabindex="-1"></a><span class="dv">41</span>    Steinkjer   male      yes        <span class="dv">0</span>       <span class="dv">0</span>          <span class="dv">0</span></span>
+<span id="cb8-48"><a href="#cb8-48" aria-hidden="true" tabindex="-1"></a><span class="dv">42</span>   Ullensaker female       no        <span class="dv">0</span>       <span class="dv">0</span>          <span class="dv">0</span></span>
+<span id="cb8-49"><a href="#cb8-49" aria-hidden="true" tabindex="-1"></a><span class="dv">43</span>   Ullensaker female      yes        <span class="dv">3</span>       <span class="dv">0</span>         <span class="sc">-</span><span class="dv">3</span></span>
+<span id="cb8-50"><a href="#cb8-50" aria-hidden="true" tabindex="-1"></a><span class="dv">44</span>   Ullensaker   male       no        <span class="dv">5</span>       <span class="dv">5</span>          <span class="dv">0</span></span>
+<span id="cb8-51"><a href="#cb8-51" aria-hidden="true" tabindex="-1"></a><span class="dv">45</span>   Ullensaker   male      yes        <span class="dv">0</span>       <span class="dv">0</span>          <span class="dv">0</span></span>
+<span id="cb8-52"><a href="#cb8-52" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-53"><a href="#cb8-53" aria-hidden="true" tabindex="-1"></a><span class="fu">PLSroundingPublish</span>(pregnant2, </span>
+<span id="cb8-54"><a href="#cb8-54" aria-hidden="true" tabindex="-1"></a>                   <span class="at">roundBase =</span> <span class="dv">5</span>, </span>
+<span id="cb8-55"><a href="#cb8-55" aria-hidden="true" tabindex="-1"></a>                   <span class="at">formula =</span> <span class="sc">~</span>municipality<span class="sc">*</span>gender<span class="sc">*</span>pregnant,</span>
+<span id="cb8-56"><a href="#cb8-56" aria-hidden="true" tabindex="-1"></a>                   <span class="at">freqVar =</span> <span class="st">&quot;freq&quot;</span>,</span>
+<span id="cb8-57"><a href="#cb8-57" aria-hidden="true" tabindex="-1"></a>                   <span class="at">removeEmpty =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb8-58"><a href="#cb8-58" aria-hidden="true" tabindex="-1"></a>   municipality gender pregnant original rounded difference</span>
+<span id="cb8-59"><a href="#cb8-59" aria-hidden="true" tabindex="-1"></a><span class="dv">1</span>         Total  Total    Total      <span class="dv">103</span>     <span class="dv">101</span>         <span class="sc">-</span><span class="dv">2</span></span>
+<span id="cb8-60"><a href="#cb8-60" aria-hidden="true" tabindex="-1"></a><span class="dv">2</span>       Drammen  Total    Total       <span class="dv">20</span>      <span class="dv">20</span>          <span class="dv">0</span></span>
+<span id="cb8-61"><a href="#cb8-61" aria-hidden="true" tabindex="-1"></a><span class="dv">3</span>        Oppdal  Total    Total       <span class="dv">38</span>      <span class="dv">39</span>          <span class="dv">1</span></span>
+<span id="cb8-62"><a href="#cb8-62" aria-hidden="true" tabindex="-1"></a><span class="dv">4</span>     Steinkjer  Total    Total       <span class="dv">37</span>      <span class="dv">37</span>          <span class="dv">0</span></span>
+<span id="cb8-63"><a href="#cb8-63" aria-hidden="true" tabindex="-1"></a><span class="dv">5</span>    Ullensaker  Total    Total        <span class="dv">8</span>       <span class="dv">5</span>         <span class="sc">-</span><span class="dv">3</span></span>
+<span id="cb8-64"><a href="#cb8-64" aria-hidden="true" tabindex="-1"></a><span class="dv">6</span>         Total female    Total       <span class="dv">54</span>      <span class="dv">52</span>         <span class="sc">-</span><span class="dv">2</span></span>
+<span id="cb8-65"><a href="#cb8-65" aria-hidden="true" tabindex="-1"></a><span class="dv">7</span>         Total   male    Total       <span class="dv">49</span>      <span class="dv">49</span>          <span class="dv">0</span></span>
+<span id="cb8-66"><a href="#cb8-66" aria-hidden="true" tabindex="-1"></a><span class="dv">8</span>         Total  Total       no       <span class="dv">91</span>      <span class="dv">91</span>          <span class="dv">0</span></span>
+<span id="cb8-67"><a href="#cb8-67" aria-hidden="true" tabindex="-1"></a><span class="dv">9</span>         Total  Total      yes       <span class="dv">12</span>      <span class="dv">10</span>         <span class="sc">-</span><span class="dv">2</span></span>
+<span id="cb8-68"><a href="#cb8-68" aria-hidden="true" tabindex="-1"></a><span class="dv">10</span>      Drammen female    Total       <span class="dv">12</span>      <span class="dv">12</span>          <span class="dv">0</span></span>
+<span id="cb8-69"><a href="#cb8-69" aria-hidden="true" tabindex="-1"></a><span class="dv">11</span>      Drammen   male    Total        <span class="dv">8</span>       <span class="dv">8</span>          <span class="dv">0</span></span>
+<span id="cb8-70"><a href="#cb8-70" aria-hidden="true" tabindex="-1"></a><span class="dv">12</span>       Oppdal female    Total       <span class="dv">20</span>      <span class="dv">21</span>          <span class="dv">1</span></span>
+<span id="cb8-71"><a href="#cb8-71" aria-hidden="true" tabindex="-1"></a><span class="dv">13</span>       Oppdal   male    Total       <span class="dv">18</span>      <span class="dv">18</span>          <span class="dv">0</span></span>
+<span id="cb8-72"><a href="#cb8-72" aria-hidden="true" tabindex="-1"></a><span class="dv">14</span>    Steinkjer female    Total       <span class="dv">19</span>      <span class="dv">19</span>          <span class="dv">0</span></span>
+<span id="cb8-73"><a href="#cb8-73" aria-hidden="true" tabindex="-1"></a><span class="dv">15</span>    Steinkjer   male    Total       <span class="dv">18</span>      <span class="dv">18</span>          <span class="dv">0</span></span>
+<span id="cb8-74"><a href="#cb8-74" aria-hidden="true" tabindex="-1"></a><span class="dv">16</span>   Ullensaker female    Total        <span class="dv">3</span>       <span class="dv">0</span>         <span class="sc">-</span><span class="dv">3</span></span>
+<span id="cb8-75"><a href="#cb8-75" aria-hidden="true" tabindex="-1"></a><span class="dv">17</span>   Ullensaker   male    Total        <span class="dv">5</span>       <span class="dv">5</span>          <span class="dv">0</span></span>
+<span id="cb8-76"><a href="#cb8-76" aria-hidden="true" tabindex="-1"></a><span class="dv">18</span>      Drammen  Total       no       <span class="dv">20</span>      <span class="dv">20</span>          <span class="dv">0</span></span>
+<span id="cb8-77"><a href="#cb8-77" aria-hidden="true" tabindex="-1"></a><span class="dv">19</span>      Drammen  Total      yes        <span class="dv">0</span>       <span class="dv">0</span>          <span class="dv">0</span></span>
+<span id="cb8-78"><a href="#cb8-78" aria-hidden="true" tabindex="-1"></a><span class="dv">20</span>       Oppdal  Total       no       <span class="dv">34</span>      <span class="dv">34</span>          <span class="dv">0</span></span>
+<span id="cb8-79"><a href="#cb8-79" aria-hidden="true" tabindex="-1"></a><span class="dv">21</span>       Oppdal  Total      yes        <span class="dv">4</span>       <span class="dv">5</span>          <span class="dv">1</span></span>
+<span id="cb8-80"><a href="#cb8-80" aria-hidden="true" tabindex="-1"></a><span class="dv">22</span>    Steinkjer  Total       no       <span class="dv">32</span>      <span class="dv">32</span>          <span class="dv">0</span></span>
+<span id="cb8-81"><a href="#cb8-81" aria-hidden="true" tabindex="-1"></a><span class="dv">23</span>    Steinkjer  Total      yes        <span class="dv">5</span>       <span class="dv">5</span>          <span class="dv">0</span></span>
+<span id="cb8-82"><a href="#cb8-82" aria-hidden="true" tabindex="-1"></a><span class="dv">24</span>   Ullensaker  Total       no        <span class="dv">5</span>       <span class="dv">5</span>          <span class="dv">0</span></span>
+<span id="cb8-83"><a href="#cb8-83" aria-hidden="true" tabindex="-1"></a><span class="dv">25</span>   Ullensaker  Total      yes        <span class="dv">3</span>       <span class="dv">0</span>         <span class="sc">-</span><span class="dv">3</span></span>
+<span id="cb8-84"><a href="#cb8-84" aria-hidden="true" tabindex="-1"></a><span class="dv">26</span>        Total female       no       <span class="dv">42</span>      <span class="dv">42</span>          <span class="dv">0</span></span>
+<span id="cb8-85"><a href="#cb8-85" aria-hidden="true" tabindex="-1"></a><span class="dv">27</span>        Total female      yes       <span class="dv">12</span>      <span class="dv">10</span>         <span class="sc">-</span><span class="dv">2</span></span>
+<span id="cb8-86"><a href="#cb8-86" aria-hidden="true" tabindex="-1"></a><span class="dv">28</span>        Total   male       no       <span class="dv">49</span>      <span class="dv">49</span>          <span class="dv">0</span></span>
+<span id="cb8-87"><a href="#cb8-87" aria-hidden="true" tabindex="-1"></a><span class="dv">29</span>        Total   male      yes        <span class="dv">0</span>       <span class="dv">0</span>          <span class="dv">0</span></span>
+<span id="cb8-88"><a href="#cb8-88" aria-hidden="true" tabindex="-1"></a><span class="dv">30</span>      Drammen female       no       <span class="dv">12</span>      <span class="dv">12</span>          <span class="dv">0</span></span>
+<span id="cb8-89"><a href="#cb8-89" aria-hidden="true" tabindex="-1"></a><span class="dv">31</span>      Drammen female      yes        <span class="dv">0</span>       <span class="dv">0</span>          <span class="dv">0</span></span>
+<span id="cb8-90"><a href="#cb8-90" aria-hidden="true" tabindex="-1"></a><span class="dv">32</span>      Drammen   male       no        <span class="dv">8</span>       <span class="dv">8</span>          <span class="dv">0</span></span>
+<span id="cb8-91"><a href="#cb8-91" aria-hidden="true" tabindex="-1"></a><span class="dv">33</span>      Drammen   male      yes        <span class="dv">0</span>       <span class="dv">0</span>          <span class="dv">0</span></span>
+<span id="cb8-92"><a href="#cb8-92" aria-hidden="true" tabindex="-1"></a><span class="dv">34</span>       Oppdal female       no       <span class="dv">16</span>      <span class="dv">16</span>          <span class="dv">0</span></span>
+<span id="cb8-93"><a href="#cb8-93" aria-hidden="true" tabindex="-1"></a><span class="dv">35</span>       Oppdal female      yes        <span class="dv">4</span>       <span class="dv">5</span>          <span class="dv">1</span></span>
+<span id="cb8-94"><a href="#cb8-94" aria-hidden="true" tabindex="-1"></a><span class="dv">36</span>       Oppdal   male       no       <span class="dv">18</span>      <span class="dv">18</span>          <span class="dv">0</span></span>
+<span id="cb8-95"><a href="#cb8-95" aria-hidden="true" tabindex="-1"></a><span class="dv">37</span>       Oppdal   male      yes        <span class="dv">0</span>       <span class="dv">0</span>          <span class="dv">0</span></span>
+<span id="cb8-96"><a href="#cb8-96" aria-hidden="true" tabindex="-1"></a><span class="dv">38</span>    Steinkjer female       no       <span class="dv">14</span>      <span class="dv">14</span>          <span class="dv">0</span></span>
+<span id="cb8-97"><a href="#cb8-97" aria-hidden="true" tabindex="-1"></a><span class="dv">39</span>    Steinkjer female      yes        <span class="dv">5</span>       <span class="dv">5</span>          <span class="dv">0</span></span>
+<span id="cb8-98"><a href="#cb8-98" aria-hidden="true" tabindex="-1"></a><span class="dv">40</span>    Steinkjer   male       no       <span class="dv">18</span>      <span class="dv">18</span>          <span class="dv">0</span></span>
+<span id="cb8-99"><a href="#cb8-99" aria-hidden="true" tabindex="-1"></a><span class="dv">41</span>    Steinkjer   male      yes        <span class="dv">0</span>       <span class="dv">0</span>          <span class="dv">0</span></span>
+<span id="cb8-100"><a href="#cb8-100" aria-hidden="true" tabindex="-1"></a><span class="dv">42</span>   Ullensaker female       no        <span class="dv">0</span>       <span class="dv">0</span>          <span class="dv">0</span></span>
+<span id="cb8-101"><a href="#cb8-101" aria-hidden="true" tabindex="-1"></a><span class="dv">43</span>   Ullensaker female      yes        <span class="dv">3</span>       <span class="dv">0</span>         <span class="sc">-</span><span class="dv">3</span></span>
+<span id="cb8-102"><a href="#cb8-102" aria-hidden="true" tabindex="-1"></a><span class="dv">44</span>   Ullensaker   male       no        <span class="dv">5</span>       <span class="dv">5</span>          <span class="dv">0</span></span>
+<span id="cb8-103"><a href="#cb8-103" aria-hidden="true" tabindex="-1"></a><span class="dv">45</span>   Ullensaker   male      yes        <span class="dv">0</span>       <span class="dv">0</span>          <span class="dv">0</span></span></code></pre></div>
+</div>
+</div>
+<div id="exercise-4" class="section level3">
+<h3>Exercise 4</h3>
+<p>Look at the inner data sets obtained by <code>PLSroundingInner</code>
+instead of <code>PLSroundingPublish</code> in Exercises 1-3.</p>
+<p>What are the differences?</p>
+<div id="solution-that-applies-to-all-exercises" class="section level4">
+<h4>Solution that applies to all exercises</h4>
+<p><code>removeEmpty = FALSE</code> has no effect on inner cells.</p>
+<div id="exercise-1-1" class="section level5">
+<h5><em>Exercise 1</em></h5>
+</div>
+</div>
+<div id="solution-3" class="section level4">
+<h4>Solution</h4>
+<p>Inner cells are aggregated input data with <code>original</code>,
+<code>rounded</code> and <code>difference</code>.</p>
+<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="fu">PLSroundingInner</span>(pregnant_micro, </span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>                   <span class="at">roundBase =</span> <span class="dv">5</span>, </span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>                   <span class="at">formula =</span> <span class="sc">~</span>municipality<span class="sc">*</span>gender<span class="sc">*</span>pregnant)</span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>   municipality gender pregnant original rounded difference</span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a><span class="dv">1</span>       Drammen female       no       <span class="dv">12</span>      <span class="dv">12</span>          <span class="dv">0</span></span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a><span class="dv">2</span>        Oppdal female       no       <span class="dv">16</span>      <span class="dv">16</span>          <span class="dv">0</span></span>
+<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a><span class="dv">3</span>     Steinkjer female       no       <span class="dv">14</span>      <span class="dv">14</span>          <span class="dv">0</span></span>
+<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a><span class="dv">4</span>       Drammen   male       no        <span class="dv">8</span>       <span class="dv">8</span>          <span class="dv">0</span></span>
+<span id="cb9-10"><a href="#cb9-10" aria-hidden="true" tabindex="-1"></a><span class="dv">5</span>        Oppdal   male       no       <span class="dv">18</span>      <span class="dv">18</span>          <span class="dv">0</span></span>
+<span id="cb9-11"><a href="#cb9-11" aria-hidden="true" tabindex="-1"></a><span class="dv">6</span>     Steinkjer   male       no       <span class="dv">18</span>      <span class="dv">18</span>          <span class="dv">0</span></span>
+<span id="cb9-12"><a href="#cb9-12" aria-hidden="true" tabindex="-1"></a><span class="dv">7</span>    Ullensaker   male       no        <span class="dv">5</span>       <span class="dv">5</span>          <span class="dv">0</span></span>
+<span id="cb9-13"><a href="#cb9-13" aria-hidden="true" tabindex="-1"></a><span class="dv">8</span>        Oppdal female      yes        <span class="dv">4</span>       <span class="dv">5</span>          <span class="dv">1</span></span>
+<span id="cb9-14"><a href="#cb9-14" aria-hidden="true" tabindex="-1"></a><span class="dv">9</span>     Steinkjer female      yes        <span class="dv">5</span>       <span class="dv">5</span>          <span class="dv">0</span></span>
+<span id="cb9-15"><a href="#cb9-15" aria-hidden="true" tabindex="-1"></a><span class="dv">10</span>   Ullensaker female      yes        <span class="dv">3</span>       <span class="dv">0</span>         <span class="sc">-</span><span class="dv">3</span></span>
+<span id="cb9-16"><a href="#cb9-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-17"><a href="#cb9-17" aria-hidden="true" tabindex="-1"></a><span class="fu">PLSroundingInner</span>(pregnant_micro, </span>
+<span id="cb9-18"><a href="#cb9-18" aria-hidden="true" tabindex="-1"></a>                   <span class="at">roundBase =</span> <span class="dv">5</span>, </span>
+<span id="cb9-19"><a href="#cb9-19" aria-hidden="true" tabindex="-1"></a>                   <span class="at">formula =</span> <span class="sc">~</span>municipality<span class="sc">*</span>gender<span class="sc">*</span>pregnant,</span>
+<span id="cb9-20"><a href="#cb9-20" aria-hidden="true" tabindex="-1"></a>                   <span class="at">removeEmpty =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb9-21"><a href="#cb9-21" aria-hidden="true" tabindex="-1"></a>   municipality gender pregnant original rounded difference</span>
+<span id="cb9-22"><a href="#cb9-22" aria-hidden="true" tabindex="-1"></a><span class="dv">1</span>       Drammen female       no       <span class="dv">12</span>      <span class="dv">12</span>          <span class="dv">0</span></span>
+<span id="cb9-23"><a href="#cb9-23" aria-hidden="true" tabindex="-1"></a><span class="dv">2</span>        Oppdal female       no       <span class="dv">16</span>      <span class="dv">16</span>          <span class="dv">0</span></span>
+<span id="cb9-24"><a href="#cb9-24" aria-hidden="true" tabindex="-1"></a><span class="dv">3</span>     Steinkjer female       no       <span class="dv">14</span>      <span class="dv">14</span>          <span class="dv">0</span></span>
+<span id="cb9-25"><a href="#cb9-25" aria-hidden="true" tabindex="-1"></a><span class="dv">4</span>       Drammen   male       no        <span class="dv">8</span>       <span class="dv">8</span>          <span class="dv">0</span></span>
+<span id="cb9-26"><a href="#cb9-26" aria-hidden="true" tabindex="-1"></a><span class="dv">5</span>        Oppdal   male       no       <span class="dv">18</span>      <span class="dv">18</span>          <span class="dv">0</span></span>
+<span id="cb9-27"><a href="#cb9-27" aria-hidden="true" tabindex="-1"></a><span class="dv">6</span>     Steinkjer   male       no       <span class="dv">18</span>      <span class="dv">18</span>          <span class="dv">0</span></span>
+<span id="cb9-28"><a href="#cb9-28" aria-hidden="true" tabindex="-1"></a><span class="dv">7</span>    Ullensaker   male       no        <span class="dv">5</span>       <span class="dv">5</span>          <span class="dv">0</span></span>
+<span id="cb9-29"><a href="#cb9-29" aria-hidden="true" tabindex="-1"></a><span class="dv">8</span>        Oppdal female      yes        <span class="dv">4</span>       <span class="dv">5</span>          <span class="dv">1</span></span>
+<span id="cb9-30"><a href="#cb9-30" aria-hidden="true" tabindex="-1"></a><span class="dv">9</span>     Steinkjer female      yes        <span class="dv">5</span>       <span class="dv">5</span>          <span class="dv">0</span></span>
+<span id="cb9-31"><a href="#cb9-31" aria-hidden="true" tabindex="-1"></a><span class="dv">10</span>   Ullensaker female      yes        <span class="dv">3</span>       <span class="dv">0</span>         <span class="sc">-</span><span class="dv">3</span></span></code></pre></div>
+<div id="exercise-2-1" class="section level5">
+<h5><em>Exercise 2</em></h5>
+</div>
+</div>
+<div id="solution-4" class="section level4">
+<h4>Solution</h4>
+<p>Inner cells are as input, not aggregated, without <code>age</code>
+and with <code>original</code>, <code>rounded</code> and
+<code>difference</code>. Several combinations are on several rows, since
+several age categories.</p>
+<p>Since data is not properly aggregated, it is better to include
+<code>preAggregate = TRUE</code>.</p>
+<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="fu">PLSroundingInner</span>(pregnant, </span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>                   <span class="at">roundBase =</span> <span class="dv">5</span>, </span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>                   <span class="at">formula =</span> <span class="sc">~</span>municipality<span class="sc">*</span>gender<span class="sc">*</span>pregnant,</span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>                   <span class="at">freqVar =</span> <span class="st">&quot;freq&quot;</span>)</span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>   municipality gender pregnant original rounded difference</span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a><span class="dv">1</span>       Drammen female      yes        <span class="dv">0</span>       <span class="dv">0</span>          <span class="dv">0</span></span>
+<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a><span class="dv">2</span>    Ullensaker female      yes        <span class="dv">3</span>       <span class="dv">0</span>         <span class="sc">-</span><span class="dv">3</span></span>
+<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a><span class="dv">3</span>     Steinkjer female      yes        <span class="dv">5</span>       <span class="dv">5</span>          <span class="dv">0</span></span>
+<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a><span class="dv">4</span>        Oppdal female      yes        <span class="dv">4</span>       <span class="dv">5</span>          <span class="dv">1</span></span>
+<span id="cb10-10"><a href="#cb10-10" aria-hidden="true" tabindex="-1"></a><span class="dv">5</span>       Drammen female       no        <span class="dv">6</span>       <span class="dv">6</span>          <span class="dv">0</span></span>
+<span id="cb10-11"><a href="#cb10-11" aria-hidden="true" tabindex="-1"></a><span class="dv">6</span>    Ullensaker female       no        <span class="dv">0</span>       <span class="dv">0</span>          <span class="dv">0</span></span>
+<span id="cb10-12"><a href="#cb10-12" aria-hidden="true" tabindex="-1"></a><span class="dv">7</span>     Steinkjer female       no       <span class="dv">12</span>      <span class="dv">12</span>          <span class="dv">0</span></span>
+<span id="cb10-13"><a href="#cb10-13" aria-hidden="true" tabindex="-1"></a><span class="dv">8</span>        Oppdal female       no        <span class="dv">7</span>       <span class="dv">7</span>          <span class="dv">0</span></span>
+<span id="cb10-14"><a href="#cb10-14" aria-hidden="true" tabindex="-1"></a><span class="dv">9</span>       Drammen   male       no        <span class="dv">2</span>       <span class="dv">2</span>          <span class="dv">0</span></span>
+<span id="cb10-15"><a href="#cb10-15" aria-hidden="true" tabindex="-1"></a><span class="dv">10</span>   Ullensaker   male       no        <span class="dv">2</span>       <span class="dv">2</span>          <span class="dv">0</span></span>
+<span id="cb10-16"><a href="#cb10-16" aria-hidden="true" tabindex="-1"></a><span class="dv">11</span>    Steinkjer   male       no        <span class="dv">9</span>       <span class="dv">9</span>          <span class="dv">0</span></span>
+<span id="cb10-17"><a href="#cb10-17" aria-hidden="true" tabindex="-1"></a><span class="dv">12</span>       Oppdal   male       no       <span class="dv">15</span>      <span class="dv">15</span>          <span class="dv">0</span></span>
+<span id="cb10-18"><a href="#cb10-18" aria-hidden="true" tabindex="-1"></a><span class="dv">13</span>      Drammen female       no        <span class="dv">0</span>       <span class="dv">0</span>          <span class="dv">0</span></span>
+<span id="cb10-19"><a href="#cb10-19" aria-hidden="true" tabindex="-1"></a><span class="dv">14</span>   Ullensaker female       no        <span class="dv">0</span>       <span class="dv">0</span>          <span class="dv">0</span></span>
+<span id="cb10-20"><a href="#cb10-20" aria-hidden="true" tabindex="-1"></a><span class="dv">15</span>    Steinkjer female       no        <span class="dv">2</span>       <span class="dv">2</span>          <span class="dv">0</span></span>
+<span id="cb10-21"><a href="#cb10-21" aria-hidden="true" tabindex="-1"></a><span class="dv">16</span>       Oppdal female       no        <span class="dv">5</span>       <span class="dv">5</span>          <span class="dv">0</span></span>
+<span id="cb10-22"><a href="#cb10-22" aria-hidden="true" tabindex="-1"></a><span class="dv">17</span>      Drammen   male       no        <span class="dv">4</span>       <span class="dv">4</span>          <span class="dv">0</span></span>
+<span id="cb10-23"><a href="#cb10-23" aria-hidden="true" tabindex="-1"></a><span class="dv">18</span>   Ullensaker   male       no        <span class="dv">0</span>       <span class="dv">0</span>          <span class="dv">0</span></span>
+<span id="cb10-24"><a href="#cb10-24" aria-hidden="true" tabindex="-1"></a><span class="dv">19</span>    Steinkjer   male       no        <span class="dv">5</span>       <span class="dv">5</span>          <span class="dv">0</span></span>
+<span id="cb10-25"><a href="#cb10-25" aria-hidden="true" tabindex="-1"></a><span class="dv">20</span>       Oppdal   male       no        <span class="dv">0</span>       <span class="dv">0</span>          <span class="dv">0</span></span>
+<span id="cb10-26"><a href="#cb10-26" aria-hidden="true" tabindex="-1"></a><span class="dv">21</span>      Drammen female       no        <span class="dv">6</span>       <span class="dv">6</span>          <span class="dv">0</span></span>
+<span id="cb10-27"><a href="#cb10-27" aria-hidden="true" tabindex="-1"></a><span class="dv">22</span>   Ullensaker female       no        <span class="dv">0</span>       <span class="dv">0</span>          <span class="dv">0</span></span>
+<span id="cb10-28"><a href="#cb10-28" aria-hidden="true" tabindex="-1"></a><span class="dv">23</span>    Steinkjer female       no        <span class="dv">0</span>       <span class="dv">0</span>          <span class="dv">0</span></span>
+<span id="cb10-29"><a href="#cb10-29" aria-hidden="true" tabindex="-1"></a><span class="dv">24</span>       Oppdal female       no        <span class="dv">4</span>       <span class="dv">4</span>          <span class="dv">0</span></span>
+<span id="cb10-30"><a href="#cb10-30" aria-hidden="true" tabindex="-1"></a><span class="dv">25</span>      Drammen   male       no        <span class="dv">2</span>       <span class="dv">2</span>          <span class="dv">0</span></span>
+<span id="cb10-31"><a href="#cb10-31" aria-hidden="true" tabindex="-1"></a><span class="dv">26</span>   Ullensaker   male       no        <span class="dv">3</span>       <span class="dv">3</span>          <span class="dv">0</span></span>
+<span id="cb10-32"><a href="#cb10-32" aria-hidden="true" tabindex="-1"></a><span class="dv">27</span>    Steinkjer   male       no        <span class="dv">4</span>       <span class="dv">4</span>          <span class="dv">0</span></span>
+<span id="cb10-33"><a href="#cb10-33" aria-hidden="true" tabindex="-1"></a><span class="dv">28</span>       Oppdal   male       no        <span class="dv">3</span>       <span class="dv">3</span>          <span class="dv">0</span></span></code></pre></div>
+</div>
+<div id="solution-5" class="section level4">
+<h4>Solution</h4>
+<p>As the <em>Exercise 2</em> solution above.</p>
+<div id="exercise-3-1" class="section level5">
+<h5><em>Exercise 3</em></h5>
+<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a><span class="fu">PLSroundingInner</span>(pregnant2, </span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>                   <span class="at">roundBase =</span> <span class="dv">5</span>, </span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>                   <span class="at">formula =</span> <span class="sc">~</span>municipality<span class="sc">*</span>gender<span class="sc">*</span>pregnant,</span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>                   <span class="at">freqVar =</span> <span class="st">&quot;freq&quot;</span>)</span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a>   municipality gender pregnant original rounded difference</span>
+<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a><span class="dv">1</span>       Drammen female      yes        <span class="dv">0</span>       <span class="dv">0</span>          <span class="dv">0</span></span>
+<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a><span class="dv">2</span>    Ullensaker female      yes        <span class="dv">3</span>       <span class="dv">0</span>         <span class="sc">-</span><span class="dv">3</span></span>
+<span id="cb11-9"><a href="#cb11-9" aria-hidden="true" tabindex="-1"></a><span class="dv">3</span>     Steinkjer female      yes        <span class="dv">5</span>       <span class="dv">5</span>          <span class="dv">0</span></span>
+<span id="cb11-10"><a href="#cb11-10" aria-hidden="true" tabindex="-1"></a><span class="dv">4</span>        Oppdal female      yes        <span class="dv">4</span>       <span class="dv">5</span>          <span class="dv">1</span></span>
+<span id="cb11-11"><a href="#cb11-11" aria-hidden="true" tabindex="-1"></a><span class="dv">5</span>       Drammen female       no        <span class="dv">6</span>       <span class="dv">6</span>          <span class="dv">0</span></span>
+<span id="cb11-12"><a href="#cb11-12" aria-hidden="true" tabindex="-1"></a><span class="dv">6</span>    Ullensaker female       no        <span class="dv">0</span>       <span class="dv">0</span>          <span class="dv">0</span></span>
+<span id="cb11-13"><a href="#cb11-13" aria-hidden="true" tabindex="-1"></a><span class="dv">7</span>     Steinkjer female       no       <span class="dv">12</span>      <span class="dv">12</span>          <span class="dv">0</span></span>
+<span id="cb11-14"><a href="#cb11-14" aria-hidden="true" tabindex="-1"></a><span class="dv">8</span>        Oppdal female       no        <span class="dv">7</span>       <span class="dv">7</span>          <span class="dv">0</span></span>
+<span id="cb11-15"><a href="#cb11-15" aria-hidden="true" tabindex="-1"></a><span class="dv">9</span>       Drammen   male       no        <span class="dv">2</span>       <span class="dv">2</span>          <span class="dv">0</span></span>
+<span id="cb11-16"><a href="#cb11-16" aria-hidden="true" tabindex="-1"></a><span class="dv">10</span>   Ullensaker   male       no        <span class="dv">2</span>       <span class="dv">2</span>          <span class="dv">0</span></span>
+<span id="cb11-17"><a href="#cb11-17" aria-hidden="true" tabindex="-1"></a><span class="dv">11</span>    Steinkjer   male       no        <span class="dv">9</span>       <span class="dv">9</span>          <span class="dv">0</span></span>
+<span id="cb11-18"><a href="#cb11-18" aria-hidden="true" tabindex="-1"></a><span class="dv">12</span>       Oppdal   male       no       <span class="dv">15</span>      <span class="dv">15</span>          <span class="dv">0</span></span>
+<span id="cb11-19"><a href="#cb11-19" aria-hidden="true" tabindex="-1"></a><span class="dv">13</span>      Drammen female       no        <span class="dv">0</span>       <span class="dv">0</span>          <span class="dv">0</span></span>
+<span id="cb11-20"><a href="#cb11-20" aria-hidden="true" tabindex="-1"></a><span class="dv">14</span>   Ullensaker female       no        <span class="dv">0</span>       <span class="dv">0</span>          <span class="dv">0</span></span>
+<span id="cb11-21"><a href="#cb11-21" aria-hidden="true" tabindex="-1"></a><span class="dv">15</span>    Steinkjer female       no        <span class="dv">2</span>       <span class="dv">2</span>          <span class="dv">0</span></span>
+<span id="cb11-22"><a href="#cb11-22" aria-hidden="true" tabindex="-1"></a><span class="dv">16</span>       Oppdal female       no        <span class="dv">5</span>       <span class="dv">5</span>          <span class="dv">0</span></span>
+<span id="cb11-23"><a href="#cb11-23" aria-hidden="true" tabindex="-1"></a><span class="dv">17</span>      Drammen   male       no        <span class="dv">4</span>       <span class="dv">4</span>          <span class="dv">0</span></span>
+<span id="cb11-24"><a href="#cb11-24" aria-hidden="true" tabindex="-1"></a><span class="dv">18</span>   Ullensaker   male       no        <span class="dv">0</span>       <span class="dv">0</span>          <span class="dv">0</span></span>
+<span id="cb11-25"><a href="#cb11-25" aria-hidden="true" tabindex="-1"></a><span class="dv">19</span>    Steinkjer   male       no        <span class="dv">5</span>       <span class="dv">5</span>          <span class="dv">0</span></span>
+<span id="cb11-26"><a href="#cb11-26" aria-hidden="true" tabindex="-1"></a><span class="dv">20</span>       Oppdal   male       no        <span class="dv">0</span>       <span class="dv">0</span>          <span class="dv">0</span></span>
+<span id="cb11-27"><a href="#cb11-27" aria-hidden="true" tabindex="-1"></a><span class="dv">21</span>      Drammen female       no        <span class="dv">6</span>       <span class="dv">6</span>          <span class="dv">0</span></span>
+<span id="cb11-28"><a href="#cb11-28" aria-hidden="true" tabindex="-1"></a><span class="dv">22</span>   Ullensaker female       no        <span class="dv">0</span>       <span class="dv">0</span>          <span class="dv">0</span></span>
+<span id="cb11-29"><a href="#cb11-29" aria-hidden="true" tabindex="-1"></a><span class="dv">23</span>    Steinkjer female       no        <span class="dv">0</span>       <span class="dv">0</span>          <span class="dv">0</span></span>
+<span id="cb11-30"><a href="#cb11-30" aria-hidden="true" tabindex="-1"></a><span class="dv">24</span>       Oppdal female       no        <span class="dv">4</span>       <span class="dv">4</span>          <span class="dv">0</span></span>
+<span id="cb11-31"><a href="#cb11-31" aria-hidden="true" tabindex="-1"></a><span class="dv">25</span>      Drammen   male       no        <span class="dv">2</span>       <span class="dv">2</span>          <span class="dv">0</span></span>
+<span id="cb11-32"><a href="#cb11-32" aria-hidden="true" tabindex="-1"></a><span class="dv">26</span>   Ullensaker   male       no        <span class="dv">3</span>       <span class="dv">3</span>          <span class="dv">0</span></span>
+<span id="cb11-33"><a href="#cb11-33" aria-hidden="true" tabindex="-1"></a><span class="dv">27</span>    Steinkjer   male       no        <span class="dv">4</span>       <span class="dv">4</span>          <span class="dv">0</span></span>
+<span id="cb11-34"><a href="#cb11-34" aria-hidden="true" tabindex="-1"></a><span class="dv">28</span>       Oppdal   male       no        <span class="dv">3</span>       <span class="dv">3</span>          <span class="dv">0</span></span>
+<span id="cb11-35"><a href="#cb11-35" aria-hidden="true" tabindex="-1"></a><span class="dv">29</span>      Drammen female      yes        <span class="dv">0</span>       <span class="dv">0</span>          <span class="dv">0</span></span>
+<span id="cb11-36"><a href="#cb11-36" aria-hidden="true" tabindex="-1"></a><span class="dv">30</span>   Ullensaker female      yes        <span class="dv">0</span>       <span class="dv">0</span>          <span class="dv">0</span></span>
+<span id="cb11-37"><a href="#cb11-37" aria-hidden="true" tabindex="-1"></a><span class="dv">31</span>    Steinkjer female      yes        <span class="dv">0</span>       <span class="dv">0</span>          <span class="dv">0</span></span>
+<span id="cb11-38"><a href="#cb11-38" aria-hidden="true" tabindex="-1"></a><span class="dv">32</span>       Oppdal female      yes        <span class="dv">0</span>       <span class="dv">0</span>          <span class="dv">0</span></span>
+<span id="cb11-39"><a href="#cb11-39" aria-hidden="true" tabindex="-1"></a><span class="dv">33</span>      Drammen female      yes        <span class="dv">0</span>       <span class="dv">0</span>          <span class="dv">0</span></span>
+<span id="cb11-40"><a href="#cb11-40" aria-hidden="true" tabindex="-1"></a><span class="dv">34</span>   Ullensaker female      yes        <span class="dv">0</span>       <span class="dv">0</span>          <span class="dv">0</span></span>
+<span id="cb11-41"><a href="#cb11-41" aria-hidden="true" tabindex="-1"></a><span class="dv">35</span>    Steinkjer female      yes        <span class="dv">0</span>       <span class="dv">0</span>          <span class="dv">0</span></span>
+<span id="cb11-42"><a href="#cb11-42" aria-hidden="true" tabindex="-1"></a><span class="dv">36</span>       Oppdal female      yes        <span class="dv">0</span>       <span class="dv">0</span>          <span class="dv">0</span></span>
+<span id="cb11-43"><a href="#cb11-43" aria-hidden="true" tabindex="-1"></a><span class="dv">37</span>      Drammen   male      yes        <span class="dv">0</span>       <span class="dv">0</span>          <span class="dv">0</span></span>
+<span id="cb11-44"><a href="#cb11-44" aria-hidden="true" tabindex="-1"></a><span class="dv">38</span>   Ullensaker   male      yes        <span class="dv">0</span>       <span class="dv">0</span>          <span class="dv">0</span></span>
+<span id="cb11-45"><a href="#cb11-45" aria-hidden="true" tabindex="-1"></a><span class="dv">39</span>    Steinkjer   male      yes        <span class="dv">0</span>       <span class="dv">0</span>          <span class="dv">0</span></span>
+<span id="cb11-46"><a href="#cb11-46" aria-hidden="true" tabindex="-1"></a><span class="dv">40</span>       Oppdal   male      yes        <span class="dv">0</span>       <span class="dv">0</span>          <span class="dv">0</span></span>
+<span id="cb11-47"><a href="#cb11-47" aria-hidden="true" tabindex="-1"></a><span class="dv">41</span>      Drammen   male      yes        <span class="dv">0</span>       <span class="dv">0</span>          <span class="dv">0</span></span>
+<span id="cb11-48"><a href="#cb11-48" aria-hidden="true" tabindex="-1"></a><span class="dv">42</span>   Ullensaker   male      yes        <span class="dv">0</span>       <span class="dv">0</span>          <span class="dv">0</span></span>
+<span id="cb11-49"><a href="#cb11-49" aria-hidden="true" tabindex="-1"></a><span class="dv">43</span>    Steinkjer   male      yes        <span class="dv">0</span>       <span class="dv">0</span>          <span class="dv">0</span></span>
+<span id="cb11-50"><a href="#cb11-50" aria-hidden="true" tabindex="-1"></a><span class="dv">44</span>       Oppdal   male      yes        <span class="dv">0</span>       <span class="dv">0</span>          <span class="dv">0</span></span>
+<span id="cb11-51"><a href="#cb11-51" aria-hidden="true" tabindex="-1"></a><span class="dv">45</span>      Drammen   male      yes        <span class="dv">0</span>       <span class="dv">0</span>          <span class="dv">0</span></span>
+<span id="cb11-52"><a href="#cb11-52" aria-hidden="true" tabindex="-1"></a><span class="dv">46</span>   Ullensaker   male      yes        <span class="dv">0</span>       <span class="dv">0</span>          <span class="dv">0</span></span>
+<span id="cb11-53"><a href="#cb11-53" aria-hidden="true" tabindex="-1"></a><span class="dv">47</span>    Steinkjer   male      yes        <span class="dv">0</span>       <span class="dv">0</span>          <span class="dv">0</span></span>
+<span id="cb11-54"><a href="#cb11-54" aria-hidden="true" tabindex="-1"></a><span class="dv">48</span>       Oppdal   male      yes        <span class="dv">0</span>       <span class="dv">0</span>          <span class="dv">0</span></span></code></pre></div>
+</div>
+</div>
+</div>
+<div id="exercise-4-with-preaggregate-true" class="section level3">
+<h3><em>Exercise 4</em> with <code>preAggregate = TRUE</code></h3>
+<div id="exercise-2-with-preaggregate-true" class="section level5">
+<h5><em>Exercise 2</em> with <code>preAggregate = TRUE</code></h5>
+<div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="fu">PLSroundingInner</span>(pregnant, </span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>                   <span class="at">roundBase =</span> <span class="dv">5</span>, </span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>                   <span class="at">formula =</span> <span class="sc">~</span>municipality<span class="sc">*</span>gender<span class="sc">*</span>pregnant,</span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a>                   <span class="at">freqVar =</span> <span class="st">&quot;freq&quot;</span>,</span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a>                   <span class="at">preAggregate =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a>   municipality gender pregnant original rounded difference</span>
+<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a><span class="dv">1</span>       Drammen female       no       <span class="dv">12</span>      <span class="dv">12</span>          <span class="dv">0</span></span>
+<span id="cb12-8"><a href="#cb12-8" aria-hidden="true" tabindex="-1"></a><span class="dv">2</span>        Oppdal female       no       <span class="dv">16</span>      <span class="dv">16</span>          <span class="dv">0</span></span>
+<span id="cb12-9"><a href="#cb12-9" aria-hidden="true" tabindex="-1"></a><span class="dv">3</span>     Steinkjer female       no       <span class="dv">14</span>      <span class="dv">14</span>          <span class="dv">0</span></span>
+<span id="cb12-10"><a href="#cb12-10" aria-hidden="true" tabindex="-1"></a><span class="dv">4</span>    Ullensaker female       no        <span class="dv">0</span>       <span class="dv">0</span>          <span class="dv">0</span></span>
+<span id="cb12-11"><a href="#cb12-11" aria-hidden="true" tabindex="-1"></a><span class="dv">5</span>       Drammen   male       no        <span class="dv">8</span>       <span class="dv">8</span>          <span class="dv">0</span></span>
+<span id="cb12-12"><a href="#cb12-12" aria-hidden="true" tabindex="-1"></a><span class="dv">6</span>        Oppdal   male       no       <span class="dv">18</span>      <span class="dv">18</span>          <span class="dv">0</span></span>
+<span id="cb12-13"><a href="#cb12-13" aria-hidden="true" tabindex="-1"></a><span class="dv">7</span>     Steinkjer   male       no       <span class="dv">18</span>      <span class="dv">18</span>          <span class="dv">0</span></span>
+<span id="cb12-14"><a href="#cb12-14" aria-hidden="true" tabindex="-1"></a><span class="dv">8</span>    Ullensaker   male       no        <span class="dv">5</span>       <span class="dv">5</span>          <span class="dv">0</span></span>
+<span id="cb12-15"><a href="#cb12-15" aria-hidden="true" tabindex="-1"></a><span class="dv">9</span>       Drammen female      yes        <span class="dv">0</span>       <span class="dv">0</span>          <span class="dv">0</span></span>
+<span id="cb12-16"><a href="#cb12-16" aria-hidden="true" tabindex="-1"></a><span class="dv">10</span>       Oppdal female      yes        <span class="dv">4</span>       <span class="dv">5</span>          <span class="dv">1</span></span>
+<span id="cb12-17"><a href="#cb12-17" aria-hidden="true" tabindex="-1"></a><span class="dv">11</span>    Steinkjer female      yes        <span class="dv">5</span>       <span class="dv">5</span>          <span class="dv">0</span></span>
+<span id="cb12-18"><a href="#cb12-18" aria-hidden="true" tabindex="-1"></a><span class="dv">12</span>   Ullensaker female      yes        <span class="dv">3</span>       <span class="dv">0</span>         <span class="sc">-</span><span class="dv">3</span></span></code></pre></div>
+</div>
+<div id="exercise-3-with-preaggregate-true" class="section level5">
+<h5><em>Exercise 3</em> with <code>preAggregate = TRUE</code></h5>
+<div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="fu">PLSroundingInner</span>(pregnant2, </span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>                   <span class="at">roundBase =</span> <span class="dv">5</span>, </span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>                   <span class="at">formula =</span> <span class="sc">~</span>municipality<span class="sc">*</span>gender<span class="sc">*</span>pregnant,</span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>                   <span class="at">freqVar =</span> <span class="st">&quot;freq&quot;</span>,</span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a>                   <span class="at">preAggregate =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a>   municipality gender pregnant original rounded difference</span>
+<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a><span class="dv">1</span>       Drammen female       no       <span class="dv">12</span>      <span class="dv">12</span>          <span class="dv">0</span></span>
+<span id="cb13-8"><a href="#cb13-8" aria-hidden="true" tabindex="-1"></a><span class="dv">2</span>        Oppdal female       no       <span class="dv">16</span>      <span class="dv">16</span>          <span class="dv">0</span></span>
+<span id="cb13-9"><a href="#cb13-9" aria-hidden="true" tabindex="-1"></a><span class="dv">3</span>     Steinkjer female       no       <span class="dv">14</span>      <span class="dv">14</span>          <span class="dv">0</span></span>
+<span id="cb13-10"><a href="#cb13-10" aria-hidden="true" tabindex="-1"></a><span class="dv">4</span>    Ullensaker female       no        <span class="dv">0</span>       <span class="dv">0</span>          <span class="dv">0</span></span>
+<span id="cb13-11"><a href="#cb13-11" aria-hidden="true" tabindex="-1"></a><span class="dv">5</span>       Drammen   male       no        <span class="dv">8</span>       <span class="dv">8</span>          <span class="dv">0</span></span>
+<span id="cb13-12"><a href="#cb13-12" aria-hidden="true" tabindex="-1"></a><span class="dv">6</span>        Oppdal   male       no       <span class="dv">18</span>      <span class="dv">18</span>          <span class="dv">0</span></span>
+<span id="cb13-13"><a href="#cb13-13" aria-hidden="true" tabindex="-1"></a><span class="dv">7</span>     Steinkjer   male       no       <span class="dv">18</span>      <span class="dv">18</span>          <span class="dv">0</span></span>
+<span id="cb13-14"><a href="#cb13-14" aria-hidden="true" tabindex="-1"></a><span class="dv">8</span>    Ullensaker   male       no        <span class="dv">5</span>       <span class="dv">5</span>          <span class="dv">0</span></span>
+<span id="cb13-15"><a href="#cb13-15" aria-hidden="true" tabindex="-1"></a><span class="dv">9</span>       Drammen female      yes        <span class="dv">0</span>       <span class="dv">0</span>          <span class="dv">0</span></span>
+<span id="cb13-16"><a href="#cb13-16" aria-hidden="true" tabindex="-1"></a><span class="dv">10</span>       Oppdal female      yes        <span class="dv">4</span>       <span class="dv">5</span>          <span class="dv">1</span></span>
+<span id="cb13-17"><a href="#cb13-17" aria-hidden="true" tabindex="-1"></a><span class="dv">11</span>    Steinkjer female      yes        <span class="dv">5</span>       <span class="dv">5</span>          <span class="dv">0</span></span>
+<span id="cb13-18"><a href="#cb13-18" aria-hidden="true" tabindex="-1"></a><span class="dv">12</span>   Ullensaker female      yes        <span class="dv">3</span>       <span class="dv">0</span>         <span class="sc">-</span><span class="dv">3</span></span>
+<span id="cb13-19"><a href="#cb13-19" aria-hidden="true" tabindex="-1"></a><span class="dv">13</span>      Drammen   male      yes        <span class="dv">0</span>       <span class="dv">0</span>          <span class="dv">0</span></span>
+<span id="cb13-20"><a href="#cb13-20" aria-hidden="true" tabindex="-1"></a><span class="dv">14</span>       Oppdal   male      yes        <span class="dv">0</span>       <span class="dv">0</span>          <span class="dv">0</span></span>
+<span id="cb13-21"><a href="#cb13-21" aria-hidden="true" tabindex="-1"></a><span class="dv">15</span>    Steinkjer   male      yes        <span class="dv">0</span>       <span class="dv">0</span>          <span class="dv">0</span></span>
+<span id="cb13-22"><a href="#cb13-22" aria-hidden="true" tabindex="-1"></a><span class="dv">16</span>   Ullensaker   male      yes        <span class="dv">0</span>       <span class="dv">0</span>          <span class="dv">0</span></span></code></pre></div>
+</div>
+</div>
+<div id="exercise-5" class="section level3">
+<h3>Exercise 5</h3>
+<p>Would you say it is safe or recommended to use
+<code>zeroCandidates = TRUE</code> in any of the analyses above?</p>
+<p>This is a theory exercise. You do not need to run the analyses.</p>
+<div id="solution-6" class="section level4">
+<h4>Solution</h4>
+<div id="exercise-1-pregnant_micro" class="section level5">
+<h5><em>Exercise 1</em>, <code>pregnant_micro</code>:</h5>
+<p>No zeros in inner cells.<br />
+<code>zeroCandidates = TRUE</code> will have no effect.</p>
+</div>
+<div id="exercise-2-pregnant" class="section level5">
+<h5><em>Exercise 2</em>, <code>pregnant</code>:</h5>
+<p>Non-structural zeros in inner cells.</p>
+<p>With <code>zeroCandidates = TRUE</code>, corresponding zeros in
+output may be “rounded up”.</p>
+<p>This approach is recommended for improved confidentiality
+protection</p>
+</div>
+<div id="exercise-3-pregnant2" class="section level5">
+<h5><em>Exercise 3</em>, <code>pregnant2</code>:</h5>
+<p>Now also, structural zeros in inner cells.</p>
+<p>With <code>zeroCandidates = TRUE</code>, corresponding structural
+zeros in output may be “rounded up”.</p>
+<p>This approach is not advised because assigning non-zero values to
+structural zeros may lead to misleading or confusing interpretations of
+the data.</p>
+</div>
+</div>
+</div>
+
+
+
+<!-- code folding -->
+
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>
