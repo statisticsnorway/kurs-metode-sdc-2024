@@ -1,0 +1,308 @@
+---
+title: "Exercises with the SmallCountRounding package"
+author: ""
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{frekvens-kurs-oppgaver}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+options(rmarkdown.html_vignette.check_title = FALSE)
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = NA
+)
+
+```
+
+
+
+
+
+### Exercise 1
+
+Load the dataset `pregnant_micro`. Tip: `load("data/pregnant_micro.RData")`
+
+Run this analysis:
+```
+PLSroundingPublish(pregnant_micro, 
+                   roundBase = 5, 
+                   formula = ~municipality*gender*pregnant)
+```
+
+Also try `removeEmpty = FALSE`
+
+What is the difference?
+
+**Correction:** We have changed from  `roundBase = 5` to `roundBase = 5` 
+                so that the results are more interesting
+
+```{r}
+load("../data/pregnant_micro.RData")
+pregnant_micro
+```
+
+#### Solution
+
+With `removeEmpty = FALSE`, five extra rows of zeros are included. This is as in the suppression functions.
+
+**Note:** With  `roundBase = 3`, the `rounded` values are equal to the `original` values for all rows, as there are neither ones nor twos present.
+
+
+```{r}
+
+library(SmallCountRounding)
+
+PLSroundingPublish(pregnant_micro, 
+                   roundBase = 5, 
+                   formula = ~municipality*gender*pregnant)
+
+PLSroundingPublish(pregnant_micro, 
+                   roundBase = 5, 
+                   formula = ~municipality*gender*pregnant,
+                   removeEmpty = FALSE)
+
+```
+
+
+
+### Exercise 2
+
+Load the dataset `pregnant`. Tip: `load("data/pregnant.RData")`
+
+
+
+Use this dataset and run the same analyses?
+
+How should this be done?
+
+What is the difference in the results?
+
+
+
+```{r}
+load("../data/pregnant.RData")
+pregnant
+```
+
+#### Solution
+
+Now it is important to use `freqVar = "freq"`
+
+With `removeEmpty = FALSE`, the results remain unchanged.
+With default (`removeEmpty = TRUE`), three extra rows of zeros are included. 
+This corresponds to the non-structural zeros in the input data. 
+
+*Note:* Even better to include `preAggregate = TRUE`. See Exercise 4. 
+
+
+```{r}
+PLSroundingPublish(pregnant, 
+                   roundBase = 5, 
+                   formula = ~municipality*gender*pregnant,
+                   freqVar = "freq")
+
+PLSroundingPublish(pregnant, 
+                   roundBase = 5, 
+                   formula = ~municipality*gender*pregnant,
+                   freqVar = "freq",
+                   removeEmpty = FALSE)
+
+```
+
+
+
+
+### Exercise 3
+
+Create a new dataset with this code:
+
+```
+pregnant2 <- SSBtools::Extend0(pregnant[-3])
+```
+
+Repeat exercise 2 with this data set.
+
+
+```{r}
+load("../data/pregnant.RData")
+
+pregnant2 <- SSBtools::Extend0(pregnant[-3])
+
+pregnant2
+```
+
+#### Solution
+
+Again it is important to use `freqVar = "freq"`
+
+With default (`removeEmpty = TRUE`), now same answer as `removeEmpty = FALSE`.
+
+Since all zeros, structural and non-structural, are included in input.  
+
+*Note:* Even better to include `preAggregate = TRUE`. See Exercise 4. 
+
+
+```{r}
+
+PLSroundingPublish(pregnant2, 
+                   roundBase = 5, 
+                   formula = ~municipality*gender*pregnant,
+                   freqVar = "freq")
+
+PLSroundingPublish(pregnant2, 
+                   roundBase = 5, 
+                   formula = ~municipality*gender*pregnant,
+                   freqVar = "freq",
+                   removeEmpty = FALSE)
+
+```
+
+
+### Exercise 4
+
+Look at the inner data sets obtained by 
+`PLSroundingInner` instead of `PLSroundingPublish` in Exercises 1-3.
+
+What are the differences?
+
+
+#### Solution that applies to all exercises
+
+`removeEmpty = FALSE` has no effect on inner cells. 
+
+
+##### *Exercise 1*
+
+
+#### Solution
+
+Inner cells are aggregated input data with `original`, `rounded` and `difference`.
+
+
+```{r}
+
+PLSroundingInner(pregnant_micro, 
+                   roundBase = 5, 
+                   formula = ~municipality*gender*pregnant)
+
+PLSroundingInner(pregnant_micro, 
+                   roundBase = 5, 
+                   formula = ~municipality*gender*pregnant,
+                   removeEmpty = FALSE)
+
+```
+
+
+##### *Exercise 2*
+
+
+#### Solution
+
+Inner cells are as input, not aggregated,  without `age` and with `original`, `rounded` and `difference`.
+Several combinations are on several rows, since several age categories. 
+
+Since data is not properly aggregated, it is better to include `preAggregate = TRUE`.
+
+
+```{r}
+PLSroundingInner(pregnant, 
+                   roundBase = 5, 
+                   formula = ~municipality*gender*pregnant,
+                   freqVar = "freq")
+
+```
+
+
+
+#### Solution
+
+As the *Exercise 2* solution above.
+
+
+##### *Exercise 3*
+
+
+
+```{r}
+
+PLSroundingInner(pregnant2, 
+                   roundBase = 5, 
+                   formula = ~municipality*gender*pregnant,
+                   freqVar = "freq")
+```
+
+
+
+### *Exercise 4*  with  `preAggregate = TRUE`
+
+
+##### *Exercise 2* with  `preAggregate = TRUE`
+
+
+```{r}
+PLSroundingInner(pregnant, 
+                   roundBase = 5, 
+                   formula = ~municipality*gender*pregnant,
+                   freqVar = "freq",
+                   preAggregate = TRUE)
+
+```
+
+
+
+##### *Exercise 3* with  `preAggregate = TRUE`
+
+
+
+```{r}
+PLSroundingInner(pregnant2, 
+                   roundBase = 5, 
+                   formula = ~municipality*gender*pregnant,
+                   freqVar = "freq",
+                   preAggregate = TRUE)
+
+```
+
+
+
+
+### Exercise 5
+
+Would you say it is safe or recommended to use `zeroCandidates = TRUE` in any of the analyses above?
+
+This is a theory exercise. You do not need to run the analyses.
+
+
+
+#### Solution
+
+
+##### *Exercise 1*, `pregnant_micro`:
+
+No zeros in inner cells.  
+`zeroCandidates = TRUE` will have no effect.
+
+
+##### *Exercise 2*, `pregnant`:
+
+Non-structural zeros in inner cells.  
+
+With `zeroCandidates = TRUE`, corresponding zeros in output may be “rounded up”.
+
+This approach is recommended for improved confidentiality protection
+
+
+##### *Exercise 3*, `pregnant2`:
+
+
+Now also, structural zeros in inner cells.  
+
+With `zeroCandidates = TRUE`, corresponding structural zeros in output may be “rounded up”.
+
+This approach is not advised because assigning non-zero values to structural zeros may lead to misleading or confusing interpretations of the data.
+
+
+
