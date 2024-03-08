@@ -9,6 +9,7 @@ The files can be viewed directly from GitHub with these links:
   * [hierarchies.html](https://htmlpreview.github.io/?https://github.com/statisticsnorway/kurs-metode-sdc-2024/blob/main/solutions/hierarchies.html)
   * [singleton.html](https://htmlpreview.github.io/?https://github.com/statisticsnorway/kurs-metode-sdc-2024/blob/main/solutions/singleton.html)
   * [structural_zeros.html](https://htmlpreview.github.io/?https://github.com/statisticsnorway/kurs-metode-sdc-2024/blob/main/solutions/structural_zeros.html)
+  * [small_count_rounding.html](https://htmlpreview.github.io/?https://github.com/statisticsnorway/kurs-metode-sdc-2024/blob/main/solutions/small_count_rounding.html)
 
 There are R Markdown files (Rmd) that are the foundation for the HTML files. The suggested solutions can also be read directly from these files.
 
