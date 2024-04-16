@@ -323,7 +323,7 @@ SuppressDominantCells(data = overnights1,
 # erstatt  ... med mer kode
 SuppressDominantCells(data = overnights1, ...)
 
-
+"The function will sum up both variables, but apply suppression only to the first of them."
 
 
 #####################################
